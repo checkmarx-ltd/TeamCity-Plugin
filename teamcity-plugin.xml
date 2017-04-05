@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+  <info>
+    <name>cxplugin</name>
+    <display-name>cxplugin</display-name>
+    <version>@Version@</version>
+    <description>Checkmarx Scan</description>
+    <download-url>https://www.checkmarx.com/plugins/</download-url>
+    <email>support@checkmarx.com</email>
+    <vendor>
+      <name>@VendorName@</name>
+      <url>@VendorURL@</url>
+      <logo>https://www.checkmarx.com/wp-content/themes/checkmarx/images/assets/cx-logo-alpha.svg</logo>
+    </vendor>
+  </info>
+  <deployment use-separate-classloader="true" />
+</teamcity-plugin>

@@ -1,0 +1,39 @@
+TeamCity plugin for CxSAST scanning
+===================================
+
+
+BUILD
+-----
+Issue 'mvn package' command from the root project to build your plugin. Resulting package cxplugin.zip will be placed in 'target' directory.
+
+
+INSTALL
+-------
+To install the plugin, go to "Administration" -> "Plugins List" -> "Upload plugin zip". Choose the cxplugin.zip file. Restart TeamCity server and all build agents.
+
+
+CONFIGURE
+---------
+1. Go to "Administration" -> "Integrations" -> "Checkmarx" to edit the default server configuration.
+2. Server certificates are validated, so if HTTPS is used for the Checkmarx server communication then make sure the certificate CA is included in the local Teamcity JRE cacerts keystore.
+3. To add a Checkmarx Build Step to a Build Configuration, go to the "Build Configuration Settings" page and then "Build Steps". Choose "Add build step" and then "Checkmarx".
+
+
+REQUIREMENTS NOT COMPLETED
+--------------------------
+- Plugin functionality and UI: Set job scan timeout threshold.
+- Security: Disable TLS/SSL Server Certificate Validation.
+
+
+KNOWN BUGS AND OTHER LIMITATIONS
+--------------------------------
+- Currently, after changing the default Checkmarx server settings, all Build Steps using the default Checkmarx server settings have to be opened and resaved so that Preset, Configuration and Team options are reflected. A warning message should probably be displayed when saving the default Checkmarx server settings so that this is made more clear.
+- Currently, after changing the Build Step level Checkmarx server settings, the Build Step has to be saved before Preset, Configuration and Team options are reflected. Would be best fixed by adding a "Test Connection"-button (see NICE-TO-HAVE FEATURES below).
+
+
+NICE-TO-HAVE FEATURES LEFT TO DEVELOP
+-------------------------------------
+- UI: Add "Test Connection"-buttons at both global and Build Step level. Update Build Step Preset/Configuration/Team select boxes.
+- UI: Fetch project names from server in the Build Step.
+- UI: Help texts and/or tooltips.
+- UI: Add a Trends tab to the results overview.
