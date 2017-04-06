@@ -24,12 +24,23 @@
     <c:set var="hideThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
 
+<script>
+
+    function refresh()
+    {
+        window.location.reload();
+
+    }
+
+</script>
+
 <l:settingsGroup title="Checkmarx Server">
     <tr>
         <th><label for="${optionsBean.defaultServer}">Use default Checkmarx server credentials:</label></th>
         <td>
             <c:set var="onclick">
                 $('serverOverrideSection').toggle();
+                refresh()
             </c:set>
             <props:checkboxProperty name="${optionsBean.defaultServer}" onclick="${onclick}"/>
         </td>
@@ -56,13 +67,21 @@
             <span class="error" id="error_${optionsBean.pass}">
         </td>
     </tr>
-
-    <td>
-         <form action="">
-                <input type="submit" value="Test Connection!">
-                <span id="testConnectionMsg"></span>
-            </form>
-        </td>
+      <td>
+         <form>
+             <c:set var="onclick1">
+                ${optionsBean.testConnection()}
+                 refresh()
+             </c:set>
+             <input type="button" name ="TestConnection" value="Test Connection" onclick="refresh()"/>
+        <!--  <button onclick="{optionsBean.testConnection(optionsBean.pass)}">Test Connection!</button>-->
+                   <span id="testConnectionMsg">"${optionsBean.testConnectionMsg}"</span>
+         </form>
+      </td>
+    <!--<td>
+            <input class="button" onclick="{optionsBean.testConnection()}" name="try" value="tryyy"/>
+    </td>-->
+  <!-- BAD, like the enter button, it immediatly save and leaves page-->
 
     </tbody>
 </l:settingsGroup>

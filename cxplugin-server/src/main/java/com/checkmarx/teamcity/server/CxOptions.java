@@ -155,7 +155,7 @@ public class CxOptions {
     }
 
     @NotNull
-    public void testConnection() {
+    public String testConnection() {
         testConnectionMsg = "";
         try {
             this.cxWebService = new CxWebService(this.serverUrlValue);
@@ -166,6 +166,7 @@ public class CxOptions {
             System.out.println("Unable to initialize web service: '" + e.getMessage() + "'");
             testConnectionMsg = e.getMessage();
         }
+        return testConnectionMsg;
     }
 
     @NotNull
