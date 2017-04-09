@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>@Version@</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
@@ -18,17 +18,17 @@
       <dependency>
            <groupId>com.checkmarx.teamcity</groupId>
            <artifactId>cxplugin-agent</artifactId>
-           <version>@Version@</version>
+           <version>${project.version}</version>
       </dependency>
       <dependency>
            <groupId>com.checkmarx.teamcity</groupId>
            <artifactId>cxplugin-common</artifactId>
-           <version>@Version@</version>
+           <version>${project.version}</version>
       </dependency>
       <dependency>
            <groupId>com.checkmarx.teamcity</groupId>
            <artifactId>cxplugin-server</artifactId>
-           <version>@Version@</version>
+           <version>${project.version}</version>
       </dependency>
   </dependencies>
   <build>
@@ -37,7 +37,7 @@
             <groupId>com.google.code.maven-replacer-plugin</groupId>
             <artifactId>replacer</artifactId>
             <version>1.5.2</version>
-            <executions>                
+            <executions>
                 <execution>
                     <phase>process-sources</phase>
                     <goals>
@@ -61,7 +61,7 @@
                         <token>@VendorURL@</token>
                         <value>${teamcity.cxplugin.plugin.vendorUrl}</value>
                     </replacement>
-                </replacements>                        
+                </replacements>
             </configuration>
         </plugin>
         <plugin>
