@@ -32,8 +32,7 @@ public class CxBuildProcess extends CallableBuildProcess {
     @Nullable
     private long projectId = 0;
 
-    //todo: take out configuration manager ("effective configuration") with webservice helper and runner parameter helper
-    //logger wrapper
+    //todo: take out configuration manager that will create a final dto with all configurations
 
 
     public CxBuildProcess(@NotNull final AgentRunningBuild runningBuild,
@@ -81,7 +80,6 @@ public class CxBuildProcess extends CallableBuildProcess {
         try {
             setProjectId();
             this.cxWSResponseRunID = submitScan();
-            setProjectId();
 
             final long scanId = this.cxWebService.trackScanProgress(this.cxWSResponseRunID, cxUser, cxPass, false, 0,
                     this.logger);
@@ -147,59 +145,27 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private void setProjectId() throws CxAbortException {
         if (this.projectId == 0) {
-            CxProjectContract projectContract = new CxProjectContract(this.cxWebService);
+            CxProjectResolver projectContract = new CxProjectResolver(this.cxWebService, this.logger);
             final String cxProject = this.runnerParameters.get(CxConstants.CXPROJECT);
             final String cxTeam = this.runnerParameters.get(CxConstants.CXTEAM);
-            if (!projectContract.newProject(cxProject, cxTeam)) {
-                this.projectId = getProjectId();
-            }
+            this.projectId = projectContract.resolveProjectId(cxProject, cxTeam);
         }
     }
 
-    private long getProjectId() throws CxAbortException {
-        final CliScanArgs cliScanArgs = createCliScanArgs(new byte[]{});
-        return this.cxWebService.getProjectId(cliScanArgs.getPrjSettings(), this.logger);
-    }
-
-    private boolean isThresholdCrossed(final CxScanResult cxScanResult) {
-        final String cxThresholdHigh = this.runnerParameters.get(CxConstants.CXTHRESHOLDHIGH);
-        final String cxThresholdMedium = this.runnerParameters.get(CxConstants.CXTHRESHOLDMEDIUM);
-        final String cxThresholdLow = this.runnerParameters.get(CxConstants.CXTHRESHOLDLOW);
-
-        final int cxThresholdHighInt = cxThresholdHigh != null ? Integer.parseInt(cxThresholdHigh) : 0;
-        final int cxThresholdMediumInt = cxThresholdMedium != null ? Integer.parseInt(cxThresholdMedium) : 0;
-        final int cxThresholdLowInt = cxThresholdLow != null ? Integer.parseInt(cxThresholdLow) : 0;
-
-        logFoundVulnerabilities("high", cxScanResult.getHighCount(), cxThresholdHighInt);
-        logFoundVulnerabilities("medium", cxScanResult.getMediumCount(), cxThresholdMediumInt);
-        logFoundVulnerabilities("low", cxScanResult.getLowCount(), cxThresholdLowInt);
-
-        return cxScanResult.getHighCount() > cxThresholdHighInt
-                || cxScanResult.getMediumCount() > cxThresholdMediumInt
-                || cxScanResult.getLowCount() > cxThresholdLowInt;
-    }
-
-    private void logFoundVulnerabilities(final String severity, final int actualNumber,
-                                         final int configuredHighThreshold) {
-        this.logger.message("Number of " + severity + " severity vulnerabilities: " + actualNumber +
-                " stability threshold: " + configuredHighThreshold);
-    }
 
     private CxWSResponseRunID submitScan() throws IOException {
         try {
             final CliScanArgs cliScanArgs = createCliScanArgs(new byte[]{});
-            final boolean incremental = checkIncrementalScan();
+            final boolean incremental = checkIncrementalScanAndWriteResultToLog();
             final String zipPath = zipWorkspaceFolder();
-            final String cxTeam = this.runnerParameters.get(CxConstants.CXTEAM);
-            CxProjectContract projectContract = new CxProjectContract(this.cxWebService);
 
             CxWSResponseRunID cxWSResponseRunId;
-            final boolean isNewProject = projectContract.newProject(cliScanArgs.getPrjSettings().getProjectName(),
-                    cxTeam);
-            if (isNewProject){
+
+            if (projectId == 0){
                 cxWSResponseRunId = this.cxWebService.createAndRunProject(cliScanArgs.getPrjSettings(),
                         cliScanArgs.getSrcCodeSettings().getPackagedCode(), true, true, zipPath,
                         cliScanArgs.getComment(), this.logger);
+                this.projectId = cxWSResponseRunId.getProjectID();
             } else {
                 if (incremental) {
                     cxWSResponseRunId = this.cxWebService.runIncrementalScan(cliScanArgs.getPrjSettings(),
@@ -213,23 +179,21 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
 
             final File tempFile = new File(zipPath);
-            tempFile.delete();
-            this.logger.message("Temporary zip file deleted");
-
+            if(tempFile.delete()) {
+                this.logger.message("Temporary zip file deleted");
+            }else {
+                this.logger.warning("Temporary zip file was not deleted");
+            }
             this.logger.message("Scan job submitted successfully");
+
             return cxWSResponseRunId;
         } catch (InterruptedException e) {
             throw new CxAbortException("Remote operation failed on slave node: " + e.getMessage());
         }
     }
-    private boolean checkIncrementalScan() {
-        final boolean incremental = isThisBuildIncremental();
-        if (incremental){
-            this.logger.message("Scan job started in incremental scan mode");
-        } else {
-            this.logger.message("Scan job started in full scan mode");
-        }
-        return incremental;
+
+    private CliScanArgs createCliScanArgs(final byte[] compressedSources) {
+        return CxCliScanArgsFactory.create(this.logger, this.runnerParameters, this.projectId, compressedSources);
     }
 
     private String zipWorkspaceFolder() throws IOException, InterruptedException {
@@ -240,9 +204,16 @@ public class CxBuildProcess extends CallableBuildProcess {
         return cxZip.ZipWorkspaceFolder(this.runningBuild, combinedFilterPattern, this.logger);
     }
 
-    private CliScanArgs createCliScanArgs(final byte[] compressedSources) {
-        return CxCliScanArgsFactory.create(this.logger, this.runnerParameters, this.projectId, compressedSources);
+    private boolean checkIncrementalScanAndWriteResultToLog() {
+        final boolean incremental = isThisBuildIncremental();
+        if (incremental){
+            this.logger.message("Scan job started in incremental scan mode");
+        } else {
+            this.logger.message("Scan job started in full scan mode");
+        }
+        return incremental;
     }
+
 
     private boolean isThisBuildIncremental() {
         final String cxIncremental = this.runnerParameters.get(CxConstants.CXINCREMENTAL);
@@ -274,4 +245,28 @@ public class CxBuildProcess extends CallableBuildProcess {
         final boolean shouldBeFullScan = buildNumberInt % (fullScanCycle + 1) == 1;
         return !shouldBeFullScan;
     }
+
+    private boolean isThresholdCrossed(final CxScanResult cxScanResult) {
+        final String cxThresholdHigh = this.runnerParameters.get(CxConstants.CXTHRESHOLDHIGH);
+        final String cxThresholdMedium = this.runnerParameters.get(CxConstants.CXTHRESHOLDMEDIUM);
+        final String cxThresholdLow = this.runnerParameters.get(CxConstants.CXTHRESHOLDLOW);
+
+        final int cxThresholdHighInt = cxThresholdHigh != null ? Integer.parseInt(cxThresholdHigh) : 0;
+        final int cxThresholdMediumInt = cxThresholdMedium != null ? Integer.parseInt(cxThresholdMedium) : 0;
+        final int cxThresholdLowInt = cxThresholdLow != null ? Integer.parseInt(cxThresholdLow) : 0;
+
+        logFoundVulnerabilities("high", cxScanResult.getHighCount(), cxThresholdHighInt);
+        logFoundVulnerabilities("medium", cxScanResult.getMediumCount(), cxThresholdMediumInt);
+        logFoundVulnerabilities("low", cxScanResult.getLowCount(), cxThresholdLowInt);
+
+        return cxScanResult.getHighCount() > cxThresholdHighInt
+                || cxScanResult.getMediumCount() > cxThresholdMediumInt
+                || cxScanResult.getLowCount() > cxThresholdLowInt;
+    }
+
+    private void logFoundVulnerabilities(final String severity, final int actualNumber, final int configuredHighThreshold) {
+        this.logger.message("Number of " + severity + " severity vulnerabilities: " + actualNumber +
+                " stability threshold: " + configuredHighThreshold);
+    }
+
 }
