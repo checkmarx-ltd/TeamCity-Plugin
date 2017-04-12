@@ -34,7 +34,6 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     //todo: take out configuration manager that will create a final dto with all configurations
 
-
     public CxBuildProcess(@NotNull final AgentRunningBuild runningBuild,
                           @NotNull final BuildRunnerContext context,
                           @NotNull final ArtifactsWatcher artifactsWatcher) throws RunBuildException {
@@ -145,10 +144,10 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private void setProjectId() throws CxAbortException {
         if (this.projectId == 0) {
-            CxProjectResolver projectContract = new CxProjectResolver(this.cxWebService, this.logger);
+            CxProjectResolver projectResolver = new CxProjectResolver(this.cxWebService, this.logger);
             final String cxProject = this.runnerParameters.get(CxConstants.CXPROJECT);
             final String cxTeam = this.runnerParameters.get(CxConstants.CXTEAM);
-            this.projectId = projectContract.resolveProjectId(cxProject, cxTeam);
+            this.projectId = projectResolver.resolveProjectId(cxProject, cxTeam);
         }
     }
 
