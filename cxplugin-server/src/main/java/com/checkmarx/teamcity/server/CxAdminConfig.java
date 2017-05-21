@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxParam;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.FileUtil;
@@ -17,7 +18,7 @@ public class CxAdminConfig {
     private final ServerPaths serverPaths;
     private final Properties properties = new Properties();
 
-    public CxAdminConfig(@NotNull final ServerPaths serverPaths) {
+    public CxAdminConfig(@NotNull final ServerPaths serverPaths) throws IOException {
         this.serverPaths = serverPaths;
 
         File configFile = getConfigFile();
@@ -27,33 +28,33 @@ public class CxAdminConfig {
         loadConfiguration(configFile);
     }
 
-    private void initConfigFile(@NotNull final File configFile) {
-        try {
-            this.properties.put(CxConstants.CXSERVERURL, "http://localhost");
-            this.properties.put(CxConstants.CXUSER, "");
-            this.properties.put(CxConstants.CXPASS, "");
-            configFile.getParentFile().mkdirs();
-            PropertiesUtil.storeProperties(this.properties, configFile, "");
-        } catch (IOException e) {
+    private void initConfigFile(@NotNull final File configFile) throws IOException {
+
+        for (String conf : CxParam.GLOBAL_CONFIGS) {
+            this.properties.put(conf, "");
         }
+
+        this.properties.put(CxParam.GLOBAL_SERVER_URL, CxConstants.DEFAULT_SERVER_URL);
+        this.properties.put(CxParam.GLOBAL_FILTER_PATTERNS, CxConstants.DEFAULT_FILTER_PATTERN);
+        this.properties.put(CxParam.GLOBAL_IS_SYNCHRONOUS, CxConstants.TRUE);
+        configFile.getParentFile().mkdirs();
+        PropertiesUtil.storeProperties(this.properties, configFile, "");
+
     }
 
-    private void loadConfiguration(@NotNull final File configFile) {
+    private void loadConfiguration(@NotNull final File configFile) throws IOException {
         FileReader fileReader = null;
         try {
             fileReader = new FileReader(configFile);
             this.properties.load(fileReader);
-            if (this.properties.get(CxConstants.CXSERVERURL) == null){
-                this.properties.put(CxConstants.CXSERVERURL, "");
+
+            for (String conf : CxParam.GLOBAL_CONFIGS) {
+                if (this.properties.get(conf) == null){
+                    this.properties.put(conf, "");
+                }
             }
-            if (this.properties.get(CxConstants.CXUSER) == null){
-                this.properties.put(CxConstants.CXUSER, "");
-            }
-            if (this.properties.get(CxConstants.CXPASS) == null){
-                this.properties.put(CxConstants.CXPASS, "");
-            }
-        } catch (IOException e) {
-        } finally {
+
+        }  finally {
             FileUtil.close(fileReader);
         }
     }
@@ -66,24 +67,11 @@ public class CxAdminConfig {
         PropertiesUtil.storeProperties(this.properties, getConfigFile(), "");
     }
 
-    public String getServerUrl() {
-        return this.properties.get(CxConstants.CXSERVERURL).toString();
-    }
-    public void setServerUrl(final String serverUrl) {
-        this.properties.put(CxConstants.CXSERVERURL, serverUrl);
+    public String getConfiguration(String key) {
+        return this.properties.get(key).toString();
     }
 
-    public String getUser() {
-        return this.properties.get(CxConstants.CXUSER).toString();
-    }
-    public void setUser(final String user) {
-        this.properties.put(CxConstants.CXUSER, user);
-    }
-
-    public String getPass() {
-        return this.properties.get(CxConstants.CXPASS).toString();
-    }
-    public void setPass(final String pass) {
-        this.properties.put(CxConstants.CXPASS, pass);
+    public void setConfiguration(String key, String val) {
+        this.properties.put(key, val);
     }
 }

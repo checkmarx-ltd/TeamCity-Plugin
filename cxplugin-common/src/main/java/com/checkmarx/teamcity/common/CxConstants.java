@@ -1,37 +1,55 @@
 package com.checkmarx.teamcity.common;
 
 
-public class CxConstants {
+public abstract class CxConstants {
+
     public static final String RUNNER_TYPE = "checkmarx";
     public static final String RUNNER_DESCRIPTION = "Checkmarx SAST Scan";
     public static final String RUNNER_DISPLAY_NAME = "Checkmarx";
 
-    public final static String CHECKMARX_REPORT_XML = "ScanReport.xml";
-    public final static String CHECKMARX_REPORT_PDF = "ScanReport.pdf";
-    public final static String CHECKMARX_REPORT_XML_PATH = RUNNER_DISPLAY_NAME + "/" + CHECKMARX_REPORT_XML;
+    public final static String REPORT_HTML_NAME = "report.html";
+    public final static String REPORT_XML_NAME = "ScanReport.xml";
+    public final static String REPORT_PDF_NAME = "ScanReport.pdf";
+    public final static String REPORT_XML_PATH = RUNNER_DISPLAY_NAME + "/" + REPORT_XML_NAME;
 
     public static final String TRUE = "true";
+    public static final String FALSE = "false";
     public static final String SAVE = "save";
 
-    public static final String DEFAULTSERVERLURL = "http://localhost";
+    public static final String DEFAULT_SERVER_URL = "http://localhost";
+    public static final String DEFAULT_FILTER_PATTERN =
+                    "!**/_cvs/**/*, !**/.svn/**/*,   !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*, !**/bin/**/*,\n" +
+                    "!**/obj/**/*,  !**/backup/**/*, !**/.idea/**/*, !**/*.DS_Store, !**/*.ipr,     !**/*.iws,\n" +
+                    "!**/*.bak,     !**/*.tmp,       !**/*.aac,      !**/*.aif,      !**/*.iff,     !**/*.m3u,   !**/*.mid, !**/*.mp3,\n" +
+                    "!**/*.mpa,     !**/*.ra,        !**/*.wav,      !**/*.wma,      !**/*.3g2,     !**/*.3gp,   !**/*.asf, !**/*.asx,\n" +
+                    "!**/*.avi,     !**/*.flv,       !**/*.mov,      !**/*.mp4,      !**/*.mpg,     !**/*.rm,    !**/*.swf, !**/*.vob,\n" +
+                    "!**/*.wmv,     !**/*.bmp,       !**/*.gif,      !**/*.jpg,      !**/*.png,     !**/*.psd,   !**/*.tif, !**/*.swf,\n" +
+                    "!**/*.jar,     !**/*.zip,       !**/*.rar,      !**/*.exe,      !**/*.dll,     !**/*.pdb,   !**/*.7z,  !**/*.gz,\n" +
+                    "!**/*.tar.gz,  !**/*.tar,       !**/*.gz,       !**/*.ahtm,     !**/*.ahtml,   !**/*.fhtml, !**/*.hdm,\n" +
+                    "!**/*.hdml,    !**/*.hsql,      !**/*.ht,       !**/*.hta,      !**/*.htc,     !**/*.htd,   !**/*.war, !**/*.ear,\n" +
+                    "!**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi,   !**/*.stm,\n" +
+                    "!**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml\n";
 
-    public static final String CXGLOBALSERVER = "cxDefaultServer";
-    public static final String CXSERVERURL = "cxServerUrl";
-    public static final String CXUSER = "cxUser";
-    public static final String CXPASS = "cxPass";
-    public static final String CXPROJECT = "cxProject";
-    public static final String CXPRESET = "cxPreset";
-    public static final String CXCONFIGURATION = "cxConfiguration";
-    public static final String CXTEAM = "cxTeam";
-    public static final String CXEXCLUDEFOLDERS = "cxExcludeFolders";
-    public static final String CXFILTERPATTERNS = "cxFilterPatterns";
-    public static final String CXINCREMENTAL = "cxIncremental";
-    public static final String CXPERIODICFULLSCANS = "cxPeriodicFullScans";
-    public static final String CXNUMBERINCREMENTAL = "cxNumberIncremental";
-    public static final String CXCOMMENT = "cxComment";
-    public static final String CXTHRESHOLDENABLE = "cxThresholdEnable";
-    public static final String CXTHRESHOLDHIGH = "cxThresholdHigh";
-    public static final String CXTHRESHOLDMEDIUM = "cxThresholdMedium";
-    public static final String CXTHRESHOLDLOW = "cxThresholdLow";
-    public static final String CXGENERATEPDF = "cxGeneratePdf";
+
+    public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
+    public static final String CHECKMARX_SERVER_NOT_FOUND_MESSAGE = "Checkmarx server was not found in specified address";
+    public static final String INVALID_URL_MESSAGE = "Invalid URL";
+    public final static String NO_PRESET_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see presets list";
+    public final static String NO_TEAM_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see teams list";
+    public final static String GENERAL_ERROR_MESSAGE = "Some error occurred. Check server logs for more information";
+
+    public static final String URL_NOT_EMPTY_MESSAGE = "Server URL must not be empty";
+    public static final String URL_NOT_VALID_MESSAGE = "Server URL is not valid";
+    public static final String USERNAME_NOT_EMPTY_MESSAGE = "Username must not be empty";
+    public static final String PASSWORD_NOT_EMPTY_MESSAGE = "Password must not be empty";
+    public static final String PROJECT_NAME_NOT_EMPTY_MESSAGE = "Project name must not be empty";
+    public static final String PRESET_NOT_EMPTY_MESSAGE = "Preset must not be empty";
+    public static final String TEAM_NOT_EMPTY_MESSAGE = "Team must not be empty";
+    public static final String SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE = "Scan timeout must be a number greater than zero";
+    public static final String THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Threshold must be 0 or greater, or blank";
+    public static final String HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "High threshold must not be positive integer";
+    public static final String MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Medium threshold must not be positive integer";
+    public static final String LOW_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Low threshold must not be positive integer";
+
+
 }

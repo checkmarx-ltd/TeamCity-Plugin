@@ -1,24 +1,17 @@
 package com.checkmarx.teamcity.server;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
-
-import jetbrains.buildServer.controllers.BaseController;
+import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxParam;
 import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.serverSide.auth.Permission;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-
 import org.jetbrains.annotations.NotNull;
 
-import com.checkmarx.teamcity.common.CxConstants;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 
 public class CxAdminPage extends AdminPage {
@@ -34,28 +27,7 @@ public class CxAdminPage extends AdminPage {
         setIncludeUrl(descriptor.getPluginResourcesPath("adminPage.jsp"));
         setTabTitle(CxConstants.RUNNER_DISPLAY_NAME);
         register();
-
-        controllerManager.registerController("/admin/checkmarxSettings.html", new BaseController() {
-            @Override
-            protected ModelAndView doHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
-                    throws Exception {
-            if (request.getParameter("save") != null) {
-                cxAdminConfig.setServerUrl(request.getParameter(CxConstants.CXSERVERURL));
-                cxAdminConfig.setUser(request.getParameter(CxConstants.CXUSER));
-                String cxPass = request.getParameter(CxConstants.CXPASS);
-                try {
-                    cxPass = EncryptUtil.scramble(cxPass);
-                } catch (RuntimeException e) {
-                    cxPass = "";
-                }
-                cxAdminConfig.setPass(cxPass);
-                cxAdminConfig.persistConfiguration();
-            }
-
-            return new ModelAndView(new RedirectView(request.getContextPath() + "/admin/admin.html?item=" +
-                    CxConstants.RUNNER_TYPE + "&save"));
-            }
-        });
+        controllerManager.registerController("/admin/checkmarxSettings.html", new CxAdminPageController(cxAdminConfig));
     }
 
     @Override
@@ -70,21 +42,11 @@ public class CxAdminPage extends AdminPage {
 
     @Override
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
-        super.fillModel(model, request);
 
-        model.put(CxConstants.CXSERVERURL, cxAdminConfig.getServerUrl());
-        model.put(CxConstants.CXUSER, cxAdminConfig.getUser());
-
-        String cxPass = cxAdminConfig.getPass();
-        try {
-            if (cxPass != null) {
-                cxPass = EncryptUtil.unscramble(cxPass);
-            }
-        } catch (IllegalArgumentException e) {
-            cxPass = "";
+        for (String conf : CxParam.GLOBAL_CONFIGS) {
+            model.put(conf, cxAdminConfig.getConfiguration(conf));
         }
-        model.put(CxConstants.CXPASS, cxPass);
 
-        model.put(CxConstants.SAVE, request.getParameter("save") != null);
+        model.put("hexEncodedPublicKey", RSACipher.getHexEncodedPublicKey());
     }
 }

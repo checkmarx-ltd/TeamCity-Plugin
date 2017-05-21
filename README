@@ -37,3 +37,12 @@ NICE-TO-HAVE FEATURES LEFT TO DEVELOP
 - UI: Fetch project names from server in the Build Step.
 - UI: Help texts and/or tooltips.
 - UI: Add a Trends tab to the results overview.
+
+
+
+add tooltips v
+copy strings from bamboo (titles, tooltips etc) v
+add comment v
+fix timeout error: Scan timeout must be a number greater than zero v
+enlarge preset and team v
+disabled inputsto be more gray (add comment and see) ?

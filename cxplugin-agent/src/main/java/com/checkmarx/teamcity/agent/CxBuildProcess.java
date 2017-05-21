@@ -1,271 +1,652 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.CxJenkinsWebService.CliScanArgs;
-import com.checkmarx.CxJenkinsWebService.CxWSCreateReportResponse;
-import com.checkmarx.CxJenkinsWebService.CxWSReportType;
-import com.checkmarx.CxJenkinsWebService.CxWSResponseRunID;
-import com.checkmarx.teamcity.common.*;
+import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.InvalidParameterException;
+import com.checkmarx.teamcity.common.client.*;
+import com.checkmarx.teamcity.common.client.dto.*;
+import com.checkmarx.teamcity.common.client.exception.CxClientException;
+import com.checkmarx.teamcity.common.client.rest.dto.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
-import jetbrains.buildServer.agent.BuildProgressLogger;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import javax.xml.ws.WebServiceException;
-import java.io.File;
-import java.io.IOException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 
+import static com.checkmarx.teamcity.common.CxConstants.*;
+import static com.checkmarx.teamcity.common.CxResultsConst.*;
 
+/**
+ * Created by: Dorg.
+ * Date: 18/04/2017.
+ */
 public class CxBuildProcess extends CallableBuildProcess {
-    private final AgentRunningBuild runningBuild;
+
+    private static final long MAX_ZIP_SIZE_BYTES = 209715200;
+    private static final long MAX_OSA_ZIP_SIZE_BYTES = 2146483647;
+    private static final String TEMP_FILE_NAME_TO_ZIP = "CxZippedSource";
+    private static final String PDF_REPORT_NAME = "CxSASTReport";
+    private static final String OSA_REPORT_NAME = "CxOSAReport";
+    public static final String OSA_LIBRARIES_NAME = "CxOSALibraries";
+    public static final String OSA_VULNERABILITIES_NAME = "CxOSAVulnerabilities";
+    public static final String OSA_SUMMARY_NAME = "CxOSASummary";
+    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
+
+
+    private final BuildRunnerContext buildRunnerContext;
+    private final AgentRunningBuild agentRunningBuild;
     private final ArtifactsWatcher artifactsWatcher;
-    private final BuildProgressLogger logger;
-    private final Map<String, String> runnerParameters;
-    private CxWebService cxWebService;
-    CxWSResponseRunID cxWSResponseRunID;
-    CxWSCreateReportResponse reportResponse;
-    @Nullable
-    private long projectId = 0;
+    private final CxBuildLoggerAdapter logger;
 
-    //todo: take out configuration manager that will create a final dto with all configurations
+    private CxScanConfiguration config;
+    private CxClientService client;
 
-    public CxBuildProcess(@NotNull final AgentRunningBuild runningBuild,
-                          @NotNull final BuildRunnerContext context,
-                          @NotNull final ArtifactsWatcher artifactsWatcher) throws RunBuildException {
-        super(runningBuild);
-        this.runningBuild = runningBuild;
+    private File checkoutDirectory;
+    private File tempDirectory;
+    private File buildDirectory;
+    private String teamFullPath;
+    private String projectStateLink;
+    private URL url;
+    private Exception osaException;
+    private CreateScanResponse createScanResponse;
+    private CreateOSAScanResponse osaScan;
+    private String osaProjectSummaryLink;
+    private String scanResultsUrl;
+    private Exception sastException;
+    private OSAScanStatus osaScanStatus;
+    private OSASummaryResults osaSummaryResults;
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private ScanResults scanResults;
+    private String osaCVEJson;
+    private String osaLibrariesJson;
+    private boolean sastResultsReady = false;
+    private boolean osaResultsReady = false;
+
+
+    public CxBuildProcess(AgentRunningBuild agentRunningBuild, BuildRunnerContext buildRunnerContext, ArtifactsWatcher artifactsWatcher) {
+        this.agentRunningBuild = agentRunningBuild;
+        this.buildRunnerContext = buildRunnerContext;
         this.artifactsWatcher = artifactsWatcher;
-        this.logger = runningBuild.getBuildLogger();
-        this.runnerParameters = context.getRunnerParameters();
+        logger = new CxBuildLoggerAdapter(agentRunningBuild.getBuildLogger());
     }
 
+    @Override
     public BuildFinishedStatus call() throws Exception {
-        final String cxGlobalServer = this.runnerParameters.get(CxConstants.CXGLOBALSERVER);
-        String cxServerUrl, cxUser, cxPass;
-        if (cxGlobalServer != null && cxGlobalServer.equals(CxConstants.TRUE)) {
-            this.logger.message("Using global Cx Server settings");
-            final Map<String, String> sharedConfigParameters = this.runningBuild.getSharedConfigParameters();
-            cxServerUrl = sharedConfigParameters.get(CxConstants.CXSERVERURL);
-            cxUser = sharedConfigParameters.get(CxConstants.CXUSER);
-            cxPass = sharedConfigParameters.get(CxConstants.CXPASS);
-        } else {
-            this.logger.message("Using build step Cx Server settings");
-            cxServerUrl = this.runnerParameters.get(CxConstants.CXSERVERURL);
-            cxUser = this.runnerParameters.get(CxConstants.CXUSER);
-            cxPass = this.runnerParameters.get(CxConstants.CXPASS);
-        }
-        try {
-            if (cxPass != null) {
-                cxPass = EncryptUtil.unscramble(cxPass);
-            }
-        } catch (IllegalArgumentException e) {
-            throw new RunBuildException("Failed to retrieve password");
-        }
-        this.logger.message("Cx server configured as '" + cxServerUrl + "'");
 
         try {
-            this.cxWebService = new CxWebService(cxServerUrl);
-            this.cxWebService.login(cxUser, cxPass);
-        } catch (Exception e) {
-            throw new RunBuildException("Login to Cx server failed: '" + e.getMessage()  + "'");
-        }
-        this.logger.message("Login to Cx server successful");
 
-        try {
-            setProjectId();
-            this.cxWSResponseRunID = submitScan();
+            Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
+            Map<String, String> sharedConfigParameters = agentRunningBuild.getSharedConfigParameters();
+            checkoutDirectory = agentRunningBuild.getCheckoutDirectory();
+            tempDirectory = agentRunningBuild.getAgentTempDirectory();
+            buildDirectory = new File(agentRunningBuild.getBuildTempDirectory() + "/" + agentRunningBuild.getProjectName() + "/" + agentRunningBuild.getBuildTypeName() + "/" + agentRunningBuild.getBuildNumber() + CX_REPORT_LOCATION);
 
-            final long scanId = this.cxWebService.trackScanProgress(this.cxWSResponseRunID, cxUser, cxPass, false, 0,
-                    this.logger);
-            if (scanId == 0) {
-                throw new RunBuildException("trackScanProgress failed");
-            }
+            config = CxScanConfiguration.resolveConfigurations(runnerParameters, sharedConfigParameters);
+            printConfiguration();
+            url = new URL(config.getUrl());
+            client = new CxClientServiceImpl(url, config.getUsername(), config.getPassword());
+            client.setLogger(logger);
+            client.checkServerConnectivity();
+            client.loginToServer();
 
-            this.reportResponse = this.cxWebService.generateScanReport(scanId, CxWSReportType.XML, this.logger);
-            final File xmlReportFile = CxScanArtifacts.getXmlFile(this.runningBuild);
-            this.cxWebService.retrieveScanReport(reportResponse.getID(), xmlReportFile, CxWSReportType.XML,
-                    this.logger);
-            CxScanArtifacts.publishArtifact(this.artifactsWatcher, xmlReportFile);
+            teamFullPath = client.resolveTeamNameFromTeamId(config.getTeamId());
 
-            final String cxGeneratePdf = this.runnerParameters.get(CxConstants.CXGENERATEPDF);
-            if (cxGeneratePdf != null && cxGeneratePdf.equals(CxConstants.TRUE)) {
-                this.reportResponse = this.cxWebService.generateScanReport(scanId, CxWSReportType.PDF, this.logger);
-                final File pdfReportFile = CxScanArtifacts.getPdfFile(this.runningBuild);
-                this.cxWebService.retrieveScanReport(this.reportResponse.getID(), pdfReportFile, CxWSReportType.PDF,
-                        this.logger);
-                CxScanArtifacts.publishArtifact(this.artifactsWatcher, pdfReportFile);
-            }
+            createScanResponse = createScan();
 
-            final CxScanResult cxScanResult = addScanResultAction(xmlReportFile);
-            if (!cxScanResult.isResultValid()) {
-                throw new RunBuildException("Invalid scan result");
-            }
 
-            final String thresholdEnable = this.runnerParameters.get(CxConstants.CXTHRESHOLDENABLE);
-            if (thresholdEnable != null && thresholdEnable.equals(CxConstants.TRUE)) {
-                if (isThresholdCrossed(cxScanResult)) {
-                    this.logger.buildFailureDescription("Vulnerabilities above threshold");
-                    return BuildFinishedStatus.FINISHED_FAILED;
+            if (config.isOsaEnabled()) {
+                try {
+                    osaScan = createOSAScan();
+
+                } catch (InterruptedException e) {
+                    throw e;
+
+                } catch (Exception e) {
+                    logger.error("Failed to create OSA Scan: " + e.getMessage());
+                    osaException = e;
                 }
             }
-        } catch (WebServiceException e) {
-            throw new RunBuildException("WebService error: " + e.getMessage());
-        } catch (IOException e) {
-            throw new RunBuildException("IO error: " + e.getMessage());
+
+            //Asynchronous MODE
+            if (!config.isSynchronous()) {
+
+                if (osaException != null) {
+                    throw osaException;
+                }
+                logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
+                return BuildFinishedStatus.FINISHED_SUCCESS;
+            }
+
+            try {
+
+                retrieveScanResults();
+
+            } catch (InterruptedException e) {
+                throw e;
+
+            } catch (CxClientException e) {
+                logger.error("Failed to perform CxSAST scan: " + e.getMessage());
+                sastException = new CxClientException("Failed to perform CxSAST scan: ", e);
+
+            } catch (Exception e) {
+                logger.error("Failed to perform CxSAST scan: " + e.getMessage());
+                sastException = new Exception("Failed to perform CxSAST scan: ", e);
+            }
+
+            if (config.isOsaEnabled()) {
+                try {
+                    if (osaException != null) {
+                        throw osaException;
+                    }
+                    retrieveOSAScanResults();
+
+                } catch (Exception e) {
+                    osaException = e;
+                    throw osaException;
+                }
+            }
+
+            logger.info("Generating full html report");
+            generateCxHTMLReport();
+
+            if (sastException != null) {
+                throw sastException;
+            }
+
+
         } catch (InterruptedException e) {
-            this.logger.message(e.getMessage());
-            return BuildFinishedStatus.INTERRUPTED;
+            logger.error("Interrupted exception: " + e.getMessage());
+
+            if (client != null && createScanResponse != null) {
+                logger.info("Canceling scan on the Checkmarx server...");
+                client.cancelScan(createScanResponse.getRunId());
+            }
+            throw new RunBuildException(e.getMessage());
+
+        } catch (CxClientException e) {
+            logger.error(e.getMessage(), e);
+
+            if (osaException == null && sastException == null) {
+                sastException = e;
+            }
+
+        } catch (InvalidParameterException e) {
+            logger.error(e.getMessage());
+            throw new RunBuildException(e);
+        } catch (MalformedURLException e) {
+            throw new RunBuildException("Invalid URL: " + config.getUrl());
+        } catch (Exception e) {
+            logger.error("Unexpected exception: " + e.getMessage(), e);
+            throw new RunBuildException(e);
+        } finally {
+            deleteTempFiles();
+            closeClient(client);
+        }
+
+        //assert if expected exception is thrown  OR when vulnerabilities under threshold
+        StringBuilder res = new StringBuilder("");
+        if (assertVulnerabilities(scanResults, osaSummaryResults, res) || sastException != null || osaException != null) {
+            printBuildFailure(res, sastException, osaException);
+            return BuildFinishedStatus.FINISHED_FAILED;
         }
 
         return BuildFinishedStatus.FINISHED_SUCCESS;
     }
 
-    protected void cancelBuild() {
-        if (this.reportResponse != null) {
-            this.cxWebService.cancelScanReport(reportResponse.getID());
-        } else if (this.cxWSResponseRunID != null) {
-            this.cxWebService.cancelScan(cxWSResponseRunID.getRunId());
-        }
-    }
+    private CreateScanResponse createScan() throws IOException, InterruptedException, RunBuildException, CxClientException {
 
-    @NotNull
-    private CxScanResult addScanResultAction(final File xmlReportFile) throws CxAbortException {
-        CxScanResult cxScanResult = new CxScanResult();
-        if (xmlReportFile != null){
-            cxScanResult.readScanXMLReport(xmlReportFile);
-        }
-        return cxScanResult;
-    }
+        //prepare sources to scan (zip them)
+        logger.info("Zipping sources");
+        File zipTempFile = zipWorkspaceFolder(config.getFolderExclusions(), config.getFilterPattern(), MAX_ZIP_SIZE_BYTES, true);
 
-    private void setProjectId() throws CxAbortException {
-        if (this.projectId == 0) {
-            CxProjectResolver projectResolver = new CxProjectResolver(this.cxWebService, this.logger);
-            final String cxProject = this.runnerParameters.get(CxConstants.CXPROJECT);
-            final String cxTeam = this.runnerParameters.get(CxConstants.CXTEAM);
-            this.projectId = projectResolver.resolveProjectId(cxProject, cxTeam);
-        }
-    }
+        //send sources to scan
+        byte[] zippedSources = getBytesFromZippedSources(zipTempFile);
+        LocalScanConfiguration conf = generateScanConfiguration(zippedSources);
+        CreateScanResponse createScanResponse = client.createLocalScan(conf);
+        projectStateLink = CxPluginHelper.composeProjectStateLink(url.toString(), createScanResponse.getProjectId());
+        logger.info("Scan created successfully. Link to project state: " + projectStateLink);
 
-
-    private CxWSResponseRunID submitScan() throws IOException {
-        try {
-            final CliScanArgs cliScanArgs = createCliScanArgs(new byte[]{});
-            final boolean incremental = checkIncrementalScanAndWriteResultToLog();
-            final String zipPath = zipWorkspaceFolder();
-
-            CxWSResponseRunID cxWSResponseRunId;
-
-            if (projectId == 0){
-                cxWSResponseRunId = this.cxWebService.createAndRunProject(cliScanArgs.getPrjSettings(),
-                        cliScanArgs.getSrcCodeSettings().getPackagedCode(), true, true, zipPath,
-                        cliScanArgs.getComment(), this.logger);
-                this.projectId = cxWSResponseRunId.getProjectID();
-            } else {
-                if (incremental) {
-                    cxWSResponseRunId = this.cxWebService.runIncrementalScan(cliScanArgs.getPrjSettings(),
-                            cliScanArgs.getSrcCodeSettings().getPackagedCode(), true, true, zipPath,
-                            cliScanArgs.getComment(), this.logger);
-                } else {
-                    cxWSResponseRunId = this.cxWebService.runScanAndAddToProject(cliScanArgs.getPrjSettings(),
-                            cliScanArgs.getSrcCodeSettings().getPackagedCode(), true, true, zipPath,
-                            cliScanArgs.getComment(), this.logger);
-                }
-            }
-
-            final File tempFile = new File(zipPath);
-            if(tempFile.delete()) {
-                this.logger.message("Temporary zip file deleted");
-            }else {
-                this.logger.warning("Temporary zip file was not deleted");
-            }
-            this.logger.message("Scan job submitted successfully");
-
-            return cxWSResponseRunId;
-        } catch (InterruptedException e) {
-            throw new CxAbortException("Remote operation failed on slave node: " + e.getMessage());
-        }
-    }
-
-    private CliScanArgs createCliScanArgs(final byte[] compressedSources) {
-        return CxCliScanArgsFactory.create(this.logger, this.runnerParameters, this.projectId, compressedSources);
-    }
-
-    private String zipWorkspaceFolder() throws IOException, InterruptedException {
-        CxFolderPattern folderPattern = new CxFolderPattern();
-        final String combinedFilterPattern = folderPattern.generatePattern(this.runnerParameters, this.logger);
-
-        CxZip cxZip = new CxZip();
-        return cxZip.ZipWorkspaceFolder(this.runningBuild, combinedFilterPattern, this.logger);
-    }
-
-    private boolean checkIncrementalScanAndWriteResultToLog() {
-        final boolean incremental = isThisBuildIncremental();
-        if (incremental){
-            this.logger.message("Scan job started in incremental scan mode");
+        if (zipTempFile.exists() && !zipTempFile.delete()) {
+            logger.warn("Failed to delete temporary zip file: " + zipTempFile.getAbsolutePath());
         } else {
-            this.logger.message("Scan job started in full scan mode");
+            logger.info("Temporary file deleted");
         }
-        return incremental;
+        return createScanResponse;
     }
 
 
-    private boolean isThisBuildIncremental() {
-        final String cxIncremental = this.runnerParameters.get(CxConstants.CXINCREMENTAL);
-        if (cxIncremental == null || !cxIncremental.equals(CxConstants.TRUE)) {
-            return false;
-        }
-
-        final String cxPeriodicFullScans = this.runnerParameters.get(CxConstants.CXPERIODICFULLSCANS);
-        if (cxPeriodicFullScans == null || !cxPeriodicFullScans.equals(CxConstants.TRUE)) {
-            return true;
-        }
-
-        final String cxNumberIncremental = this.runnerParameters.get(CxConstants.CXNUMBERINCREMENTAL);
-        if (cxNumberIncremental == null || cxNumberIncremental.isEmpty()) {
-            this.logger.warning("cxNumberIncremental is empty");
-            return true;
-        }
-
-        // If user asked to perform full scan after every 9 incremental scans -
-        // it means that every 10th scan should be full,
-        // that is the ordinal numbers of full scans will be "1", "11", "21" and so on...
-        final String buildNumber = this.runningBuild.getBuildNumber();
-        if (buildNumber == null || buildNumber.isEmpty()) {
-            this.logger.error("buildNumber is empty");
-            return true;
-        }
-        final int buildNumberInt = Integer.parseInt(buildNumber);
-        final int fullScanCycle = Integer.parseInt(cxNumberIncremental);
-        final boolean shouldBeFullScan = buildNumberInt % (fullScanCycle + 1) == 1;
-        return !shouldBeFullScan;
+    private File zipWorkspaceFolder(String folderExclusions, String filterPattern, long maxZipSizeInBytes, boolean writeToLog) throws IOException, InterruptedException {
+        final String combinedFilterPattern = CxFolderPattern.generatePattern(folderExclusions, filterPattern, logger);
+        CxZip cxZip = new CxZip(TEMP_FILE_NAME_TO_ZIP).setMaxZipSizeInBytes(maxZipSizeInBytes);
+        return cxZip.zipWorkspaceFolder(checkoutDirectory, tempDirectory, combinedFilterPattern, logger, writeToLog);
     }
 
-    private boolean isThresholdCrossed(final CxScanResult cxScanResult) {
-        final String cxThresholdHigh = this.runnerParameters.get(CxConstants.CXTHRESHOLDHIGH);
-        final String cxThresholdMedium = this.runnerParameters.get(CxConstants.CXTHRESHOLDMEDIUM);
-        final String cxThresholdLow = this.runnerParameters.get(CxConstants.CXTHRESHOLDLOW);
-
-        final int cxThresholdHighInt = cxThresholdHigh != null ? Integer.parseInt(cxThresholdHigh) : 0;
-        final int cxThresholdMediumInt = cxThresholdMedium != null ? Integer.parseInt(cxThresholdMedium) : 0;
-        final int cxThresholdLowInt = cxThresholdLow != null ? Integer.parseInt(cxThresholdLow) : 0;
-
-        logFoundVulnerabilities("high", cxScanResult.getHighCount(), cxThresholdHighInt);
-        logFoundVulnerabilities("medium", cxScanResult.getMediumCount(), cxThresholdMediumInt);
-        logFoundVulnerabilities("low", cxScanResult.getLowCount(), cxThresholdLowInt);
-
-        return cxScanResult.getHighCount() > cxThresholdHighInt
-                || cxScanResult.getMediumCount() > cxThresholdMediumInt
-                || cxScanResult.getLowCount() > cxThresholdLowInt;
+    private byte[] getBytesFromZippedSources(File zip) throws RunBuildException {
+        logger.info("Converting zipped sources to byte array");
+        byte[] zipFileByte;
+        InputStream fileStream = null;
+        try {
+            fileStream = new FileInputStream(zip);
+            zipFileByte = IOUtils.toByteArray(fileStream);
+        } catch (Exception e) {
+            throw new RunBuildException("Fail to set zipped file into project: " + e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(fileStream);
+        }
+        return zipFileByte;
     }
 
-    private void logFoundVulnerabilities(final String severity, final int actualNumber, final int configuredHighThreshold) {
-        this.logger.message("Number of " + severity + " severity vulnerabilities: " + actualNumber +
-                " stability threshold: " + configuredHighThreshold);
+    private LocalScanConfiguration generateScanConfiguration(byte[] zippedSources) {
+        LocalScanConfiguration ret = new LocalScanConfiguration();
+        ret.setProjectName(config.getProjectName());
+        ret.setClientOrigin(ClientOrigin.TEAMCITY);
+        ret.setFolderExclusions(config.getFolderExclusions());
+        ret.setFullTeamPath(teamFullPath);
+        ret.setComment(config.getScanComment());
+        ret.setIncrementalScan(config.isIncremental());
+        ret.setPresetId(config.getPresetId());
+        ret.setZippedSources(zippedSources);
+        ret.setFileName(config.getProjectName());
+
+        return ret;
+    }
+
+    private CreateOSAScanResponse createOSAScan() throws IOException, InterruptedException, CxClientException {
+
+        logger.info("Creating OSA scan");
+        logger.info("Zipping dependencies");
+        //prepare sources (zip it) for the OSA scan and send it to OSA scan
+        String patternExclusion = "!Checkmarx/Reports/*.*";
+        File zipForOSA = zipWorkspaceFolder("", patternExclusion, MAX_OSA_ZIP_SIZE_BYTES, false);
+        logger.info("Sending OSA scan request");
+        CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), zipForOSA);
+        osaProjectSummaryLink = CxPluginHelper.composeProjectOSASummaryLink(config.getUrl(), createScanResponse.getProjectId());
+        logger.info("OSA scan created successfully");
+        if (zipForOSA.exists() && !zipForOSA.delete()) {
+            logger.warn("Failed to delete temporary zip file: " + zipForOSA.getAbsolutePath());
+        }
+        logger.info("Temporary file deleted");
+
+        return osaScan;
+    }
+
+
+    private void printConfiguration() {
+        logger.info("----------------------------Configurations:-----------------------------");
+        logger.info("URL: " + config.getUrl());
+        logger.info("Username: " + config.getUsername());
+        logger.info("Project name: " + config.getProjectName());
+        logger.info("Preset ID: " + config.getPresetId());
+        logger.info("Team ID: " + config.getTeamId());
+        logger.info("Folder exclusions: " + config.getFolderExclusions());
+        logger.info("Filter pattern: " + config.getFilterPattern());
+        logger.info("Scan timeout in minutes: " + config.getScanTimeoutInMinutes());
+        logger.info("Scan comment: " + config.getScanComment());
+        logger.info("Is incremental scan: " + config.isIncremental());
+        logger.info("Generate PDF report: " + config.isGeneratePDFReport());
+        logger.info("CxOSA enabled: " + config.isOsaEnabled());
+
+        logger.info("Is synchronous scan: " + config.isSynchronous());
+        logger.info("CxSAST thresholds enabled: " + config.isThresholdsEnabled());
+        if (config.isThresholdsEnabled()) {
+            logger.info("CxSAST high threshold: " + (config.getHighThreshold() == null ? "[No Threshold]" : config.getHighThreshold()));
+            logger.info("CxSAST medium threshold: " + (config.getMediumThreshold() == null ? "[No Threshold]" : config.getMediumThreshold()));
+            logger.info("CxSAST low threshold: " + (config.getLowThreshold() == null ? "[No Threshold]" : config.getLowThreshold()));
+        }
+        if (config.isOsaEnabled()) {
+            logger.info("CxOSA thresholds enabled: " + config.isOsaThresholdsEnabled());
+            if (config.isOsaThresholdsEnabled()) {
+                logger.info("CxOSA high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
+                logger.info("CxOSA medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
+                logger.info("CxOSA low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
+            }
+        }
+        logger.info("------------------------------------------------------------------------");
+    }
+
+
+    private void retrieveScanResults() throws InterruptedException, CxClientException, IOException, JAXBException {
+        //wait for SAST scan to finish
+        ConsoleScanWaitHandler consoleScanWaitHandler = new ConsoleScanWaitHandler();
+        consoleScanWaitHandler.setLogger(logger);
+        logger.info("Waiting for CxSAST scan to finish.");
+        long timeout = config.getScanTimeoutInMinutes() == null ? 0 : config.getScanTimeoutInMinutes();
+        client.waitForScanToFinish(createScanResponse.getRunId(), timeout, consoleScanWaitHandler);
+        logger.info("Scan finished. Retrieving scan results");
+
+        //retrieve SAST scan results
+        scanResults = client.retrieveScanResults(createScanResponse.getProjectId());
+
+        scanResultsUrl = CxPluginHelper.composeScanLink(url.toString(), scanResults);
+        printResultsToConsole(scanResults);
+
+        //SAST detailed report
+        byte[] cxReport = client.getScanReport(scanResults.getScanID(), ReportType.XML);
+        String xmlFileName = PDF_REPORT_NAME + ".xml";
+        File xmlFile = new File(buildDirectory, xmlFileName);
+        FileUtils.writeByteArrayToFile(xmlFile, cxReport);
+        publishArtifact(xmlFile.getAbsolutePath());
+
+        CxXMLResults reportObj = convertToXMLResult(cxReport);
+
+        scanResults.setScanDetailedReport(reportObj);
+
+        if (config.isGeneratePDFReport()) {
+            createPDFReport(scanResults.getScanID());
+        }
+
+        sastResultsReady = true;
+    }
+
+    private void printResultsToConsole(ScanResults scanResults) {
+        logger.info("----------------------------Checkmarx Scan Results(CxSAST):-------------------------------");
+        logger.info("High severity results: " + scanResults.getHighSeverityResults());
+        logger.info("Medium severity results: " + scanResults.getMediumSeverityResults());
+        logger.info("Low severity results: " + scanResults.getLowSeverityResults());
+        logger.info("Info severity results: " + scanResults.getInfoSeverityResults());
+        logger.info("");
+        logger.info("Scan results location: " + scanResultsUrl);
+        logger.info("------------------------------------------------------------------------------------------\n");
+    }
+
+    private void createPDFReport(long scanId) throws InterruptedException {
+        logger.info("Generating PDF report");
+        byte[] scanReport;
+        try {
+            scanReport = client.getScanReport(scanId, ReportType.PDF);
+            String pdfFileName = PDF_REPORT_NAME + ".pdf";
+            File pdfFile = new File(buildDirectory, pdfFileName);
+            FileUtils.writeByteArrayToFile(pdfFile, scanReport);
+            publishArtifact(pdfFile.getAbsolutePath());
+            logger.info("PDF report location: " + buildDirectory + "/" + pdfFileName);
+        } catch (Exception e) {
+            logger.error("Fail to generate PDF report", e);
+        }
+    }
+
+    private void retrieveOSAScanResults() throws InterruptedException, CxClientException, IOException {
+
+        OSAConsoleScanWaitHandler osaConsoleScanWaitHandler = new OSAConsoleScanWaitHandler();
+        osaConsoleScanWaitHandler.setLogger(logger);
+        logger.info("Waiting for OSA scan to finish");
+        osaScanStatus = client.waitForOSAScanToFinish(osaScan.getScanId(), -1, osaConsoleScanWaitHandler);
+        logger.info("OSA scan finished successfully");
+        logger.info("Creating OSA reports");
+        //retrieve OSA scan results
+        osaSummaryResults = client.retrieveOSAScanSummaryResults(osaScan.getScanId());
+        printOSAResultsToConsole(osaSummaryResults);
+
+        //OSA PDF report
+        byte[] osaPDFByte = client.retrieveOSAScanPDFResults(osaScan.getScanId());
+        String pdfFileName = OSA_REPORT_NAME + ".pdf";
+        File osaPdfFile = new File(buildDirectory, pdfFileName);
+        FileUtils.writeByteArrayToFile(osaPdfFile, osaPDFByte);
+        publishArtifact(osaPdfFile.getAbsolutePath());
+        logger.info("OSA PDF report location: " + buildDirectory + "/" + pdfFileName);
+
+        //OSA HTML report
+        String osaHtml = client.retrieveOSAScanHtmlResults(osaScan.getScanId());
+        String htmlFileName = OSA_REPORT_NAME + ".html";
+        File osaHtmlFile = new File(buildDirectory, htmlFileName);
+        FileUtils.writeStringToFile(osaHtmlFile, osaHtml, Charset.defaultCharset());
+        publishArtifact(osaHtmlFile.getAbsolutePath());
+        logger.info("OSA HTML report location: " + buildDirectory + "/" + htmlFileName);
+        logger.info("");
+
+        //OSA json reports
+        publishJson(OSA_SUMMARY_NAME, osaSummaryResults);
+        List<Library> libraries = client.getOSALibraries(osaScan.getScanId());
+        publishJson(OSA_LIBRARIES_NAME, libraries);
+        List<CVE> osaVulnerabilities = client.getOSAVulnerabilities(osaScan.getScanId());
+        publishJson(OSA_VULNERABILITIES_NAME, osaVulnerabilities);
+
+        osaCVEJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(osaVulnerabilities);
+        osaLibrariesJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(libraries);
+
+        osaResultsReady = true;
+    }
+
+    private void printOSAResultsToConsole(OSASummaryResults osaSummaryResults) {
+        logger.info("----------------------------Checkmarx Scan Results(CxOSA):-------------------------------");
+        logger.info("");
+        logger.info("------------------------");
+        logger.info("Vulnerabilities Summary:");
+        logger.info("------------------------");
+        logger.info("OSA high severity results: " + osaSummaryResults.getTotalHighVulnerabilities());
+        logger.info("OSA medium severity results: " + osaSummaryResults.getTotalMediumVulnerabilities());
+        logger.info("OSA low severity results: " + osaSummaryResults.getTotalLowVulnerabilities());
+        logger.info("Vulnerability score: " + osaSummaryResults.getVulnerabilityScore());
+        logger.info("");
+        logger.info("-----------------------");
+        logger.info("Libraries Scan Results:");
+        logger.info("-----------------------");
+        logger.info("Open-source libraries: " + osaSummaryResults.getTotalLibraries());
+        logger.info("Vulnerable and outdated: " + osaSummaryResults.getVulnerableAndOutdated());
+        logger.info("Vulnerable and updated: " + osaSummaryResults.getVulnerableAndUpdated());
+        logger.info("Non-vulnerable libraries: " + osaSummaryResults.getNonVulnerableLibraries());
+        logger.info("");
+        logger.info("OSA scan results location: " + osaProjectSummaryLink);
+        logger.info("-----------------------------------------------------------------------------------------");
+    }
+
+    private CxXMLResults convertToXMLResult(byte[] cxReport) throws IOException, JAXBException {
+
+        CxXMLResults reportObj = null;
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(cxReport);
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(CxXMLResults.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            reportObj = (CxXMLResults) unmarshaller.unmarshal(byteArrayInputStream);
+
+        } finally {
+            IOUtils.closeQuietly(byteArrayInputStream);
+        }
+        return reportObj;
+    }
+
+    private void publishJson(String name, Object jsonObj) throws IOException {
+        String fileName = name + ".json";
+        File jsonFile = new File(buildDirectory, fileName);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, jsonObj);
+        publishArtifact(jsonFile.getAbsolutePath());
+        logger.info(name + " json location: " + buildDirectory + "/" + fileName);
+    }
+
+    private boolean assertVulnerabilities(ScanResults scanResults, OSASummaryResults osaSummaryResults, StringBuilder res) {
+
+        boolean failByThreshold = false;
+        if (config.isSASTThresholdEnabled() && scanResults != null) {
+            failByThreshold = isFail(scanResults.getHighSeverityResults(), config.getHighThreshold(), res, "high", "CxSAST ");
+            failByThreshold |= isFail(scanResults.getMediumSeverityResults(), config.getMediumThreshold(), res, "medium", "CxSAST ");
+            failByThreshold |= isFail(scanResults.getLowSeverityResults(), config.getLowThreshold(), res, "low", "CxSAST ");
+        }
+        if (config.isOSAThresholdEnabled() && osaSummaryResults != null) {
+            failByThreshold |= isFail(osaSummaryResults.getTotalHighVulnerabilities(), config.getOsaHighThreshold(), res, "high", "CxOSA ");
+            failByThreshold |= isFail(osaSummaryResults.getTotalMediumVulnerabilities(), config.getOsaMediumThreshold(), res, "medium", "CxOSA ");
+            failByThreshold |= isFail(osaSummaryResults.getTotalLowVulnerabilities(), config.getOsaLowThreshold(), res, "low", "CxOSA ");
+        }
+        return failByThreshold;
+    }
+
+    private boolean isFail(int result, Integer threshold, StringBuilder res, String severity, String severityType) {
+        boolean fail = false;
+        if (threshold != null && result > threshold) {
+            res.append(severityType).append(severity).append(" severity results are above threshold. Results: ").append(result).append(". Threshold: ").append(threshold).append("\n");
+            fail = true;
+        }
+        return fail;
+    }
+
+    private void printBuildFailure(StringBuilder res, Exception sastBuildFailException, Exception osaBuildFailException) {
+        logger.error("*************************");
+        logger.error("The Build Failed due to: ");
+        logger.error("*************************");
+
+        if (sastBuildFailException != null) {
+            logger.error(sastBuildFailException.getMessage() + (sastBuildFailException.getCause() == null ? "" : sastBuildFailException.getCause().getMessage()));
+        }
+        if (osaBuildFailException != null) {
+            logger.error(osaBuildFailException.getMessage() + (osaBuildFailException.getCause() == null ? "" : osaBuildFailException.getCause().getMessage()));
+        }
+
+        String[] lines = res.toString().split("\\n");
+        for (String s : lines) {
+            logger.error(s);
+        }
+        logger.error("-----------------------------------------------------------------------------------------\n");
+        logger.error("");
+    }
+
+    private void deleteTempFiles() {
+
+        try {
+            String tempDir = System.getProperty("java.io.tmpdir");
+            CxFileChecker.deleteFile(tempDir, TEMP_FILE_NAME_TO_ZIP);
+        } catch (Exception e) {
+            logger.warn("Failed to delete temp files: " + e.getMessage());
+        }
+
+    }
+
+    private void closeClient(CxClientService client) {
+        if (client != null) {
+            try {
+                client.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+
+    public void generateCxHTMLReport() {
+        String html = getResultsTemplate();
+        if (html == null) {
+            return;
+        }
+
+        if (sastResultsReady) {
+
+            //SAST: fill html with results
+            html = html
+                    .replace(SAST_RESULTS_READY, TRUE)
+                    .replaceAll(HIGH_RESULTS, String.valueOf(scanResults.getHighSeverityResults()))
+                    .replace(MEDIUM_RESULTS, String.valueOf(scanResults.getMediumSeverityResults()))
+                    .replace(LOW_RESULTS, String.valueOf(scanResults.getLowSeverityResults()))
+                    .replace(SAST_SUMMARY_RESULTS_LINK, String.valueOf(projectStateLink))
+                    .replace(SAST_SCAN_RESULTS_LINK, String.valueOf(scanResultsUrl))
+                    .replace(THRESHOLD_ENABLED, String.valueOf(config.isThresholdsEnabled()))
+                    .replace(HIGH_THRESHOLD, String.valueOf(config.getHighThreshold()))
+                    .replace(MEDIUM_THRESHOLD, String.valueOf(config.getMediumThreshold()))
+                    .replace(LOW_THRESHOLD, String.valueOf(config.getLowThreshold()))
+                    .replace(SCAN_START_DATE, String.valueOf(scanResults.getScanStart()))
+                    .replace(SCAN_TIME, String.valueOf(scanResults.getScanTime()))
+                    .replace(SCAN_FILES_SCANNED, String.valueOf(scanResults.getFilesScanned()))
+                    .replace(SCAN_LOC_SCANNED, String.valueOf(scanResults.getLinesOfCodeScanned()))
+                    .replace(SCAN_QUERY_LIST, String.valueOf(scanResults.getQueryList()));
+        } else {
+
+            //SAST: fill html with empty values
+            html = html
+                    .replace(SAST_RESULTS_READY, FALSE)
+                    .replaceAll(HIGH_RESULTS, "0")
+                    .replace(MEDIUM_RESULTS, "0")
+                    .replace(LOW_RESULTS, "0")
+                    .replace(SAST_SUMMARY_RESULTS_LINK, "")
+                    .replace(SAST_SCAN_RESULTS_LINK, "")
+                    .replace(THRESHOLD_ENABLED, FALSE)
+                    .replace(HIGH_THRESHOLD, "0")
+                    .replace(MEDIUM_THRESHOLD, "0")
+                    .replace(LOW_THRESHOLD, "0")
+                    .replace(SCAN_START_DATE, "")
+                    .replace(SCAN_TIME, "")
+                    .replace(SCAN_FILES_SCANNED, "null")
+                    .replace(SCAN_LOC_SCANNED, "null")
+                    .replace(SCAN_QUERY_LIST, "null");
+        }
+
+        if (osaResultsReady) {
+            //OSA: fill html with results
+            html = html
+                    .replace(OSA_ENABLED, TRUE)
+                    .replace(OSA_HIGH_RESULTS, String.valueOf(osaSummaryResults.getTotalHighVulnerabilities()))
+                    .replace(OSA_MEDIUM_RESULTS, String.valueOf(osaSummaryResults.getTotalMediumVulnerabilities()))
+                    .replace(OSA_LOW_RESULTS, String.valueOf(osaSummaryResults.getTotalLowVulnerabilities()))
+                    .replace(OSA_SUMMARY_RESULTS_LINK, String.valueOf(osaProjectSummaryLink))
+                    .replace(OSA_THRESHOLD_ENABLED, String.valueOf(config.isOSAThresholdEnabled()))
+                    .replace(OSA_HIGH_THRESHOLD, String.valueOf(config.getOsaHighThreshold()))
+                    .replace(OSA_MEDIUM_THRESHOLD, String.valueOf(config.getOsaMediumThreshold()))
+                    .replace(OSA_LOW_THRESHOLD, String.valueOf(config.getOsaLowThreshold()))
+                    .replace(OSA_VULNERABLE_LIBRARIES, String.valueOf(osaSummaryResults.getHighVulnerabilityLibraries() + osaSummaryResults.getMediumVulnerabilityLibraries() + osaSummaryResults.getLowVulnerabilityLibraries()))
+                    .replace(OSA_OK_LIBRARIES, String.valueOf(osaSummaryResults.getNonVulnerableLibraries()))
+                    .replace(OSA_CVE_LIST, String.valueOf(osaCVEJson))
+                    .replace(OSA_LIBRARIES, String.valueOf(osaLibrariesJson))
+                    .replace(OSA_START_TIME, String.valueOf(osaScanStatus.getStartAnalyzeTime()))
+                    .replace(OSA_END_TIME, String.valueOf(osaScanStatus.getEndAnalyzeTime()));
+
+        } else {
+
+            //SAST: fill html with empty values
+            html = html
+                    .replace(OSA_ENABLED, FALSE)
+                    .replace(OSA_HIGH_RESULTS, "0")
+                    .replace(OSA_MEDIUM_RESULTS, "0")
+                    .replace(OSA_LOW_RESULTS, "0")
+                    .replace(OSA_SUMMARY_RESULTS_LINK, "")
+                    .replace(OSA_THRESHOLD_ENABLED, FALSE)
+                    .replace(OSA_HIGH_THRESHOLD, "0")
+                    .replace(OSA_MEDIUM_THRESHOLD, "0")
+                    .replace(OSA_LOW_THRESHOLD, "0")
+                    .replace(OSA_VULNERABLE_LIBRARIES, "0")
+                    .replace(OSA_OK_LIBRARIES, "0")
+                    .replace(OSA_CVE_LIST, "null")
+                    .replace(OSA_LIBRARIES, "null")
+                    .replace(OSA_START_TIME, "")
+                    .replace(OSA_END_TIME, "");
+        }
+
+
+        File htmlFile = new File(buildDirectory, REPORT_HTML_NAME);
+        try {
+            FileUtils.writeStringToFile(htmlFile, html);
+        } catch (IOException e) {
+            logger.error("Failed to generate full html report: " + e.getMessage());
+            return;
+        }
+        publishArtifact(htmlFile.getAbsolutePath());
+    }
+
+    private String getResultsTemplate() {
+        String ret = null;
+        InputStream resourceAsStream = CxBuildProcess.class.getResourceAsStream("/com/checkmarx/teamcity/agent/resultsTemplate.html");
+        if (resourceAsStream != null) {
+            try {
+                ret = IOUtils.toString(resourceAsStream, Charset.defaultCharset().name());
+            } catch (IOException e) {
+                logger.warn("Failed to get results template: " + e.getMessage());
+            } finally {
+                IOUtils.closeQuietly(resourceAsStream);
+            }
+        }
+        return ret;
+    }
+
+
+    private void publishArtifact(String filePath) {
+        artifactsWatcher.addNewArtifactsPath(filePath + "=>" + CxConstants.RUNNER_DISPLAY_NAME);
+
     }
 
 }

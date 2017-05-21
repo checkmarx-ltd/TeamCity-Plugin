@@ -1,217 +1,249 @@
 package com.checkmarx.teamcity.server;
 
-import com.checkmarx.teamcity.common.CxAbortException;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxSelectOption;
-import com.checkmarx.teamcity.common.CxWebService;
+import com.checkmarx.teamcity.common.client.CxClientService;
+import com.checkmarx.teamcity.common.client.CxClientServiceImpl;
+import jetbrains.buildServer.log.Loggers;
+import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.xml.ws.WebServiceException;
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
+import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+
+import static com.checkmarx.teamcity.common.CxParam.*;
 
 
 public class CxOptions {
-    private CxWebService cxWebService = null;
-    private boolean cxWebServiceInitialized = false;
-    private String serverUrlValue;
-    private String userValue;
-    private String passValue;
-    private volatile String testConnectionMsg = "";
+
+    private List<CxSelectOption> teamList = Collections.singletonList(new CxSelectOption("0", CxConstants.NO_TEAM_MESSAGE));
+    private List<CxSelectOption> presetList = Collections.singletonList(new CxSelectOption("0", CxConstants.NO_PRESET_MESSAGE));
+
 
     @NotNull
-    public String getDefaultServer() {
-        return CxConstants.CXGLOBALSERVER;
+    public String getUseDefaultServer() {
+        return USE_DEFAULT_SERVER;
+    }
+
+    @NotNull
+    public String getUseDefaultSastConfig() {
+        return USE_DEFAULT_SAST_CONFIG;
+    }
+
+    @NotNull
+    public String getUseDefaultScanControl() {
+        return USE_DEFAULT_SCAN_CONTROL;
     }
 
     @NotNull
     public String getServerUrl() {
-        return CxConstants.CXSERVERURL;
+        return SERVER_URL;
     }
 
     @NotNull
-    public String getUser() {
-        return CxConstants.CXUSER;
+    public String getUsername() {
+        return USERNAME;
     }
 
     @NotNull
-    public String getPass() {
-        return CxConstants.CXPASS;
+    public String getPassword() {
+        return PASSWORD;
     }
 
     @NotNull
-    public String getTestConnectionMsg() {
-        return testConnectionMsg;
+    public String getProjectName() {
+        return PROJECT_NAME;
     }
 
     @NotNull
-    public String getProject() {
-        return CxConstants.CXPROJECT;
-    }
-
-    @NotNull
-    public String getPreset() {
-        return CxConstants.CXPRESET;
-    }
-
-    @NotNull
-    public String getConfiguration() {
-        return CxConstants.CXCONFIGURATION;
-    }
-
-    @NotNull
-    public String getTeam() {
-        return CxConstants.CXTEAM;
-    }
-
-    @NotNull
-    public String getExcludeFolders() {
-        return CxConstants.CXEXCLUDEFOLDERS;
-    }
-
-    @NotNull
-    public String getFilterPatterns() {
-        return CxConstants.CXFILTERPATTERNS;
-    }
-
-    @NotNull
-    public String getIncremental() {
-        return CxConstants.CXINCREMENTAL;
-    }
-
-    @NotNull
-    public String getPeriodicFullScans() {
-        return CxConstants.CXPERIODICFULLSCANS;
-    }
-
-    @NotNull
-    public String getNumberIncremental() {
-        return CxConstants.CXNUMBERINCREMENTAL;
-    }
-
-    @NotNull
-    public String getComment() {
-        return CxConstants.CXCOMMENT;
-    }
-
-    @NotNull
-    public String getThresholdEnable() {
-        return CxConstants.CXTHRESHOLDENABLE;
-    }
-
-    @NotNull
-    public String getThresholdHigh() {
-        return CxConstants.CXTHRESHOLDHIGH;
-    }
-
-    @NotNull
-    public String getThresholdMedium() {
-        return CxConstants.CXTHRESHOLDMEDIUM;
-    }
-
-    @NotNull
-    public String getThresholdLow() {
-        return CxConstants.CXTHRESHOLDLOW;
-    }
-
-    @NotNull
-    public String getGeneratePdf() {
-        return CxConstants.CXGENERATEPDF;
-    }
-
-    public void setServerUrlValue(final String serverUrlValue) {
-        this.serverUrlValue = serverUrlValue;
-    }
-    public void setUserValue(final String userValue) {
-        this.userValue = userValue;
-    }
-    public void setPassValue(final String passValue) {
-        this.passValue = passValue;
-    }
-
-    private boolean initWebService() {
-        if (this.cxWebServiceInitialized) {
-            return true;
-        }
-
-        if (this.serverUrlValue == null || this.serverUrlValue.isEmpty() ||
-                this.userValue == null || this.userValue.isEmpty() ||
-                this.passValue == null || this.passValue.isEmpty()) {
-            return false;
-        }
-
-        try {
-            this.cxWebService = new CxWebService(this.serverUrlValue);
-            this.cxWebService.login(this.userValue, this.passValue);
-            this.cxWebServiceInitialized = true;
-        } catch (CxAbortException | MalformedURLException | WebServiceException | ConnectException e) {
-            System.out.println("Unable to initialize web service: '" + e.getMessage() + "'");
-            return false;
-        }
-
-        return true;
-    }
-
-    @NotNull
-    public String testConnection() {
-        testConnectionMsg = "";
-        try {
-            this.cxWebService = new CxWebService(this.serverUrlValue);
-            this.cxWebService.login(this.userValue, this.passValue);
-            this.cxWebServiceInitialized = true;
-            testConnectionMsg ="Connection successful";
-        } catch (CxAbortException | MalformedURLException | WebServiceException | ConnectException e) {
-            System.out.println("Unable to initialize web service: '" + e.getMessage() + "'");
-            testConnectionMsg = e.getMessage();
-        }
-        return testConnectionMsg;
+    public String getPresetId() {
+        return PRESET_ID;
     }
 
     @NotNull
     public List<CxSelectOption> getPresetList() {
-        if (initWebService()) {
-            try {
-                return this.cxWebService.getPresetsSelectList();
-            } catch (CxAbortException | WebServiceException e) {
-                System.out.println("Unable to retrieve preset list: '" + e.getMessage() + "'");
-            }
-        }
-
-        List<CxSelectOption> list = new ArrayList<>();
-        list.add(new CxSelectOption("0", "Provide Checkmarx server credentials to see preset list"));
-        return list;
+        return presetList;
     }
 
-    @NotNull
-    public List<CxSelectOption> getConfigurationList() {
-        if (initWebService()) {
-            try {
-                return this.cxWebService.getConfigurationSetsSelectList();
-            } catch (CxAbortException | WebServiceException e) {
-                System.out.println("Unable to retrieve configuration list: '" + e.getMessage() + "'");
-            }
-        }
 
-        List<CxSelectOption> list = new ArrayList<>();
-        list.add(new CxSelectOption("0", "Provide Checkmarx server credentials to see configuration list"));
-        return list;
+    @NotNull
+    public String getTeamId() {
+        return TEAM_ID;
     }
 
     @NotNull
     public List<CxSelectOption> getTeamList() {
-        if (initWebService()) {
-            try {
-                return this.cxWebService.getAssociatedGroupsSelectList();
-            } catch (CxAbortException | WebServiceException e) {
-                System.out.println("Unable to retrieve team list: '" + e.getMessage() + "'");
-            }
-        }
+        return teamList;
+    }
 
-        List<CxSelectOption> list = new ArrayList<>();
-        list.add(new CxSelectOption("0", "Provide Checkmarx server credentials to see team list"));
-        return list;
+    @NotNull
+    public String getExcludeFolders() {
+        return EXCLUDE_FOLDERS;
+    }
+
+    @NotNull
+    public String getFilterPatterns() {
+        return FILTER_PATTERNS;
+    }
+
+    @NotNull
+    public String getScanComment() {
+        return SCAN_COMMENT;
+    }
+
+    @NotNull
+    public String getScanTimeoutInMinutes() {
+        return SCAN_TIMEOUT_IN_MINUTES;
+    }
+
+
+    @NotNull
+    public String getIsIncremental() {
+        return IS_INCREMENTAL;
+    }
+
+    @NotNull
+    public String getGeneratePDFReport() {
+        return GENERATE_PDF_REPORT;
+    }
+
+    @NotNull
+    public String getOsaEnabled() {
+        return OSA_ENABLED;
+    }
+
+    @NotNull
+    public String getIsSynchronous() {
+        return IS_SYNCHRONOUS;
+    }
+
+    @NotNull
+    public String getThresholdEnabled() {
+        return THRESHOLD_ENABLED;
+    }
+
+    @NotNull
+    public String getHighThreshold() {
+        return HIGH_THRESHOLD;
+    }
+
+    @NotNull
+    public String getMediumThreshold() {
+        return MEDIUM_THRESHOLD;
+    }
+
+    @NotNull
+    public String getLowThreshold() {
+        return LOW_THRESHOLD;
+    }
+
+    @NotNull
+    public String getOsaThresholdEnabled() {
+        return OSA_THRESHOLD_ENABLED;
+    }
+
+    @NotNull
+    public String getOsaHighThreshold() {
+        return OSA_HIGH_THRESHOLD;
+    }
+
+    @NotNull
+    public String getOsaMediumThreshold() {
+        return OSA_MEDIUM_THRESHOLD;
+    }
+
+    @NotNull
+    public String getOsaLowThreshold() {
+        return OSA_LOW_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalServerUrl() {
+        return GLOBAL_SERVER_URL;
+    }
+
+    @NotNull
+    public String getGlobalUsername() {
+        return GLOBAL_USERNAME;
+    }
+
+    @NotNull
+    public String getGlobalExcludeFolders() {
+        return GLOBAL_EXCLUDE_FOLDERS;
+    }
+
+    @NotNull
+    public String getGlobalFilterPatterns() {
+        return GLOBAL_FILTER_PATTERNS;
+    }
+
+    @NotNull
+    public String getGlobalScanTimeoutInMinutes() {
+        return GLOBAL_SCAN_TIMEOUT_IN_MINUTES;
+    }
+
+    @NotNull
+    public String getGlobalIsSynchronous() {
+        return GLOBAL_IS_SYNCHRONOUS;
+    }
+
+    @NotNull
+    public String getGlobalThresholdEnabled() {
+        return GLOBAL_THRESHOLD_ENABLED;
+    }
+
+    @NotNull
+    public String getGlobalHighThreshold() {
+        return GLOBAL_HIGH_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalMediumThreshold() {
+        return GLOBAL_MEDIUM_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalLowThreshold() {
+        return GLOBAL_LOW_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalOsaThresholdEnabled() {
+        return GLOBAL_OSA_THRESHOLD_ENABLED;
+    }
+
+    @NotNull
+    public String getGlobalOsaHighThreshold() {
+        return GLOBAL_OSA_HIGH_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalOsaMediumThreshold() {
+        return GLOBAL_OSA_MEDIUM_THRESHOLD;
+    }
+
+    @NotNull
+    public String getGlobalOsaLowThreshold() {
+        return GLOBAL_OSA_LOW_THRESHOLD;
+    }
+
+
+    public void testConnection(String serverUrl, String username, String password) {
+
+        try {
+            if (EncryptUtil.isScrambled(password)) {
+                password = EncryptUtil.unscramble(password);
+            }
+            CxClientService client = new CxClientServiceImpl(new URL(serverUrl), username, password);
+            client.loginToServer();
+            presetList = client.getPresetListForSelect();
+            teamList = client.getTeamListForSelect();
+
+        } catch (Exception e) {
+            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + e.getMessage());
+
+        }
     }
 
     @NotNull

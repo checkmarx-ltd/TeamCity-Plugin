@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.checkmarx.teamcity.common.CxParam;
+import com.checkmarx.teamcity.common.CxPluginUtils;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.StatefulObject;
 import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
@@ -21,54 +23,38 @@ import com.checkmarx.teamcity.common.CxConstants;
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
 
-    private static final String SET = "Set";
-
     public CxEditRunTypeControllerExtension(@NotNull final SBuildServer server,
                                             @NotNull final CxAdminConfig cxAdminConfig) {
         server.registerExtension(EditRunTypeControllerExtension.class, CxConstants.RUNNER_TYPE, this);
+
         this.cxAdminConfig = cxAdminConfig;
     }
 
     public void fillModel(@NotNull final HttpServletRequest request,
                           @NotNull final BuildTypeForm form,
                           @NotNull final Map model) {
-        String cxServerUrl, cxUser, cxPass;
-        final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
-        final String cxGlobalServer = properties.get(CxConstants.CXGLOBALSERVER);
-        if (cxGlobalServer != null && cxGlobalServer.equals(CxConstants.TRUE)) {
-            System.out.println("Using global Cx Server settings");
-            cxServerUrl = this.cxAdminConfig.getServerUrl();
-            cxUser = this.cxAdminConfig.getUser();
-            cxPass = this.cxAdminConfig.getPass();
-        } else {
-            System.out.println("Using build step Cx Server settings");
-            cxServerUrl = properties.get(CxConstants.CXSERVERURL);
-            cxUser = properties.get(CxConstants.CXUSER);
-            cxPass = properties.get(CxConstants.CXPASS);
-        }
-        try {
-            if (cxPass != null) {
-                cxPass = EncryptUtil.unscramble(cxPass);
-            }
-        } catch (IllegalArgumentException e) {
-        }
-        model.put("actualServerUrl", cxServerUrl);
-        model.put("actualUser", cxUser);
-        model.put("actualPass", cxPass);
 
-        if (properties.get(SET) != null) {
-            // properties already set, exiting
-            return;
+        final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
+
+
+        //put default project name as the build name
+        if(CxPluginUtils.isEmptyString(properties.get(CxParam.PROJECT_NAME))) {
+            properties.put(CxParam.PROJECT_NAME, form.getName());
         }
-        try {
-            cxPass = properties.get(CxConstants.CXPASS);
-            if (cxPass != null) {
-                cxPass = EncryptUtil.unscramble(cxPass);
-                properties.put(CxConstants.CXPASS, cxPass);
-            }
-            properties.put(SET, CxConstants.TRUE);
-        } catch (IllegalArgumentException e) {
+
+        //put all global properties to the config page
+        for (String conf : CxParam.GLOBAL_CONFIGS) {
+            properties.put(conf, cxAdminConfig.getConfiguration(conf));
         }
+
+        model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
+        model.put(CxParam.SERVER_URL, properties.get(CxParam.SERVER_URL));
+        model.put(CxParam.USERNAME, properties.get(CxParam.USERNAME));
+        model.put(CxParam.PASSWORD, properties.get(CxParam.PASSWORD));
+        model.put(CxParam.GLOBAL_SERVER_URL, cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL));
+        model.put(CxParam.GLOBAL_USERNAME, cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME));
+        model.put(CxParam.GLOBAL_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD));
+
     }
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {}
@@ -86,13 +72,16 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     @NotNull
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
-        String cxPass = properties.get(CxConstants.CXPASS);
+        String cxPass = properties.get(CxParam.PASSWORD);
+
         try {
-            cxPass = EncryptUtil.scramble(cxPass);
+            if(cxPass != null && !EncryptUtil.isScrambled(cxPass)) {
+                cxPass = EncryptUtil.scramble(cxPass);
+            }
         } catch (RuntimeException e) {
             cxPass = "";
         }
-        properties.put(CxConstants.CXPASS, cxPass);
+        properties.put(CxParam.PASSWORD, cxPass);
 
         return new ActionErrors();
     }

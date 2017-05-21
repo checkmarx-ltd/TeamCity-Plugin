@@ -1,81 +1,87 @@
 package com.checkmarx.teamcity.server;
 
+import com.checkmarx.teamcity.common.CxParam;
+import jetbrains.buildServer.serverSide.InvalidProperty;
+import jetbrains.buildServer.serverSide.PropertiesProcessor;
+import jetbrains.buildServer.util.PropertiesUtil;
+import jetbrains.buildServer.util.StringUtil;
+
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import jetbrains.buildServer.serverSide.InvalidProperty;
-import jetbrains.buildServer.serverSide.PropertiesProcessor;
-import jetbrains.buildServer.util.PropertiesUtil;
-
-import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.CxUrlValidation;
+import static com.checkmarx.teamcity.common.CxConstants.*;
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
-    private final static String CANNOT_BE_EMPTY = " cannot be empty";
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
         List<InvalidProperty> result = new Vector<>();
 
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXGLOBALSERVER))) {
-            final String cxServerUrl = properties.get(CxConstants.CXSERVERURL);
+        if (!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SERVER))) {
+            final String cxServerUrl = properties.get(CxParam.SERVER_URL);
             if (PropertiesUtil.isEmptyOrNull(cxServerUrl)) {
-                result.add(new InvalidProperty(CxConstants.CXSERVERURL, "Server URL" + CANNOT_BE_EMPTY));
+                result.add(new InvalidProperty(CxParam.SERVER_URL, URL_NOT_EMPTY_MESSAGE));
             } else {
                 try {
-                    CxUrlValidation.validate(cxServerUrl);
+                    new URL(cxServerUrl);
                 } catch (MalformedURLException e) {
-                    result.add(new InvalidProperty(CxConstants.CXSERVERURL, "Server URL malformed or has path"));
+                    result.add(new InvalidProperty(CxParam.SERVER_URL, URL_NOT_VALID_MESSAGE));
                 }
             }
-            if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXUSER))) {
-                result.add(new InvalidProperty(CxConstants.CXUSER, "User" + CANNOT_BE_EMPTY));
+
+            if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.USERNAME))) {
+                result.add(new InvalidProperty(CxParam.USERNAME, USERNAME_NOT_EMPTY_MESSAGE));
             }
-            if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXPASS))) {
-                result.add(new InvalidProperty(CxConstants.CXPASS, "Password" + CANNOT_BE_EMPTY));
+            if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PASSWORD))) {
+                result.add(new InvalidProperty(CxParam.PASSWORD, PASSWORD_NOT_EMPTY_MESSAGE));
             }
         }
 
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXPROJECT))) {
-            result.add(new InvalidProperty(CxConstants.CXPROJECT, "Project" + CANNOT_BE_EMPTY));
+        if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PROJECT_NAME))) {
+            result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_NOT_EMPTY_MESSAGE));
         }
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXPRESET))) {
-            result.add(new InvalidProperty(CxConstants.CXPRESET, "Preset" + CANNOT_BE_EMPTY));
+
+        if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PRESET_ID))) {
+            result.add(new InvalidProperty(CxParam.PRESET_ID, PRESET_NOT_EMPTY_MESSAGE));
         }
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXCONFIGURATION))) {
-            result.add(new InvalidProperty(CxConstants.CXCONFIGURATION, "Configuration" + CANNOT_BE_EMPTY));
+
+        if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.TEAM_ID))) {
+            result.add(new InvalidProperty(CxParam.TEAM_ID, TEAM_NOT_EMPTY_MESSAGE));
         }
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXTEAM))) {
-            result.add(new InvalidProperty(CxConstants.CXTEAM, "Team" + CANNOT_BE_EMPTY));
+
+        if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SAST_CONFIG))) {
+            validateNumeric(CxParam.SCAN_TIMEOUT_IN_MINUTES, properties, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, result);
         }
-        if (!PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXINCREMENTAL))) {
-            if (!PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXPERIODICFULLSCANS))) {
-                final String cxNumberIncremental = properties.get(CxConstants.CXNUMBERINCREMENTAL);
-                if (PropertiesUtil.isEmptyOrNull(cxNumberIncremental)) {
-                    result.add(new InvalidProperty(CxConstants.CXNUMBERINCREMENTAL, "Number of incremental scans" + CANNOT_BE_EMPTY));
-                } else {
-                    final int cxNumberIncrementalInt = Integer.parseInt(cxNumberIncremental);
-                    if (cxNumberIncrementalInt < 1 || cxNumberIncrementalInt > 99) {
-                        result.add(new InvalidProperty(CxConstants.CXNUMBERINCREMENTAL, "Number of incremental scans must be between 1-99"));
-                    }
+
+        if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SAST_CONFIG))) {
+
+
+            if (TRUE.equals(properties.get(CxParam.IS_SYNCHRONOUS))) {
+                if (TRUE.equals(properties.get(CxParam.THRESHOLD_ENABLED))) {
+                    validateNumeric(CxParam.HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.MEDIUM_THRESHOLD, properties, MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                 }
-            }
-        }
-        if (!PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXTHRESHOLDENABLE))) {
-            if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXTHRESHOLDHIGH))) {
-                result.add(new InvalidProperty(CxConstants.CXTHRESHOLDHIGH, "Threshold" + CANNOT_BE_EMPTY));
-            }
-            if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXTHRESHOLDMEDIUM))) {
-                result.add(new InvalidProperty(CxConstants.CXTHRESHOLDMEDIUM, "Threshold" + CANNOT_BE_EMPTY));
-            }
-            if (PropertiesUtil.isEmptyOrNull(properties.get(CxConstants.CXTHRESHOLDLOW))) {
-                result.add(new InvalidProperty(CxConstants.CXTHRESHOLDLOW, "Threshold" + CANNOT_BE_EMPTY));
+
+                if (TRUE.equals(properties.get(CxParam.OSA_ENABLED)) && TRUE.equals(properties.get(CxParam.OSA_THRESHOLD_ENABLED))) {
+                    validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.OSA_MEDIUM_THRESHOLD, properties, MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                }
             }
         }
 
         return result;
+    }
+
+    private void validateNumeric(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
+        String num = properties.get(parameterName);
+        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
+            result.add(new InvalidProperty(parameterName, errorMessage));
+        }
     }
 }

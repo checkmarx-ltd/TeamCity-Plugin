@@ -17,7 +17,7 @@
   <pluginRepositories>
       <pluginRepository>
           <id>JetBrains</id>
-          <url>http://repository.jetbrains.com/all</url>
+          <url>http://download.jetbrains.com/teamcity-repository</url>
       </pluginRepository>
   </pluginRepositories>
   <build>
@@ -36,7 +36,7 @@
                   <artifactId>teamcity-sdk-maven-plugin</artifactId>
                   <version>0.2</version>
                   <configuration>
-                      <!-- <teamcityDir>/path/to/tc/distro</teamcityDir> -->
+                       <teamcityDir>${project.basedir}/work</teamcityDir>
                   </configuration>
               </plugin>
           </plugins>

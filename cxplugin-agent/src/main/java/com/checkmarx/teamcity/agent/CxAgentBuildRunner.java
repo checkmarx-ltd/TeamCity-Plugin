@@ -1,15 +1,17 @@
 package com.checkmarx.teamcity.agent;
 
+import com.checkmarx.teamcity.common.CxConstants;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
-
 import org.jetbrains.annotations.NotNull;
 
-import com.checkmarx.teamcity.common.CxConstants;
-
-
+/**
+ * Created by: Dorg.
+ * Date: 18/04/2017.
+ */
 public class CxAgentBuildRunner implements AgentBuildRunner, AgentBuildRunnerInfo {
+
     private final ArtifactsWatcher artifactsWatcher;
 
     public CxAgentBuildRunner(@NotNull final ArtifactsWatcher artifactsWatcher) {
@@ -17,22 +19,25 @@ public class CxAgentBuildRunner implements AgentBuildRunner, AgentBuildRunnerInf
     }
 
     @NotNull
-    public BuildProcess createBuildProcess(@NotNull final AgentRunningBuild runningBuild,
-                                           @NotNull final BuildRunnerContext context) throws RunBuildException {
-        return new CxBuildProcess(runningBuild, context, this.artifactsWatcher);
+    @Override
+    public BuildProcess createBuildProcess(@NotNull AgentRunningBuild agentRunningBuild, @NotNull BuildRunnerContext buildRunnerContext) throws RunBuildException {
+        return new CxBuildProcess(agentRunningBuild, buildRunnerContext, artifactsWatcher);
     }
 
     @NotNull
+    @Override
     public AgentBuildRunnerInfo getRunnerInfo() {
         return this;
     }
 
     @NotNull
+    @Override
     public String getType() {
         return CxConstants.RUNNER_TYPE;
     }
 
-    public boolean canRun(@NotNull final BuildAgentConfiguration agentConfiguration) {
+    @Override
+    public boolean canRun(@NotNull BuildAgentConfiguration buildAgentConfiguration) {
         return true;
     }
 }
