@@ -91,21 +91,21 @@ public class CxAdminPageController extends BaseFormXmlController {
             ret.addError(INVALID + GLOBAL_PASSWORD, PASSWORD_NOT_EMPTY_MESSAGE);
         }
 
-        validateNumeric(GLOBAL_SCAN_TIMEOUT_IN_MINUTES, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, request, ret);
+        validateNumericLargerThanZero(GLOBAL_SCAN_TIMEOUT_IN_MINUTES, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, request, ret);
 
 
         if(TRUE.equals(request.getParameter(GLOBAL_IS_SYNCHRONOUS))) {
 
             if(TRUE.equals(request.getParameter(GLOBAL_THRESHOLD_ENABLED))) {
-                validateNumeric(GLOBAL_HIGH_THRESHOLD, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
-                validateNumeric(GLOBAL_MEDIUM_THRESHOLD, MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
-                validateNumeric(GLOBAL_LOW_THRESHOLD, LOW_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_HIGH_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_MEDIUM_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_LOW_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
             }
 
             if(TRUE.equals(request.getParameter(GLOBAL_OSA_THRESHOLD_ENABLED))) {
-                validateNumeric(GLOBAL_OSA_HIGH_THRESHOLD, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
-                validateNumeric(GLOBAL_OSA_MEDIUM_THRESHOLD,MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
-                validateNumeric(GLOBAL_OSA_LOW_THRESHOLD, LOW_THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_OSA_HIGH_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_OSA_MEDIUM_THRESHOLD,THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
+                validateNumeric(GLOBAL_OSA_LOW_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
             }
         }
 
@@ -116,6 +116,13 @@ public class CxAdminPageController extends BaseFormXmlController {
         String num = request.getParameter(parameterName);
         if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
                 errors.addError(INVALID + parameterName, errorMessage);
+        }
+    }
+
+    private void validateNumericLargerThanZero(String parameterName, String errorMessage, HttpServletRequest request, ActionErrors errors) {
+        String num = request.getParameter(parameterName);
+        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
+            errors.addError(INVALID + parameterName, errorMessage);
         }
     }
 }

@@ -19,9 +19,14 @@ Checkmarx = {
     },
 
     testConnection: function (credentials) {
-
         if (Checkmarx.validateCredentials(credentials)) {
+            var messageElm = jQuery('#testConnectionMsg');
+            var buttonElm = jQuery('#testConnection');
 
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
             jQuery.ajax({
                 type: 'POST',
                 url: window['base_uri'] + '/checkmarx/testConnection/',
@@ -29,11 +34,21 @@ Checkmarx = {
                 dataType: 'json',
                 data: JSON.stringify(credentials),
                 success: function (data) {
-                    $('testConnectionMsg').innerHTML = data.message;
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
                     if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'name');
                     }
+
                 },
                 error: function (data) {
                 }
@@ -42,18 +57,22 @@ Checkmarx = {
     },
 
     validateCredentials: function (credentials) {
+        var messageElm = jQuery('#testConnectionMsg');
         if (!credentials.serverUrl) {
-            $('testConnectionMsg').innerHTML = 'URL must not be empty';
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
             return false;
         }
 
         if (!credentials.username) {
-            $('testConnectionMsg').innerHTML = 'Username must not be empty';
+            messageElm.text('Username must not be empty');
+            messageElm.css('color','red');
             return false;
         }
 
         if (!credentials.password) {
-            $('testConnectionMsg').innerHTML = 'Password must not be empty';
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
             return false;
         }
 

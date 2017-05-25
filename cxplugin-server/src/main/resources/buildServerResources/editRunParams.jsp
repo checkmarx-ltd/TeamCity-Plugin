@@ -77,8 +77,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 <l:settingsGroup title="Checkmarx Server">
     <tr>
-        <th><label for="${optionsBean.useDefaultServer}">Use Default Checkmarx Server Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
+        <th><label for="${optionsBean.useDefaultServer}">Use Default Server<br>
+            Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
+            Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
         </th>
         <td>
             <c:set var="onclick">
@@ -111,7 +112,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
     <td>
         <form>
-            <input id="test_connection" type="button" name="TestConnection" value="Connect to Server"
+            <input id="testConnection" type="button" name="TestConnection" value="Connect to Server"
                    onclick="Checkmarx.testConnection(Checkmarx.extractCredentials())"/>
             <span id="testConnectionMsg"></span>
         </form>
@@ -215,9 +216,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <bs:helpIcon
                     iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
         <td>
-            <textarea id="globalFilterPatterns123" type="text" rows="5" cols="50" class="multilineProperty" disabled>
-                    ${propertiesBean.properties[optionsBean.globalFilterPatterns]}
-            </textarea>
+            <textarea id="globalFilterPatterns123" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
         </td>
     </tr>
 
@@ -233,7 +232,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     <tr>
         <th><label for="${optionsBean.scanComment}">Comment
             <bs:helpIcon
-                    iconTitle="Free text comment. May reference build parameters like %teamcity.variable.name%"/></label>
+                    iconTitle="Comment that can be added to the scan result . May reference build parameters like %teamcity.variable.name%"/></label>
         </th>
         <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
                                      cols="50" className="longField"/></td>
@@ -469,12 +468,8 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 </tbody>
 
             </table>
-
         </td>
     </tr>
-
-
     </tbody>
-
 
 </l:settingsGroup>

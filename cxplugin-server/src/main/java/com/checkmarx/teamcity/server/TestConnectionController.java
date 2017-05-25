@@ -1,5 +1,6 @@
 package com.checkmarx.teamcity.server;
 
+import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxSelectOption;
 import com.checkmarx.teamcity.common.client.CxClientService;
 import com.checkmarx.teamcity.common.client.CxClientServiceImpl;
@@ -9,6 +10,7 @@ import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +84,7 @@ public class TestConnectionController extends BaseController {
             }
 
             //write response
-            res = new TestConnectionResponse(true, "Success", presets, teams);
+            res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
             httpServletResponse.getWriter().write(gson.toJson(res));
             httpServletResponse.setContentType("application/json");
             httpServletResponse.setStatus(200);
@@ -102,6 +104,8 @@ public class TestConnectionController extends BaseController {
     private TestConnectionRequest extractRequestBody(HttpServletRequest request) throws IOException {
         String jsonString = IOUtils.toString(request.getReader());
         TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
+        ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
+        ret.setUsername(StringUtil.trim(ret.getUsername()));
         ret.setPassword(resolvePasswordPlainText(ret.getPassword(), ret.isGlobal()));
         return ret;
     }

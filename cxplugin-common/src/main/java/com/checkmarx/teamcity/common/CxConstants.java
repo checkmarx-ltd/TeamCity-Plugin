@@ -31,6 +31,7 @@ public abstract class CxConstants {
                     "!**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml\n";
 
 
+    public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection successful";
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
     public static final String CHECKMARX_SERVER_NOT_FOUND_MESSAGE = "Checkmarx server was not found in specified address";
     public static final String INVALID_URL_MESSAGE = "Invalid URL";
@@ -43,13 +44,12 @@ public abstract class CxConstants {
     public static final String USERNAME_NOT_EMPTY_MESSAGE = "Username must not be empty";
     public static final String PASSWORD_NOT_EMPTY_MESSAGE = "Password must not be empty";
     public static final String PROJECT_NAME_NOT_EMPTY_MESSAGE = "Project name must not be empty";
+    public static final String PROJECT_NAME_ILLEGAL_CHARS_MESSAGE = "Project name should not contain the following characters: / ? < > : * |";
+    public static final String PROJECT_NAME_MAX_CHARS_MESSAGE = "Project name length must not exceed 200 characters";
     public static final String PRESET_NOT_EMPTY_MESSAGE = "Preset must not be empty";
     public static final String TEAM_NOT_EMPTY_MESSAGE = "Team must not be empty";
     public static final String SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE = "Scan timeout must be a number greater than zero";
-    public static final String THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Threshold must be 0 or greater, or blank";
-    public static final String HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "High threshold must not be positive integer";
-    public static final String MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Medium threshold must not be positive integer";
-    public static final String LOW_THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Low threshold must not be positive integer";
+    public static final String THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Threshold threshold must be 0 or greater, or leave blank for no thresholds";
 
 
 }

@@ -364,7 +364,7 @@ public class CxClientServiceImpl implements CxClientService {
         }
 
         long reportId = createScanReportResponse.getID();
-        waitForReport(reportId);
+        waitForReport(reportId, reportType);
 
         CxWSResponseScanResults scanReport = client.getScanReport(sessionId, reportId);
 
@@ -381,13 +381,13 @@ public class CxClientServiceImpl implements CxClientService {
         restClient.close();
     }
 
-    private void waitForReport(long reportId) throws CxClientException, InterruptedException {
+    private void waitForReport(long reportId, ReportType reportType) throws CxClientException, InterruptedException {
         //todo: const+ research of the appropriate time
         long timeToStop = (System.currentTimeMillis() / 1000) + generateReportTimeOutInSec;
         CxWSReportStatusResponse scanReportStatus = null;
 
         while ((System.currentTimeMillis() / 1000) <= timeToStop) {
-            log.debug("Waiting for server to generate pdf report " + (timeToStop - (System.currentTimeMillis() / 1000)) + " sec left to timeout");
+            log.debug("Waiting for server to generate "+reportType.name()+" report " + (timeToStop - (System.currentTimeMillis() / 1000)) + " sec left to timeout");
 
             Thread.sleep(10000); //Get status every 10 sec
 

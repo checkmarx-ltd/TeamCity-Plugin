@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
 
@@ -41,9 +43,8 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
             }
         }
 
-        if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PROJECT_NAME))) {
-            result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_NOT_EMPTY_MESSAGE));
-        }
+        validateProjectName(properties.get(CxParam.PROJECT_NAME), result);
+
 
         if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PRESET_ID))) {
             result.add(new InvalidProperty(CxParam.PRESET_ID, PRESET_NOT_EMPTY_MESSAGE));
@@ -54,7 +55,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         }
 
         if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SAST_CONFIG))) {
-            validateNumeric(CxParam.SCAN_TIMEOUT_IN_MINUTES, properties, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, result);
+            validateNumericLargerThanZero(CxParam.SCAN_TIMEOUT_IN_MINUTES, properties, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, result);
         }
 
         if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SAST_CONFIG))) {
@@ -62,15 +63,15 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
             if (TRUE.equals(properties.get(CxParam.IS_SYNCHRONOUS))) {
                 if (TRUE.equals(properties.get(CxParam.THRESHOLD_ENABLED))) {
-                    validateNumeric(CxParam.HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
-                    validateNumeric(CxParam.MEDIUM_THRESHOLD, properties, MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
-                    validateNumeric(CxParam.HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.LOW_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                 }
 
                 if (TRUE.equals(properties.get(CxParam.OSA_ENABLED)) && TRUE.equals(properties.get(CxParam.OSA_THRESHOLD_ENABLED))) {
-                    validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
-                    validateNumeric(CxParam.OSA_MEDIUM_THRESHOLD, properties, MEDIUM_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
-                    validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, HIGH_THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.OSA_MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
+                    validateNumeric(CxParam.OSA_LOW_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                 }
             }
         }
@@ -78,9 +79,36 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         return result;
     }
 
+    private void validateProjectName(String projectName, List<InvalidProperty> result) {
+        if (PropertiesUtil.isEmptyOrNull(projectName)) {
+            result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_NOT_EMPTY_MESSAGE));
+            return;
+        }
+
+        Pattern pattern = Pattern.compile("[/?<>\\:*|\"]");
+
+        Matcher matcher = pattern.matcher(projectName);
+        if (matcher.find()) {
+            result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_ILLEGAL_CHARS_MESSAGE));
+            return;
+        }
+
+        if(projectName.length() > 200) {
+            result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_MAX_CHARS_MESSAGE));
+            return;
+        }
+    }
+
     private void validateNumeric(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
         String num = properties.get(parameterName);
         if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
+            result.add(new InvalidProperty(parameterName, errorMessage));
+        }
+    }
+
+    private void validateNumericLargerThanZero(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
+        String num = properties.get(parameterName);
+        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
     }

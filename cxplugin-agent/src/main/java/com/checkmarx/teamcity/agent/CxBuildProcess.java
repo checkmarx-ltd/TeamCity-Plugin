@@ -37,7 +37,7 @@ public class CxBuildProcess extends CallableBuildProcess {
     private static final long MAX_ZIP_SIZE_BYTES = 209715200;
     private static final long MAX_OSA_ZIP_SIZE_BYTES = 2146483647;
     private static final String TEMP_FILE_NAME_TO_ZIP = "CxZippedSource";
-    private static final String PDF_REPORT_NAME = "CxSASTReport";
+    private static final String REPORT_NAME = "CxSASTReport";
     private static final String OSA_REPORT_NAME = "CxOSAReport";
     public static final String OSA_LIBRARIES_NAME = "CxOSALibraries";
     public static final String OSA_VULNERABILITIES_NAME = "CxOSAVulnerabilities";
@@ -63,7 +63,9 @@ public class CxBuildProcess extends CallableBuildProcess {
     private CreateScanResponse createScanResponse;
     private CreateOSAScanResponse osaScan;
     private String osaProjectSummaryLink;
+    private String osaPDFLink = "";
     private String scanResultsUrl;
+    private String sastPDFLink = "";
     private Exception sastException;
     private OSAScanStatus osaScanStatus;
     private OSASummaryResults osaSummaryResults;
@@ -176,7 +178,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             throw new RunBuildException(e.getMessage());
 
         } catch (CxClientException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
 
             if (osaException == null && sastException == null) {
                 sastException = e;
@@ -334,7 +336,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
         //SAST detailed report
         byte[] cxReport = client.getScanReport(scanResults.getScanID(), ReportType.XML);
-        String xmlFileName = PDF_REPORT_NAME + ".xml";
+        String xmlFileName = REPORT_NAME + ".xml";
         File xmlFile = new File(buildDirectory, xmlFileName);
         FileUtils.writeByteArrayToFile(xmlFile, cxReport);
         publishArtifact(xmlFile.getAbsolutePath());
@@ -366,10 +368,11 @@ public class CxBuildProcess extends CallableBuildProcess {
         byte[] scanReport;
         try {
             scanReport = client.getScanReport(scanId, ReportType.PDF);
-            String pdfFileName = PDF_REPORT_NAME + ".pdf";
+            String pdfFileName = REPORT_NAME + ".pdf";
             File pdfFile = new File(buildDirectory, pdfFileName);
             FileUtils.writeByteArrayToFile(pdfFile, scanReport);
             publishArtifact(pdfFile.getAbsolutePath());
+            sastPDFLink = compileLinkToArtifact(pdfFileName);
             logger.info("PDF report location: " + buildDirectory + "/" + pdfFileName);
         } catch (Exception e) {
             logger.error("Fail to generate PDF report", e);
@@ -394,6 +397,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         File osaPdfFile = new File(buildDirectory, pdfFileName);
         FileUtils.writeByteArrayToFile(osaPdfFile, osaPDFByte);
         publishArtifact(osaPdfFile.getAbsolutePath());
+        osaPDFLink = compileLinkToArtifact(pdfFileName);
         logger.info("OSA PDF report location: " + buildDirectory + "/" + pdfFileName);
 
         //OSA HTML report
@@ -547,6 +551,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(LOW_RESULTS, String.valueOf(scanResults.getLowSeverityResults()))
                     .replace(SAST_SUMMARY_RESULTS_LINK, String.valueOf(projectStateLink))
                     .replace(SAST_SCAN_RESULTS_LINK, String.valueOf(scanResultsUrl))
+                    .replace(SAST_PDF_LINK, String.valueOf(sastPDFLink))
                     .replace(THRESHOLD_ENABLED, String.valueOf(config.isThresholdsEnabled()))
                     .replace(HIGH_THRESHOLD, String.valueOf(config.getHighThreshold()))
                     .replace(MEDIUM_THRESHOLD, String.valueOf(config.getMediumThreshold()))
@@ -566,6 +571,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(LOW_RESULTS, "0")
                     .replace(SAST_SUMMARY_RESULTS_LINK, "")
                     .replace(SAST_SCAN_RESULTS_LINK, "")
+                    .replace(SAST_PDF_LINK, "")
                     .replace(THRESHOLD_ENABLED, FALSE)
                     .replace(HIGH_THRESHOLD, "0")
                     .replace(MEDIUM_THRESHOLD, "0")
@@ -585,6 +591,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(OSA_MEDIUM_RESULTS, String.valueOf(osaSummaryResults.getTotalMediumVulnerabilities()))
                     .replace(OSA_LOW_RESULTS, String.valueOf(osaSummaryResults.getTotalLowVulnerabilities()))
                     .replace(OSA_SUMMARY_RESULTS_LINK, String.valueOf(osaProjectSummaryLink))
+                    .replace(OSA_PDF_LINK, String.valueOf(osaPDFLink))
                     .replace(OSA_THRESHOLD_ENABLED, String.valueOf(config.isOSAThresholdEnabled()))
                     .replace(OSA_HIGH_THRESHOLD, String.valueOf(config.getOsaHighThreshold()))
                     .replace(OSA_MEDIUM_THRESHOLD, String.valueOf(config.getOsaMediumThreshold()))
@@ -605,6 +612,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(OSA_MEDIUM_RESULTS, "0")
                     .replace(OSA_LOW_RESULTS, "0")
                     .replace(OSA_SUMMARY_RESULTS_LINK, "")
+                    .replace(OSA_PDF_LINK, "")
                     .replace(OSA_THRESHOLD_ENABLED, FALSE)
                     .replace(OSA_HIGH_THRESHOLD, "0")
                     .replace(OSA_MEDIUM_THRESHOLD, "0")
@@ -646,7 +654,13 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private void publishArtifact(String filePath) {
         artifactsWatcher.addNewArtifactsPath(filePath + "=>" + CxConstants.RUNNER_DISPLAY_NAME);
+    }
 
+    private String compileLinkToArtifact(String artifactName) {
+        String rootServerUrl = agentRunningBuild.getSharedConfigParameters().get("teamcity.serverUrl");
+        long buildId = buildRunnerContext.getBuild().getBuildId();
+        String buildTypeId = buildRunnerContext.getBuild().getBuildTypeExternalId();
+        return rootServerUrl + "/repository/download/" + buildTypeId + "/" + buildId + ":id/" + CxConstants.RUNNER_DISPLAY_NAME + "/" + artifactName;
     }
 
 }

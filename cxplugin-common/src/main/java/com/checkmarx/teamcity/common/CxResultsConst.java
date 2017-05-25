@@ -20,6 +20,7 @@ public abstract class CxResultsConst {
 
     public static final String SAST_SUMMARY_RESULTS_LINK = "cx.sastSummaryResultsLink";
     public static final  String SAST_SCAN_RESULTS_LINK = "cx.sastScanResultsLink";
+    public static final  String SAST_PDF_LINK = "cx.sastPDFLink";
 
 
     public static final String SCAN_DETAILED_REPORT = "cx.scanDetailedReport";
@@ -41,6 +42,7 @@ public abstract class CxResultsConst {
     public static final String OSA_LOW_THRESHOLD = "cx.osaLowThreshold";
 
     public static final String OSA_SUMMARY_RESULTS_LINK = "cx.osaSummaryResultsLink";
+    public static final String OSA_PDF_LINK = "cx.osaPDFLink";
 
     public static final String OSA_VULNERABLE_LIBRARIES = "cx.osaVulnerableLibraries";
     public static final String OSA_OK_LIBRARIES = "cx.osaOkLibraries";

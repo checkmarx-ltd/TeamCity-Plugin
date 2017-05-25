@@ -165,7 +165,7 @@ public class CxScanConfiguration {
 
     private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
 
-        if(param != null) {
+        if(param != null && param.length() > 0) {
             try {
                 int i = Integer.parseInt(param);
                 if(i < 0) {

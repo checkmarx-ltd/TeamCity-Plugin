@@ -6,6 +6,13 @@
   .scanControlSectionTable {
     margin-left: -10px;
   }
+
+  .cxTitle {
+    text-align: center;
+    font-weight: bold;
+    font-size: medium;
+  }
+
 </style>
 
 <script type="text/javascript">
@@ -105,7 +112,7 @@
 
       <table class="runnerFormTable">
         <tr class="groupingTitle">
-          <td colspan="2">Checkmarx Plugin Default Configuration</td>
+          <td colspan="2" class="cxTitle">Checkmarx Plugin Default Configuration</td>
         </tr>
         <tr class="groupingTitle">
           <td colspan="2">Checkmarx Server</td>

@@ -60,28 +60,44 @@
         margin-right: 6%;
     }
 
-    .results-report .summary-title-links {
-        display: flex;
+    .results-report .detailed-report .report-link {
         color: #4A90E2;
         font-size: 14px;
         padding: 15px 2px;
     }
 
-    .results-report .summary-section .summary-title-links {
+    .results-report .title-links {
+        display: flex;
+        color: #4A90E2;
+        font-size: 14px;
+        padding: 15px 2px;
+        align-items: center;
+    }
+
+    .results-report .summary-section .title-links {
         border-bottom: solid 1px #d5d5d5;
     }
 
     .link-icon {
         align-items: center;
-        display: flex;
+        display: inline-flex;
     }
 
-    .summary-link {
+    .summary-section .link-to-result {
         display: inline-flex;
         align-items: center;
     }
 
+    .link-to-result {
+        display: flex;
+        align-items: center;
+    }
+
     .summary-link-text {
+        padding: 0 8px;
+    }
+
+    .link-text {
         padding: 0 8px;
     }
 
@@ -445,8 +461,8 @@
 
     .download-icon,
     .download-icon,
-    .download-txt {
-        display: inline-block;
+    .link-text {
+        display: inline-flex;
     }
 
     .download-icon {
@@ -472,8 +488,18 @@
         margin-right: 6px;
     }
 
-    a.html-report {
+
+    .summary-section .html-report {
+        margin-right: 10px;
+        border-right: solid 1px #d5d5d5;
+    }
+    .link-to-result a {
+        display: inline-flex;
+        align-items: center;
+    }
+    .title-links a {
         color: #4A90E2;
+        text-decoration: none;
     }
 
     .report-link {
@@ -514,6 +540,10 @@
     .sast-downloads a {
         color: #4A90E2;
         text-decoration: none;
+    }
+
+    .full-downloads {
+        white-space: normal;
     }
 
     .full-severity-title {
@@ -624,9 +654,9 @@
                 <div class="summary-report-title sast">
                     <div class="summary-title-text sast">CxSAST Vulnerabilities Status</div>
 
-                    <div class="summary-title-links">
+                    <div class="title-links">
+                        <div class="link-to-result summary-link">
                         <a class="html-report" id="sast-summary-html-link">
-                            <div class="results-link summary-link">
                                 <div class="results-link-icon link-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14">
                                         <g fill="none" fill-rule="evenodd">
@@ -635,9 +665,10 @@
                                         </g>
                                     </svg>
                                 </div>
-                                <div class="summary-link-text">Results</div>
-                            </div>
+                                <div class="link-text">Results</div>
                         </a>
+                    </div>
+                        <div id="sast-summary-pdf-link" class="link-to-result"></div>
                     </div>
 
 
@@ -780,9 +811,9 @@
             <div class="osa-summary" id="osa-summary">
                 <div class="summary-report-title osa">
                     <div class="summary-title-text osa">CxOSA Vulnerabilities & Libraries</div>
-                    <div class="summary-title-links">
+                    <div class="title-links">
+                        <div class="link-to-result summary-link">
                         <a class="html-report" id="osa-summary-html-link">
-                            <div class="results-link summary-link">
                                 <div class="results-link-icon link-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14">
                                         <title>analize</title>
@@ -792,9 +823,10 @@
                                         </g>
                                     </svg>
                                 </div>
-                                <div class="summary-link-text">Results</div>
-                            </div>
+                                <div class="link-text">Results</div>
                         </a>
+                    </div>
+                        <div id="osa-summary-pdf-link" class="link-to-result"></div>
                     </div>
                 </div>
                 <div class="osa-results">
@@ -1041,12 +1073,11 @@
                         <div class="sum1">Full Report</div>
                     </div>
                     <div class="detailed-report">
-                        <div class="sast-downloads">
+                        <div class="full-downloads sast-downloads">
                             <!--html-->
-                            <div class="report-link">
+                            <div class="report-link link-to-result">
                                 <a class="pdf-report" id="sast-code-viewer-link">
-                                    <div class="summary-title-links">
-                                        <div class="results-link summary-link">
+                                    <div class="link-to-result">
                                             <div class="results-link-icon link-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14"
                                                      viewBox="0 0 12 14"><title>analize</title>
@@ -1057,11 +1088,12 @@
                                                     </g>
                                                 </svg>
                                             </div>
-                                            <div class="summary-link-text">Analyze Results</div>
-                                        </div>
+                                        <div class="link-text">Analyze Results</div>
                                     </div>
                                 </a>
                             </div>
+                            <div id="sast-full-pdf-link" class="link-to-result"></div>
+
                         </div>
                     </div>
                 </div>
@@ -1264,11 +1296,10 @@
                         <div class="sum1">Full Report</div>
                     </div>
                     <div class="detailed-report">
-                        <div class="sast-downloads osa-downloads">
+                        <div class="full-downloads osa-downloads">
                             <div class="report-link">
                                 <a class="html-report" id="osa-html-link">
-                                    <div class="summary-title-links">
-                                        <div class="results-link summary-link">
+                                    <div class="link-to-result">
                                             <div class="results-link-icon link-icon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14"
                                                      viewBox="0 0 12 14"><title>analize</title>
@@ -1279,11 +1310,11 @@
                                                     </g>
                                                 </svg>
                                             </div>
-                                            <div class="summary-link-text">Analyze Results</div>
-                                        </div>
+                                        <div class="link-text">Analyze Results</div>
                                     </div>
                                 </a>
                             </div>
+                            <div id="osa-full-pdf-link" class="link-to-result"></div>
                         </div>
                     </div>
                 </div>
@@ -1453,6 +1484,9 @@
 
     //links
     var sastScanResultsLink = 'cx.sastScanResultsLink';
+    var sastPDFLink= 'cx.sastPDFLink';
+
+
 
     //counts
     var highCount = cx.highResults;
@@ -1475,6 +1509,8 @@
 
     //links
     var osaSummaryResultsLink = 'cx.osaSummaryResultsLink';
+    var osaPDFLink = 'cx.osaPDFLink';
+
 
     //counts
     var osaHighCount = cx.osaHighResults;
@@ -1564,7 +1600,19 @@
             //link
             document.getElementById("sast-summary-html-link").setAttribute("href", sastScanResultsLink);
             document.getElementById("sast-code-viewer-link").setAttribute("href", sastScanResultsLink);
+            //only if pdf Report is ready
+            if (sastPDFLink) {
+                document.getElementById("sast-summary-pdf-link").innerHTML =
 
+                        '<a class="pdf-report" href="' + sastPDFLink + '">' +
+                        '<div class="link-icon">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16"><title>PDF icon</title><g fill="none" fill-rule="evenodd"><path d="M8.55 0H8v5h5V4L9.097 0H8.55z" fill="#4A90E2"/><path d="M.5.5h8.387L12.5 4.204V15.5H.5V.5z" stroke="#4A90E2"/><text font-family="Roboto-Black, Roboto" font-size="5" font-weight="700" fill="#4A90E2"><tspan x="1.889" y="11">PDF</tspan></text></g></svg>' +
+                        '</div>' +
+                        '<div class="link-text">' +
+                        'PDF Report' +
+                        '</div>' +
+                        '</a>';
+            }
             document.getElementById("onSastError").setAttribute("style", "display:none");
             document.getElementById("scanErrorMessage").setAttribute("style", "display:none");
 
@@ -1627,7 +1675,16 @@
         try {
             //link
             document.getElementById("osa-summary-html-link").setAttribute("href", osaHtmlPath);
+            document.getElementById("osa-summary-pdf-link").innerHTML =
 
+                    '<a class="pdf-report" href="' + osaPDFLink + '">' +
+                    '<div class="link-icon">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16"><title>PDF icon</title><g fill="none" fill-rule="evenodd"><path d="M8.55 0H8v5h5V4L9.097 0H8.55z" fill="#4A90E2"/><path d="M.5.5h8.387L12.5 4.204V15.5H.5V.5z" stroke="#4A90E2"/><text font-family="Roboto-Black, Roboto" font-size="5" font-weight="700" fill="#4A90E2"><tspan x="1.889" y="11">PDF</tspan></text></g></svg>' +
+                    '</div>' +
+                    '<div class="link-text">' +
+                    'PDF Report' +
+                    '</div>' +
+                    '</a>';
             //set bars height and count
             document.getElementById("osa-bar-count-high").innerHTML = osaHighCount;
             document.getElementById("osa-bar-count-med").innerHTML = osaMedCount;
@@ -1703,7 +1760,18 @@
         try {
             //sast links
             document.getElementById("sast-code-viewer-link").setAttribute("href", sastScanResultsLink);
+            if (sastPDFLink) {
+                document.getElementById("sast-full-pdf-link").innerHTML =
 
+                        '<a class="pdf-report full" href="' + sastPDFLink + '">' +
+                        '<div class="link-icon">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16"><title>PDF icon</title><g fill="none" fill-rule="evenodd"><path d="M8.55 0H8v5h5V4L9.097 0H8.55z" fill="#4A90E2"/><path d="M.5.5h8.387L12.5 4.204V15.5H.5V.5z" stroke="#4A90E2"/><text font-family="Roboto-Black, Roboto" font-size="5" font-weight="700" fill="#4A90E2"><tspan x="1.889" y="11">PDF</tspan></text></g></svg>' +
+                        '</div>' +
+                        '<div class="link-text">' +
+                        'PDF Report' +
+                        '</div>' +
+                        '</a>';
+            }
 
             //sast info
             document.getElementById("sast-full-start-date").innerHTML = formatDate(sastStartDate, "dd/mm/yy hh:mm");
@@ -1753,7 +1821,16 @@
 
             //osa links
             document.getElementById("osa-html-link").setAttribute("href", osaHtmlPath);
+            document.getElementById("osa-full-pdf-link").innerHTML =
 
+                    '<a class="pdf-report full" href="' + osaPDFLink + '">' +
+                    '<div class="link-icon">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16"><title>PDF icon</title><g fill="none" fill-rule="evenodd"><path d="M8.55 0H8v5h5V4L9.097 0H8.55z" fill="#4A90E2"/><path d="M.5.5h8.387L12.5 4.204V15.5H.5V.5z" stroke="#4A90E2"/><text font-family="Roboto-Black, Roboto" font-size="5" font-weight="700" fill="#4A90E2"><tspan x="1.889" y="11">PDF</tspan></text></g></svg>' +
+                    '</div>' +
+                    '<div class="link-text">' +
+                    'PDF Report' +
+                    '</div>' +
+                    '</a>';
 
             //osa info
             document.getElementById("osa-full-start-date").innerHTML = formatDate(osaStartDate, "dd/mm/yy hh:mm");
