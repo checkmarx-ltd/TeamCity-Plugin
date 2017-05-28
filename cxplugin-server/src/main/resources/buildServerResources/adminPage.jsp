@@ -169,7 +169,7 @@
         <tr>
           <th><label for="cxGlobalFilterPatterns">Include/Exclude Wildcard Patterns
             <bs:helpIcon iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></label></th>
-          <td><textarea rows="5" cols="50" name="cxGlobalFilterPatterns">${cxGlobalFilterPatterns}</textarea>
+          <td><textarea rows="5" cols="50" name="cxGlobalFilterPatterns" wrap="off">${cxGlobalFilterPatterns}</textarea>
           </td>
         </tr>
 

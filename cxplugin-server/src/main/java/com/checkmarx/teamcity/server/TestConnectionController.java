@@ -92,7 +92,7 @@ public class TestConnectionController extends BaseController {
 
         } catch (Exception e) {
             log.error("Error occurred in test connection", e);
-            res.setMessage(GENERAL_ERROR_MESSAGE);
+            res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
             httpServletResponse.getWriter().write(gson.toJson(res));
             httpServletResponse.setContentType("application/json");
             httpServletResponse.setStatus(200);

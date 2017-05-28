@@ -38,6 +38,7 @@ public abstract class CxConstants {
     public final static String NO_PRESET_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see presets list";
     public final static String NO_TEAM_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see teams list";
     public final static String GENERAL_ERROR_MESSAGE = "Some error occurred. Check server logs for more information";
+    public final static String UNABLE_TO_CONNECT_MESSAGE = "Unable to connect to the server. Please check the server logs for further information";
 
     public static final String URL_NOT_EMPTY_MESSAGE = "Server URL must not be empty";
     public static final String URL_NOT_VALID_MESSAGE = "Server URL is not valid";
