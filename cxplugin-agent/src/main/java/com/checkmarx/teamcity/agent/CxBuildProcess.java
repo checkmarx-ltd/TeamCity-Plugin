@@ -657,7 +657,7 @@ public class CxBuildProcess extends CallableBuildProcess {
     }
 
     private String compileLinkToArtifact(String artifactName) {
-        String rootServerUrl = agentRunningBuild.getSharedConfigParameters().get("teamcity.serverUrl");
+        String rootServerUrl = agentRunningBuild.getSharedConfigParameters().get(CxConstants.TEAMCITY_SERVER_URL);
         long buildId = buildRunnerContext.getBuild().getBuildId();
         String buildTypeId = buildRunnerContext.getBuild().getBuildTypeExternalId();
         return rootServerUrl + "/repository/download/" + buildTypeId + "/" + buildId + ":id/" + CxConstants.RUNNER_DISPLAY_NAME + "/" + artifactName;
