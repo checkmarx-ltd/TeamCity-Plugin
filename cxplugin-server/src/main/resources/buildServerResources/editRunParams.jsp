@@ -77,7 +77,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 <l:settingsGroup title="Checkmarx Server">
     <tr>
-        <th><label for="${optionsBean.useDefaultServer}">Use Default Server<br>
+        <th><label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
             Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
             Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
         </th>
