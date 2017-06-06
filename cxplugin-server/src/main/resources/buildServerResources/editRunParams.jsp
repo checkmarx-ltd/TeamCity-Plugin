@@ -15,6 +15,14 @@
     .scanControlSectionTable {
         margin-left: -10px;
     }
+
+    .runnerFormTable .cx-title.groupingTitle td {
+        padding: 6px 0 6px 8px;
+        background-color: #edeff5;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
 </style>
 
 ${'true'.equals(cxUseDefaultServer) ?
@@ -75,7 +83,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 </c:if>
 
 
-<l:settingsGroup title="Checkmarx Server">
+<l:settingsGroup className="cx-title" title="Checkmarx Server">
     <tr>
         <th><label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
             Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
@@ -157,7 +165,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 </l:settingsGroup>
 
 
-<l:settingsGroup title="Checkmarx Scan CxSAST">
+<l:settingsGroup className="cx-title" title="Checkmarx Scan CxSAST">
 
     <tr>
         <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
@@ -232,7 +240,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     <tr>
         <th><label for="${optionsBean.scanComment}">Comment
             <bs:helpIcon
-                    iconTitle="Comment that can be added to the scan result . May reference build parameters like %teamcity.variable.name%"/></label>
+                    iconTitle="Comment that can be added to the scan result. May reference build parameters like %teamcity.variable.name%"/></label>
         </th>
         <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
                                      cols="50" className="longField"/></td>
@@ -253,7 +261,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 </l:settingsGroup>
 
-<l:settingsGroup title="Checkmarx Scan CxOSA">
+<l:settingsGroup className="cx-title" title="Checkmarx Scan CxOSA">
     <tr>
         <th><label for="${optionsBean.osaEnabled}">Enable OSA Scan
             <bs:helpIcon
@@ -269,7 +277,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 </l:settingsGroup>
 
-<l:settingsGroup title="Control Checkmarx Scan">
+<l:settingsGroup className="cx-title" title="Control Checkmarx Scan">
 
     <tr>
         <th><label for="${optionsBean.useDefaultScanControl}">Use Default Settings</label></th>
