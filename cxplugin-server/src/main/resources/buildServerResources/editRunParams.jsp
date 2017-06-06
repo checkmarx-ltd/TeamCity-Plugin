@@ -224,7 +224,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <bs:helpIcon
                     iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
         <td>
-            <textarea id="globalFilterPatterns123" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
+            <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
         </td>
     </tr>
 
