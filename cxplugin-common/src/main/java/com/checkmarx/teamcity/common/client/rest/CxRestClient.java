@@ -264,7 +264,9 @@ public class CxRestClient {
 
     private void validateResponse(HttpResponse response, int status, String message) throws CxClientException {
         if (response.getStatusLine().getStatusCode() != status) {
-            throw new CxClientException(message + ": " + "status code: " + response.getStatusLine().getStatusCode() + ". reason phrase: " + response.getStatusLine().getReasonPhrase());
+            String responseBody = extractResponseBody(response);
+            responseBody = responseBody.replace("{", "").replace("}", "").replace(System.lineSeparator(), " ").replace("  ", "");
+            throw new CxClientException(message + ": " + "status code: " + response.getStatusLine().getStatusCode() + ". error:" + responseBody);
         }
     }
 
@@ -288,6 +290,14 @@ public class CxRestClient {
         } catch (IOException e) {
             log.debug("Failed to parse json response: [" + json + "]", e);
             throw new CxClientException("Failed to parse json response: " + e.getMessage());
+        }
+    }
+
+    private String extractResponseBody(HttpResponse response) {
+        try {
+            return IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
+        } catch (IOException e) {
+            return "";
         }
     }
 }
