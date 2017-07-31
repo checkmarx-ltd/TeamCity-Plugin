@@ -3,10 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.checkmarx.teamcity</groupId>
   <artifactId>cxplugin</artifactId>
-  <version>8.5.0-SNAPSHOT</version>
+  <version>${cx-plugin-version}</version>
   <packaging>pom</packaging>
   <properties>
     <teamcity-version>9.0.3</teamcity-version>
+    <cx-plugin-version>8.5.0-SNAPSHOT</cx-plugin-version>
   </properties>
   <repositories>
     <repository>
