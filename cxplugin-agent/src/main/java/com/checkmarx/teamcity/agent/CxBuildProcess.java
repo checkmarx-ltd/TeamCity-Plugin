@@ -49,6 +49,7 @@ public class CxBuildProcess extends CallableBuildProcess {
     private final AgentRunningBuild agentRunningBuild;
     private final ArtifactsWatcher artifactsWatcher;
     private final CxBuildLoggerAdapter logger;
+    private String pluginVersion;
 
     private CxScanConfiguration config;
     private CxClientService client;
@@ -96,6 +97,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             buildDirectory = new File(agentRunningBuild.getBuildTempDirectory() + "/" + agentRunningBuild.getProjectName() + "/" + agentRunningBuild.getBuildTypeName() + "/" + agentRunningBuild.getBuildNumber() + CX_REPORT_LOCATION);
 
             config = CxScanConfiguration.resolveConfigurations(runnerParameters, sharedConfigParameters);
+            pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
             printConfiguration();
             url = new URL(config.getUrl());
             client = new CxClientServiceImpl(url, config.getUsername(), config.getPassword());
@@ -287,6 +289,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private void printConfiguration() {
         logger.info("----------------------------Configurations:-----------------------------");
+        logger.info("Plugin version: " + pluginVersion);
         logger.info("URL: " + config.getUrl());
         logger.info("Username: " + config.getUsername());
         logger.info("Project name: " + config.getProjectName());

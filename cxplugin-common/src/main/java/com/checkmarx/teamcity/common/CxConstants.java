@@ -54,6 +54,7 @@ public abstract class CxConstants {
 
 
     public static final String TEAMCITY_SERVER_URL = "cx.teamcity.server.url";
+    public static final String TEAMCITY_PLUGIN_VERSION = "cx.teamcity.plugin.version";
 
 
 }
