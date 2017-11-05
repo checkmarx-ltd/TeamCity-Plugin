@@ -201,8 +201,9 @@ public class CxBuildProcess extends CallableBuildProcess {
 
         //assert if expected exception is thrown  OR when vulnerabilities under threshold
         StringBuilder res = new StringBuilder("");
-        if (assertVulnerabilities(scanResults, osaSummaryResults, res) || sastException != null || osaException != null) {
-            printBuildFailure(res, sastException, osaException);
+        boolean thresholdExceeded = assertVulnerabilities(scanResults, osaSummaryResults, res);
+        if (thresholdExceeded || sastException != null || osaException != null) {
+            printBuildFailure(res, thresholdExceeded, sastException, osaException);
             return BuildFinishedStatus.FINISHED_FAILED;
         }
 
@@ -497,16 +498,19 @@ public class CxBuildProcess extends CallableBuildProcess {
         return fail;
     }
 
-    private void printBuildFailure(StringBuilder res, Exception sastBuildFailException, Exception osaBuildFailException) {
-        logger.error("*************************");
-        logger.error("The Build Failed due to: ");
-        logger.error("*************************");
+    private void printBuildFailure(StringBuilder res, boolean thresholdExceeded, Exception sastBuildFailException, Exception osaBuildFailException) {
+        logger.error("*********************************************");
+        logger.error(" The Build Failed for the Following Reasons: ");
+        logger.error("*********************************************");
 
         if (sastBuildFailException != null) {
-            logger.error(sastBuildFailException.getMessage() + (sastBuildFailException.getCause() == null ? "" : sastBuildFailException.getCause().getMessage()));
+            agentRunningBuild.getBuildLogger().buildFailureDescription(sastBuildFailException.getMessage() + (sastBuildFailException.getCause() == null ? "" : sastBuildFailException.getCause().getMessage()));
         }
         if (osaBuildFailException != null) {
-            logger.error(osaBuildFailException.getMessage() + (osaBuildFailException.getCause() == null ? "" : osaBuildFailException.getCause().getMessage()));
+            agentRunningBuild.getBuildLogger().buildFailureDescription(osaBuildFailException.getMessage() + (osaBuildFailException.getCause() == null ? "" : osaBuildFailException.getCause().getMessage()));
+        }
+        if(thresholdExceeded) {
+            agentRunningBuild.getBuildLogger().buildFailureDescription("Failure: threshold exceeded");
         }
 
         String[] lines = res.toString().split("\\n");
