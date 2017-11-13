@@ -1,6 +1,13 @@
 def server
 def buildInfo
 def fileName
+def revertSnapshot(){
+    bat 'c:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_Revert.ps1 -vm ' + machine_name + ' -SnapshotName ' + SnapshotName + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
+}
+
+def powerOnServer(){
+    bat 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_PowerOn.PS1 -vm ' + machine_name + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
+}
 
 pipeline {
 
@@ -160,7 +167,7 @@ pipeline {
     post { 
         success {
             fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
-            fileName = fileName.replaceAll("\\p{C}", "");
+            fileName = fileName.replaceAll("\\p{C}", "")
             cleanWs()
         }
         failure { 
@@ -182,76 +189,97 @@ pipeline {
 
 
 //revert
-
-    agent{
-        node {
-            label 'Plugins-TeamCity-Node'}
+    agent {
+        label 'revert-agent-2016-server'
     }
+    stages {
+        stage('Revert snapshot') {
+            agent {
+                label 'revert-agent-2016-server'
+            }
+            steps {
+                revertSnapshot()
+                powerOnServer()
+                sleep(180)
+                copyFile()
+            }
+        }
 
-    stages{
-        stage('Install checkmarx'){
-            if (toInstall == true){
-                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
+        agent {
+            node {
+                label 'Plugins-TeamCity-Node'
             }
-            else{
-                echo "no CX version was installed"
-            }
-            post{
-                failure{
-                    error 'Failure during Installation of latest CX build'
+        }
+
+        stages {
+            stage('Install checkmarx') {
+                if (toInstall == true) {
+                    git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
+                    bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
+                        buildDef
+                    } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
+                } else {
+                    echo "no CX version was installed"
+                }
+                post {
+                    failure {
+                        error 'Failure during Installation of latest CX build'
+                    }
                 }
             }
         }
-    }
 
-    //<== preparation for separation ==>
-    agent{
-        node {
-            label 'Plugins-TeamCity-Node'}
-    }
+        //<== preparation for separation ==>
+        agent {
+            node {
+                label 'Plugins-TeamCity-Node'
+            }
+        }
 
-    stages {
-        stage('copy TeamCity Plugin') {
-            echo "cleaning installer older from previous files"
-            powershell "cd '.\\installer'"
-            powershell "Remove-Item *"
-            def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
-            def downloadSpec = """{
+        stages {
+            stage('copy TeamCity Plugin') {
+                echo "cleaning installer older from previous files"
+                powershell "cd '.\\installer'"
+                powershell "Remove-Item *"
+                def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
+                def downloadSpec = """{
                         "files": [
                             {
                                 "pattern": "$filePath",
                                 "target": "c:\\installer\\"
                             }]
                         }"""
-            server.download(downloadSpec)
-            post {
-                failure {
-                    error 'failed to copy teamcity plugin'
-                }
-            }
-        }
-
-        stage('Install TeamCity Plugin') {
-            git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
-            bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= """
-
-            post {
-                failure {
-                    error 'Failure during Installation of latest teamcity plugin'
-                }
-            }
-        }
-        stage('Test TeamCity Plugin') {
-            git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-System-Test'
-            bat """mvn clean test -Dtest=com.cx.automation.plugin.test.teamcity.**.* -Denv=hardening_env -DfailIfNoTests=false -Dmaven.test.failure.ignore=true"""
-
-            post {
-                always {
-                    junit 'TeamCity/target/surefire-reports/**/*.xml'
+                server.download(downloadSpec)
+                post {
+                    failure {
+                        error 'failed to copy teamcity plugin'
+                    }
                 }
             }
 
+            stage('Install TeamCity Plugin') {
+                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
+                bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${
+                    job_name
+                } -Dbuild.ver=${version} -Dbuild.location= """
+
+                post {
+                    failure {
+                        error 'Failure during Installation of latest teamcity plugin'
+                    }
+                }
+            }
+            stage('Test TeamCity Plugin') {
+                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-System-Test'
+                bat """mvn clean test -Dtest=com.cx.automation.plugin.test.teamcity.**.* -Denv=hardening_env -DfailIfNoTests=false -Dmaven.test.failure.ignore=true"""
+
+                post {
+                    always {
+                        junit 'TeamCity/target/surefire-reports/**/*.xml'
+                    }
+                }
+
+            }
         }
     }
 
