@@ -2,6 +2,14 @@ def server
 def buildInfo
 def fileName
 
+
+
+def loadFile() {
+    node { label 'Plugins' }
+        fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
+        fileName = fileName.replaceAll("\\p{C}", "");
+    }
+
 pipeline {
 
     agent {
@@ -159,8 +167,7 @@ pipeline {
 	
     post { 
         success {
-            fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
-            fileName = fileName.replaceAll("\\p{C}", "");
+            loadFile()
             cleanWs()
         }
         failure { 
