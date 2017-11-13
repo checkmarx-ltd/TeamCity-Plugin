@@ -22,9 +22,9 @@ pipeline {
     agent {
         node { label 'Plugins' }
     }
-	
-	tools { 
-        maven 'mvn_3.3.3_windows' 
+
+    tools {
+        maven 'mvn_3.3.3_windows'
         jdk 'JDK_WINDOWS_1.8.0_92' 
     }
 	
@@ -112,16 +112,24 @@ pipeline {
             }
         }
 		
-		stage('Apply Artifact Version') {
+		stage(
+
+                'Apply Artifact Version') {
             steps{
                 script {
-					workspacePath = pwd()
-					writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
+                    workspacePath = pwd()
+                    writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
                 }
                 
-                dir("$workspacePath") {
+                dir("$
+
+                workspacePath")
+
+                        {
                     
-					powershell ''' If(Test-Path pom.xml)
+					powershell
+
+                    ''' If(Test-Path pom.xml)
 					{ 
 						[xml]$XmlDocument = Get-Content -Path pom.xml
                         $version = $XmlDocument.project.version.Split(\'-\')[0]
@@ -164,7 +172,13 @@ pipeline {
                         }"""
                     }
                     
-                    server.upload spec: uploadSpec, buildInfo: buildInfo
+                    server.upload spec: uploadSpec
+
+                            ,
+
+
+                            buildInfo:
+                                    buildInfo
                    
 				}   
 			}
@@ -187,7 +201,10 @@ pipeline {
             <hr />
             <p>Thanks,</p>            
 			<p>DevOps Team</p>
-			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"         
+			""", subject
+
+            :
+                    "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
 			
 			cleanWs()
         }
