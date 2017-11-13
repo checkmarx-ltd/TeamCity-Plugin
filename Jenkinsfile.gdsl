@@ -10,7 +10,6 @@ def powerOnServer(){
 }
 
 
-
 def loadFile() {
     node { label 'Plugins' }
         fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
@@ -112,24 +111,16 @@ pipeline {
             }
         }
 		
-		stage(
-
-                'Apply Artifact Version') {
+		stage('Apply Artifact Version') {
             steps{
                 script {
-                    workspacePath = pwd()
-                    writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
+					workspacePath = pwd()
+					writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
                 }
                 
-                dir("$
-
-                workspacePath")
-
-                        {
+                dir("$workspacePath") {
                     
-					powershell
-
-                    ''' If(Test-Path pom.xml)
+					powershell ''' If(Test-Path pom.xml)
 					{ 
 						[xml]$XmlDocument = Get-Content -Path pom.xml
                         $version = $XmlDocument.project.version.Split(\'-\')[0]
@@ -172,20 +163,12 @@ pipeline {
                         }"""
                     }
                     
-                    server.upload spec: uploadSpec
-
-                            ,
-
-
-                            buildInfo:
-                                    buildInfo
+                    server.upload spec: uploadSpec, buildInfo: buildInfo
                    
 				}   
 			}
         }
 	}
-		
-	
     post { 
         success {
             loadFile()
@@ -201,10 +184,7 @@ pipeline {
             <hr />
             <p>Thanks,</p>            
 			<p>DevOps Team</p>
-			""", subject
-
-            :
-                    "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
+			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
 			
 			cleanWs()
         }
@@ -235,7 +215,6 @@ pipeline {
             }
         }
 
-        stages {
             stage('Install checkmarx') {
                 if (toInstall == true) {
                     git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
@@ -306,5 +285,3 @@ pipeline {
             }
         }
     }
-
-}
