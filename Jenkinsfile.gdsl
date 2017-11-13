@@ -1,20 +1,21 @@
 def server
 def buildInfo
 def fileName
-def revertSnapshot(){
+
+def revertSnapshot() {
     bat 'c:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_Revert.ps1 -vm ' + machine_name + ' -SnapshotName ' + SnapshotName + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
 }
 
-def powerOnServer(){
+def powerOnServer() {
     bat 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_PowerOn.PS1 -vm ' + machine_name + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
 }
 
 
 def loadFile() {
     node { label 'Plugins' }
-        fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
-        fileName = fileName.replaceAll("\\p{C}", "");
-    }
+    fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
+    fileName = fileName.replaceAll("\\p{C}", "");
+}
 
 pipeline {
 
@@ -24,103 +25,103 @@ pipeline {
 
     tools {
         maven 'mvn_3.3.3_windows'
-        jdk 'JDK_WINDOWS_1.8.0_92' 
+        jdk 'JDK_WINDOWS_1.8.0_92'
     }
-	
-	parameters
-	{
-		booleanParam (
-            defaultValue: false,
-            description: '',
-            name : 'IsReleaseBuild')
-	}
-		
+
+    parameters
+            {
+                booleanParam(
+                        defaultValue: false,
+                        description: '',
+                        name: 'IsReleaseBuild')
+            }
+
     stages {
-	
-		stage('Pipeline Info') {
+
+        stage('Pipeline Info') {
             steps {
                 echo bat(returnStdout: true, script: 'set')
             }
         }
-		
+
         stage('Remove Snapshot from build') {
-		    when {
+            when {
                 expression {
-                    return params.IsReleaseBuild 
+                    return params.IsReleaseBuild
                 }
             }
             steps {
                 echo " ----------------------------------------------------- "
-				echo "|  SNAPSHOT DISABLED: Removing Snapshot Before Build  |"
-				echo " ----------------------------------------------------- "
-				
-				script {
-					workspacePath = pwd()
-                }
-				
-				dir("$workspacePath") {
-					powershell '''		If(Test-Path pom.xml)
-					{  
-						[xml]$XmlDocument = Get-Content -Path pom.xml
-						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
-						$XmlDocument.Save("$pwd\\pom.xml")
-					}'''
-				}
-				
-				dir("$workspacePath\\build") {
-				    powershell '''		If(Test-Path pom.xml)
-					{  
-						[xml]$XmlDocument = Get-Content -Path pom.xml
-						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
-						$XmlDocument.Save("$pwd\\pom.xml")
-					}'''
-				}
-				
-				dir("$workspacePath\\cxplugin-agent") {
-					powershell '''		If(Test-Path pom.xml)
-					{  
-						[xml]$XmlDocument = Get-Content -Path pom.xml
-						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
-						$XmlDocument.Save("$pwd\\pom.xml")
-					}'''
-				}	
+                echo "|  SNAPSHOT DISABLED: Removing Snapshot Before Build  |"
+                echo " ----------------------------------------------------- "
 
-				dir("$workspacePath\\cxplugin-common") {
-				    powershell '''		If(Test-Path pom.xml)
+                script {
+                    workspacePath = pwd()
+                }
+
+                dir("$workspacePath") {
+                    powershell '''		If(Test-Path pom.xml)
 					{  
 						[xml]$XmlDocument = Get-Content -Path pom.xml
 						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
 						$XmlDocument.Save("$pwd\\pom.xml")
 					}'''
-				}
-				
-				dir("$workspacePath\\cxplugin-server") {
-				    powershell '''		If(Test-Path pom.xml)
+                }
+
+                dir("$workspacePath\\build") {
+                    powershell '''		If(Test-Path pom.xml)
 					{  
 						[xml]$XmlDocument = Get-Content -Path pom.xml
 						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
 						$XmlDocument.Save("$pwd\\pom.xml")
 					}'''
-				}
-			}		
-		}
-		
-		stage('Build') {
-            steps{
+                }
+
+                dir("$workspacePath\\cxplugin-agent") {
+                    powershell '''		If(Test-Path pom.xml)
+					{  
+						[xml]$XmlDocument = Get-Content -Path pom.xml
+						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
+						$XmlDocument.Save("$pwd\\pom.xml")
+					}'''
+                }
+
+                dir("$workspacePath\\cxplugin-common") {
+                    powershell '''		If(Test-Path pom.xml)
+					{  
+						[xml]$XmlDocument = Get-Content -Path pom.xml
+						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
+						$XmlDocument.Save("$pwd\\pom.xml")
+					}'''
+                }
+
+                dir("$workspacePath\\cxplugin-server") {
+                    powershell '''		If(Test-Path pom.xml)
+					{  
+						[xml]$XmlDocument = Get-Content -Path pom.xml
+						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
+						$XmlDocument.Save("$pwd\\pom.xml")
+					}'''
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
                 bat "mvn clean install -Dbuild.number=${BUILD_NUMBER}"
             }
         }
-		
-		stage('Apply Artifact Version') {
-            steps{
+
+        stage('Apply Artifact Version') {
+            steps {
                 script {
-					workspacePath = pwd()
-					writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
+                    workspacePath = pwd()
+                    writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
                 }
-                
+
                 dir("$workspacePath") {
-                    
-					powershell ''' If(Test-Path pom.xml)
+
+                    powershell ''' If(Test-Path pom.xml)
 					{ 
 						[xml]$XmlDocument = Get-Content -Path pom.xml
                         $version = $XmlDocument.project.version.Split(\'-\')[0]
@@ -130,11 +131,11 @@ pipeline {
                         $newName | Out-File c:\\newName.txt
                         Get-ChildItem target\\*.zip | Rename-Item -NewName {$newName}
 					}'''
-				}
+                }
             }
         }
-		
-		stage('Upload To Artifactory') {
+
+        stage('Upload To Artifactory') {
             steps {
                 script {
                     server = Artifactory.server "-484709638@1439224648400"
@@ -142,8 +143,8 @@ pipeline {
                     buildInfo.env.capture = true
                     buildInfo.env.collect()
                     def uploadSpec = ""
-                    
-                    if("${params.IsReleaseBuild}" == "true") {
+
+                    if ("${params.IsReleaseBuild}" == "true") {
                         uploadSpec = """{
                         "files": [
                         {
@@ -162,20 +163,19 @@ pipeline {
                         ]
                         }"""
                     }
-                    
+
                     server.upload spec: uploadSpec, buildInfo: buildInfo
-                   
-				}   
-			}
+
+                }
+            }
         }
-	}
-    post { 
-        success {
-            loadFile()
-            cleanWs()
-        }
-        failure { 
-			emailext body: """
+        post {
+            success {
+                loadFile()
+                cleanWs()
+            }
+            failure {
+                emailext body: """
             <b>TeamCity Failed Pipeline</b><br>
             <B>Build URL: </b> ${BUILD_URL} <br>
             <br>
@@ -185,18 +185,12 @@ pipeline {
             <p>Thanks,</p>            
 			<p>DevOps Team</p>
 			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
-			
-			cleanWs()
+
+                cleanWs()
+            }
         }
-    }
-//    <==automation part==>
 
-
-//revert
-    agent {
-        label 'revert-agent-2016-server'
-    }
-    stages {
+        //    <==automation part==>
         stage('Revert snapshot') {
             agent {
                 label 'revert-agent-2016-server'
@@ -209,79 +203,80 @@ pipeline {
             }
         }
 
-        agent {
-            node {
+        stage('Install checkmarx') {
+            agent {
                 label 'Plugins-TeamCity-Node'
             }
-        }
-
-            stage('Install checkmarx') {
-                if (toInstall == true) {
-                    git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                    bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
-                        buildDef
-                    } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
-                } else {
-                    echo "no CX version was installed"
-                }
-                post {
-                    failure {
-                        error 'Failure during Installation of latest CX build'
-                    }
+            if (toInstall == true) {
+                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
+                bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
+                    buildDef
+                } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
+            } else {
+                echo "no CX version was installed"
+            }
+            post {
+                failure {
+                    error 'Failure during Installation of latest CX build'
                 }
             }
         }
 
-        //<== preparation for separation ==>
-        agent {
-            node {
+        stage('copy TeamCity Plugin') {
+            agent {
                 label 'Plugins-TeamCity-Node'
             }
-        }
-
-        stages {
-            stage('copy TeamCity Plugin') {
-                echo "cleaning installer older from previous files"
-                powershell "cd '.\\installer'"
-                powershell "Remove-Item *"
-                def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
-                def downloadSpec = """{
+            echo "cleaning installer older from previous files"
+            powershell "cd '.\\installer'"
+            powershell "Remove-Item *"
+            def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
+            def downloadSpec = """{
                         "files": [
                             {
                                 "pattern": "$filePath",
                                 "target": "c:\\installer\\"
                             }]
                         }"""
-                server.download(downloadSpec)
-                post {
-                    failure {
-                        error 'failed to copy teamcity plugin'
-                    }
+            server.download(downloadSpec)
+            post {
+                failure {
+                    error 'failed to copy teamcity plugin'
                 }
             }
+        }
 
-            stage('Install TeamCity Plugin') {
-                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
-                bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${
-                    job_name
-                } -Dbuild.ver=${version} -Dbuild.location= """
+        stage('Install TeamCity Plugin') {
+            agent {
+                label 'Plugins-TeamCity-Node'
+            }
+            git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
+            bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${
+                job_name
+            } -Dbuild.ver=${version} -Dbuild.location= """
 
-                post {
-                    failure {
-                        error 'Failure during Installation of latest teamcity plugin'
-                    }
+            post {
+                failure {
+                    error 'Failure during Installation of latest teamcity plugin'
                 }
             }
-            stage('Test TeamCity Plugin') {
-                git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-System-Test'
-                bat """mvn clean test -Dtest=com.cx.automation.plugin.test.teamcity.**.* -Denv=hardening_env -DfailIfNoTests=false -Dmaven.test.failure.ignore=true"""
+        }
 
-                post {
-                    always {
-                        junit 'TeamCity/target/surefire-reports/**/*.xml'
-                    }
+        stage('Test TeamCity Plugin') {
+            agent {
+                label 'Plugins-TeamCity-Node'
+            }
+
+            git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-System-Test'
+            bat """mvn clean test -Dtest=com.cx.automation.plugin.test.teamcity.**.* -Denv=hardening_env -DfailIfNoTests=false -Dmaven.test.failure.ignore=true"""
+
+            post {
+                always {
+                    junit 'TeamCity/target/surefire-reports/**/*.xml'
                 }
-
             }
         }
     }
+
+
+
+}
