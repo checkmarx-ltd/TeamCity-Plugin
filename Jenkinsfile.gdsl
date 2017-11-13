@@ -163,19 +163,17 @@ pipeline {
                         ]
                         }"""
                     }
-
                     server.upload spec: uploadSpec, buildInfo: buildInfo
 
                 }
             }
-        }
-        post {
-            success {
-                loadFile()
-                cleanWs()
-            }
-            failure {
-                emailext body: """
+            post {
+                success {
+                    loadFile()
+                    cleanWs()
+                }
+                failure {
+                    emailext body: """
             <b>TeamCity Failed Pipeline</b><br>
             <B>Build URL: </b> ${BUILD_URL} <br>
             <br>
@@ -186,9 +184,11 @@ pipeline {
 			<p>DevOps Team</p>
 			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
 
-                cleanWs()
+                    cleanWs()
+                }
             }
         }
+
 
         //    <==automation part==>
         stage('Revert snapshot') {
@@ -276,7 +276,6 @@ pipeline {
             }
         }
     }
-
 
 
 }
