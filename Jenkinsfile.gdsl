@@ -231,18 +231,20 @@ pipeline {
                 label 'Plugins-TeamCity-Node'
             }
             steps {
-                echo "cleaning installer older from previous files"
-                powershell "cd '.\\installer'"
-                powershell "Remove-Item *"
-                def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
-                def downloadSpec = """{
+                script {
+                    echo "cleaning installer older from previous files"
+                    powershell "cd '.\\installer'"
+                    powershell "Remove-Item *"
+                    def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
+                    def downloadSpec = """{
                         "files": [
                             {
                                 "pattern": "$filePath",
                                 "target": "c:\\installer\\"
                             }]
                         }"""
-                server.download(downloadSpec)
+                    server.download(downloadSpec)
+                }
             }
             post {
                 failure {
