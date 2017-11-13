@@ -1,7 +1,7 @@
 def server
 def buildInfo
 def fileName
-def toInstall=false
+def toInstall = false
 
 def revertSnapshot() {
     bat 'c:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_Revert.ps1 -vm ' + machine_name + ' -SnapshotName ' + SnapshotName + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
@@ -190,7 +190,6 @@ pipeline {
             }
         }
 
-
         //    <==automation part==>
         stage('Revert snapshot') {
             agent {
@@ -209,13 +208,15 @@ pipeline {
                 label 'Plugins-TeamCity-Node'
             }
             steps {
-                if (toInstall == true) {
-                    git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                    bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
-                        buildDef
-                    } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
-                } else {
-                    echo "no CX version was installed"
+                script {
+                    if (toInstall == true) {
+                        git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
+                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
+                            buildDef
+                        } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
+                    } else {
+                        echo "no CX version was installed"
+                    }
                 }
                 post {
                     failure {
