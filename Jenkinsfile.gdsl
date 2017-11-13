@@ -216,11 +216,12 @@ pipeline {
             echo "cleaning installer older from previous files"
             powershell "cd '.\\installer'"
             powershell "Remove-Item *"
+            def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
             def downloadSpec = """{
                         "files": [
                             {
-                                "pattern": "plugins-release-local/com/checkmarx/teamcity/",
-                                "target": "c:\\installer\\"""fileName"""""
+                                "pattern": "$filePath",
+                                "target": "c:\\installer\\"
                             }]
                         }"""
             server.download(downloadSpec)
