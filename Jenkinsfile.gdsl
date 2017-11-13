@@ -162,7 +162,6 @@ pipeline {
             fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
             fileName = fileName.replaceAll("\\p{C}", "");
             cleanWs()
-
         }
         failure { 
 			emailext body: """
@@ -221,7 +220,7 @@ pipeline {
                         "files": [
                             {
                                 "pattern": "plugins-release-local/com/checkmarx/teamcity/",
-                                "target": "c:\\installer\\"
+                                "target": "c:\\installer\\"""fileName"""""
                             }]
                         }"""
             server.download(downloadSpec)
