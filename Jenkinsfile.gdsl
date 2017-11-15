@@ -1,6 +1,6 @@
 def server
 def buildInfo
-def String fileName
+def String fileName = ""
 
 def revertSnapshot() {
     bat 'c:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -noe -c ". \\"C:\\Program Files (x86)\\VMware\\Infrastructure\\PowerCLI\\Scripts\\Initialize-PowerCLIEnvironment.ps1\\" $true"; c:\\scripts\\VMware_Revert.ps1 -vm ' + machine_name + ' -SnapshotName ' + SnapshotName + ' -VMHostName "VcenterServer01.dm.cx"  -VMServerUsername "dm\\tfs" -VMServerPassword "Tfs12345"'
@@ -11,7 +11,7 @@ def powerOnServer() {
 }
 
 
-def String loadFile(fileName) {
+def String loadFile() {
     node { label 'Plugins' }
     fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
     fileName = fileName.replaceAll("\\p{C}", "");
@@ -171,7 +171,7 @@ pipeline {
             }
             post {
                 success {
-                    fileName =loadFile(fileName)
+                    fileName =loadFile()
                     cleanWs()
                 }
                 failure {
