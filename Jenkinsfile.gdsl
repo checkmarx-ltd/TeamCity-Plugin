@@ -11,7 +11,7 @@ def powerOnServer() {
 }
 
 
-def String loadFile() {
+def String loadFile(fileName) {
     node { label 'Plugins' }
     fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
     fileName = fileName.replaceAll("\\p{C}", "");
@@ -171,7 +171,7 @@ pipeline {
             }
             post {
                 success {
-                    fileName = loadFile()
+                    fileName =loadFile(fileName)
                     cleanWs()
                 }
                 failure {
