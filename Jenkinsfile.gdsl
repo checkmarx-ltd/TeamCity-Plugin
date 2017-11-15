@@ -46,9 +46,6 @@ pipeline {
         }
 
         stage('Remove Snapshot from build') {
-            agent {
-                label 'Plugins-TeamCity-Node'
-            }
             when {
                 expression {
                     return params.IsReleaseBuild
@@ -117,9 +114,6 @@ pipeline {
         }
 
         stage('Apply Artifact Version') {
-            agent {
-                label 'Plugins-TeamCity-Node'
-            }
             steps {
                 script {
                     workspacePath = pwd()
@@ -143,9 +137,6 @@ pipeline {
         }
 
         stage('Upload To Artifactory') {
-            agent {
-                label 'Plugins-TeamCity-Node'
-            }
             steps {
                 script {
                     server = Artifactory.server "-484709638@1439224648400"
