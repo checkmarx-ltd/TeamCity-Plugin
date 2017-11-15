@@ -133,7 +133,7 @@ pipeline {
 					}'''
                 }
 
-                filename = getVersion(fileName)
+                fileName = getVersion(fileName)
                 bat """echo $fileName"""
             }
         }
