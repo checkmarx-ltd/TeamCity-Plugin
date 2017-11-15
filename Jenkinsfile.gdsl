@@ -13,7 +13,7 @@ def powerOnServer() {
 
 def loadFile() {
     node { label 'Plugins' }
-    fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
+    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
     fileName = fileName.replaceAll("\\p{C}", "");
     bat """echo $fileName"""
 }
@@ -171,7 +171,7 @@ pipeline {
             post {
                 success {
                     loadFile()
-                    cleanWs()
+//                    cleanWs()
                 }
                 failure {
                     emailext body: """
