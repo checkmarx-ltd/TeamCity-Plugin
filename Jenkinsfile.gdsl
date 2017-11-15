@@ -11,12 +11,12 @@ def powerOnServer() {
 }
 
 
-def loadFile() {
-    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
-    fileName = fileName.replaceAll("\\p{C}", "");
-    bat """echo $fileName"""
-    return fileName
-}
+//def loadFile() {
+//    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
+//    fileName = fileName.replaceAll("\\p{C}", "");
+//    bat """echo $fileName"""
+//    return fileName
+//}
 
 pipeline {
 
@@ -132,7 +132,9 @@ pipeline {
                         $newName | Out-File c:\\newName.txt
                         Get-ChildItem target\\*.zip | Rename-Item -NewName {$newName}
 					}'''
-                    fileName = loadFile()
+                    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
+                    fileName = fileName.replaceAll("\\p{C}", "");
+                    bat """echo $fileName"""
                 }
             }
         }
