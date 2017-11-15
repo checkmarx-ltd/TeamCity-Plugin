@@ -11,11 +11,11 @@ def powerOnServer() {
 }
 
 
-def loadFile() {
+def getVersion() {
     def fileVersionName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
     fileVersionName = fileName.replaceAll("\\p{C}", "");
     bat """echo $fileVersionName"""
-    return fileVersionName;
+    return fileVersionName
 }
 
 pipeline {
@@ -133,7 +133,7 @@ pipeline {
 					}'''
                 }
 
-                filename = loadFile()
+                filename = getVersion()
                 bat """echo $fileName"""
             }
         }
