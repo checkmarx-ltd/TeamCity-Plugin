@@ -11,12 +11,11 @@ def powerOnServer() {
 }
 
 
-//def loadFile() {
-//    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
-//    fileName = fileName.replaceAll("\\p{C}", "");
-//    bat """echo $fileName"""
-//    return fileName
-//}
+def loadFile(filename) {
+    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
+    fileName = fileName.replaceAll("\\p{C}", "");
+    bat """echo $fileName"""
+}
 
 pipeline {
 
@@ -134,8 +133,7 @@ pipeline {
 					}'''
                 }
 
-                fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
-                fileName = fileName.replaceAll("\\p{C}", "");
+                loadFile()
                 bat """echo $fileName"""
             }
         }
