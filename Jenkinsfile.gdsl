@@ -231,7 +231,7 @@ pipeline {
                 script {
                     echo "cleaning installer older from previous files"
                     powershell 'cd c:\\\\installer'
-                    powershell 'Remove-Item *'
+                    powershell 'Remove-Item * -Recurse'
                     server = Artifactory.server "-484709638@1439224648400"
                     def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
                     def downloadSpec = """{
