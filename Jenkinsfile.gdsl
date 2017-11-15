@@ -202,28 +202,28 @@ pipeline {
 //            }
 //        }
 
-        stage('Install checkmarx') {
-            agent {
-                label 'Plugins-TeamCity-Node'
-            }
-            steps {
-                script {
-                    if (toInstall == true) {
-                        git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
-                            buildDef
-                        } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
-                    } else {
-                        echo "no CX version was installed"
-                    }
-                }
-                post {
-                    failure {
-                        error 'Failure during Installation of latest CX build'
-                    }
-                }
-            }
-        }
+//        stage('Install checkmarx') {
+//            agent {
+//                label 'Plugins-TeamCity-Node'
+//            }
+//            steps {
+//                script {
+//                    if (toInstall == true) {
+//                        git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
+//                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
+//                            buildDef
+//                        } -Djob.name=${job_name} -Dbuild.ver=${buildVersion} -Dbuild.location= -Drun.verification=true"""
+//                    } else {
+//                        echo "no CX version was installed"
+//                    }
+//                }
+//                post {
+//                    failure {
+//                        error 'Failure during Installation of latest CX build'
+//                    }
+//                }
+//            }
+//        }
 
         stage('copy TeamCity Plugin') {
             agent {
@@ -258,7 +258,7 @@ pipeline {
             }
             steps {
                 git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
-                bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= """
+                bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${buildVersion} -Dbuild.location= """
             }
             post {
                 failure {
