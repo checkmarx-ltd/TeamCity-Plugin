@@ -132,10 +132,11 @@ pipeline {
                         $newName | Out-File c:\\newName.txt
                         Get-ChildItem target\\*.zip | Rename-Item -NewName {$newName}
 					}'''
-                    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
-                    fileName = fileName.replaceAll("\\p{C}", "");
-                    bat """echo $fileName"""
                 }
+
+                fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
+                fileName = fileName.replaceAll("\\p{C}", "");
+                bat """echo $fileName"""
             }
         }
 
