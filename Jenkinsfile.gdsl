@@ -118,10 +118,10 @@ pipeline {
                 script {
                     workspacePath = pwd()
                     writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
-                }
-                dir("$workspacePath") {
+                    //}
+                    dir("$workspacePath") {
 
-                    powershell ''' If(Test-Path pom.xml)
+                        powershell ''' If(Test-Path pom.xml)
 					{ 
 						[xml]$XmlDocument = Get-Content -Path pom.xml
                         $version = $XmlDocument.project.version.Split(\'-\')[0]
@@ -131,10 +131,11 @@ pipeline {
                         $newName | Out-File c:\\newName.txt
                         Get-ChildItem target\\*.zip | Rename-Item -NewName {$newName}
 					}'''
-                }
+                    }
 
-                fileName = getVersion(fileName)
-                bat """echo $fileName"""
+                    fileName = getVersion(fileName)
+                    bat """echo $fileName"""
+                }
             }
         }
 
