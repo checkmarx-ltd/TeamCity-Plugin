@@ -133,7 +133,7 @@ pipeline {
 					}'''
                 }
 
-                loadFile()
+                loadFile(fileName)
                 bat """echo $fileName"""
             }
         }
