@@ -16,6 +16,7 @@ def loadFile() {
     fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
     fileName = fileName.replaceAll("\\p{C}", "");
     bat """echo $fileName"""
+    return fileName
 }
 
 pipeline {
@@ -170,8 +171,8 @@ pipeline {
             }
             post {
                 success {
-                    loadFile()
-//                    cleanWs()
+                    fileName = loadFile()
+                    cleanWs()
                 }
                 failure {
                     emailext body: """
