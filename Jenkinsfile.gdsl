@@ -135,7 +135,6 @@ pipeline {
                 }
             }
         }
-
         stage('Upload To Artifactory') {
             steps {
                 script {
