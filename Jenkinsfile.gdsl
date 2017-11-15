@@ -118,7 +118,6 @@ pipeline {
                     workspacePath = pwd()
                     writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
                 }
-
                 dir("$workspacePath") {
 
                     powershell ''' If(Test-Path pom.xml)
