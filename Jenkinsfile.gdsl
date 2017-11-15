@@ -167,10 +167,10 @@ pipeline {
                     server.upload spec: uploadSpec, buildInfo: buildInfo
 
                 }
+                fileName = loadFile()
             }
             post {
                 success {
-                    fileName = loadFile()
                     cleanWs()
                 }
                 failure {
