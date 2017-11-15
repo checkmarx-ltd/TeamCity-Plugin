@@ -170,7 +170,7 @@ pipeline {
             }
             post {
                 success {
-                    fileName = loadFile()
+                    loadFile()
 //                    cleanWs()
                 }
                 failure {
