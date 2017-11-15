@@ -182,7 +182,7 @@ pipeline {
             <hr />
             <p>Thanks,</p>            
 			<p>DevOps Team</p>
-			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com"
+			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com,tal.levi@checkmarx.com"
 
                     cleanWs()
                 }
@@ -210,11 +210,9 @@ pipeline {
                 script {
                     if (toInstall == true) {
                         git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${
-                            buildDef
-                        } -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
+                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= -Drun.verification=true"""
                     } else {
-                        echo "no CX version was installed"
+                        echo "No CX version was installed"
                     }
                 }
                 post {
@@ -258,7 +256,7 @@ pipeline {
             }
             steps {
                 git credentialsId: '8d5be3e2-b7fe-47f5-a430-9bd926d07711',poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Plugin-Reactor'
-                bat """mvn clean install -Dplugin.install=true   -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location= """
+                bat """mvn clean install -Dplugin.install=true -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location="""
             }
             post {
                 failure {
