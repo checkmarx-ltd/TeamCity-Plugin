@@ -11,10 +11,11 @@ def powerOnServer() {
 }
 
 
-def loadFile(filename) {
-    fileName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
-    fileName = fileName.replaceAll("\\p{C}", "");
-    bat """echo $fileName"""
+def loadFile() {
+    def fileVersionName = readFile encoding: 'unicode', file: 'c:\\newName.txt'
+    fileVersionName = fileName.replaceAll("\\p{C}", "");
+    bat """echo $fileVersionName"""
+    return fileVersionName;
 }
 
 pipeline {
@@ -132,7 +133,7 @@ pipeline {
 					}'''
                 }
 
-                loadFile(fileName)
+                filename = loadFile()
                 bat """echo $fileName"""
             }
         }
@@ -201,27 +202,27 @@ pipeline {
 ////                copyFile()
 //            }
 //        }
-
-        stage('Install checkmarx') {
-            agent {
-                label 'Plugins-TeamCity-Node'
-            }
-            steps {
-                script {
-                    if (toInstall == true) {
-                        git credentialsId: '15f8e7b7-6ce7-44c0-b151-84f99ffa7aed', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
-                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location=${buildLocation} -Drun.verification=true"""
-                    } else {
-                        echo "No CX version was installed"
-                    }
-                }
-            }
-            post {
-                failure {
-                    error 'Failure during Installation of latest CX build'
-                }
-            }
-        }
+//
+//        stage('Install checkmarx') {
+//            agent {
+//                label 'Plugins-TeamCity-Node'
+//            }
+//            steps {
+//                script {
+//                    if (toInstall == true) {
+//                        git credentialsId: '15f8e7b7-6ce7-44c0-b151-84f99ffa7aed', poll: false, url: 'http://tfs2013:8080/tfs/DefaultCollection/Automation/_git/Checkmarx-Reactor'
+//                        bat """mvn clean install -Drun.install=true -Drun.copy.slave=true -Dbuild.def=${buildDef} -Djob.name=${job_name} -Dbuild.ver=${version} -Dbuild.location=${buildLocation} -Drun.verification=true"""
+//                    } else {
+//                        echo "No CX version was installed"
+//                    }
+//                }
+//            }
+//            post {
+//                failure {
+//                    error 'Failure during Installation of latest CX build'
+//                }
+//            }
+//        }
 
         stage('copy TeamCity Plugin') {
             agent {
