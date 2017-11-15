@@ -230,7 +230,7 @@ pipeline {
             steps {
                 script {
                     echo "cleaning installer older from previous files"
-                    powershell "cd '.\\installer'"
+                    powershell " cd C:\\installer"
                     powershell "Remove-Item *"
                     def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
                     def downloadSpec = """{
