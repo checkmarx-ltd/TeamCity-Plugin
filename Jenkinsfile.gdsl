@@ -14,7 +14,8 @@ def powerOnServer() {
 
 def loadFile() {
     fileName = readFile encoding: 'utf8', file: 'c:\\newName.txt'
-    fileName = fileName.replaceAll("\\p{C}", "");
+    fileName = fileName.replaceAll("\\p{C}", "")
+    return fileName
 }
 
 pipeline {
@@ -169,7 +170,7 @@ pipeline {
             }
             post {
                 success {
-                    loadFile()
+                    fileName = loadFile()
 //                    cleanWs()
                 }
                 failure {
