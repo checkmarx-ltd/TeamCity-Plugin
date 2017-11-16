@@ -21,12 +21,12 @@ def loadFile() {
 pipeline {
 
     agent {
-        label 'Plugins-TeamCity-Node'
+        node { label 'Plugins' }
     }
 
     tools {
         maven 'mvn_3.3.3_windows'
-        jdk 'JDK_WINDOWS_1.8.0_131'
+        jdk 'JDK_WINDOWS_1.8.0_92'
     }
 
     parameters
@@ -119,11 +119,9 @@ pipeline {
                     workspacePath = pwd()
                     writeFile file: "$workspacePath\\buildNumber.txt", text: "${env.BUILD_NUMBER}"
                 }
-
                 dir("$workspacePath") {
-
                     powershell ''' If(Test-Path pom.xml)
-					{ 
+					{
 						[xml]$XmlDocument = Get-Content -Path pom.xml
                         $version = $XmlDocument.project.version.Split(\'-\')[0]
                         $fileName = Get-ChildItem target\\*.zip | Split-Path -Leaf
