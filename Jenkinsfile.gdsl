@@ -40,6 +40,9 @@ pipeline {
     stages {
 
         stage('Pipeline Info') {
+            agent {
+                node { label 'Plugins' }
+            }
             steps {
                 echo bat(returnStdout: true, script: 'set')
             }
@@ -112,6 +115,10 @@ pipeline {
         }
 
         stage('Apply Artifact Version') {
+            agent {
+                label 'Plugins-TeamCity-Node'
+            }
+
             steps {
                 script {
                     workspacePath = pwd()
