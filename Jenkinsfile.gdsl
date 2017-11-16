@@ -191,17 +191,17 @@ pipeline {
         }
 
 //            <==automation part==>
-//        stage('Revert snapshot') {
-//            agent {
-//                label 'revert-agent-2016-server'
-//            }
-//            steps {
-//                revertSnapshot()
-//                powerOnServer()
-//                sleep(180)
-////                copyFile()
-//            }
-//        }
+        stage('Revert snapshot') {
+            agent {
+                label 'revert-agent-2016-server'
+            }
+            steps {
+                revertSnapshot()
+                powerOnServer()
+                sleep(180)
+//                copyFile()
+            }
+        }
 
         stage('Install checkmarx') {
             agent {
