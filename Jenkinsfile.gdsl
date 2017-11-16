@@ -55,14 +55,12 @@ pipeline {
                 echo " ----------------------------------------------------- "
                 echo "|  SNAPSHOT DISABLED: Removing Snapshot Before Build  |"
                 echo " ----------------------------------------------------- "
-
                 script {
                     workspacePath = pwd()
                 }
-
                 dir("$workspacePath") {
-                    powershell '''		If(Test-Path pom.xml)
-					{  
+                    powershell '''If(Test-Path pom.xml)
+					{
 						[xml]$XmlDocument = Get-Content -Path pom.xml
 						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
 						$XmlDocument.Save("$pwd\\pom.xml")
@@ -70,7 +68,7 @@ pipeline {
                 }
 
                 dir("$workspacePath\\build") {
-                    powershell '''		If(Test-Path pom.xml)
+                    powershell '''If(Test-Path pom.xml)
 					{  
 						[xml]$XmlDocument = Get-Content -Path pom.xml
 						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
@@ -88,7 +86,7 @@ pipeline {
                 }
 
                 dir("$workspacePath\\cxplugin-common") {
-                    powershell '''		If(Test-Path pom.xml)
+                    powershell '''If(Test-Path pom.xml)
 					{  
 						[xml]$XmlDocument = Get-Content -Path pom.xml
 						$XmlDocument.project.version = $XmlDocument.project.version.Replace("-SNAPSHOT", "")
@@ -230,6 +228,7 @@ pipeline {
             steps {
                 script {
                     echo "cleaning installer older from previous files"
+                    echo """"My file name is: ${filename} """""
                     powershell "cd '.\\installer'"
                     powershell "Remove-Item *"
                     def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/" + filename + ".zip"
