@@ -231,7 +231,7 @@ pipeline {
             steps {
                 bat'echo cleaning installer older from previous files'
                 bat 'del /s/q c:\\installer\\* '
-                def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/*." + env.BUILD_NUMBER + ".zip"
+                def filePath = "plugins-snapshot-local/com/checkmarx/teamcity/*." + ${env.BUILD_NUMBER} + ".zip"
                 script {
                     server = Artifactory.server "-484709638@1439224648400"
                     def downloadSpec = """{
