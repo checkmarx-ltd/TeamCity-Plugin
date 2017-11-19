@@ -172,6 +172,7 @@ pipeline {
             post {
                 success {
                     cleanWs()
+                    println("upload to artifactory was completed successfully")
                 }
                 failure {
                     emailext body: """
@@ -184,7 +185,6 @@ pipeline {
             <p>Thanks,</p>            
 			<p>DevOps Team</p>
 			""", subject: "Jenkins Job TeamCity Plugin - Failed", to: "Rona.Hirsch@checkmarx.com,tal.levi@checkmarx.com"
-
                     cleanWs()
                 }
             }
@@ -200,6 +200,14 @@ pipeline {
                 powerOnServer()
                 sleep(180)
 //                copyFile()
+            }
+            post {
+                failure {
+                    error 'Cannot revert machines'
+                }
+                success{
+                    println("Revert machine was completed successfully")
+                }
             }
         }
 
@@ -221,8 +229,12 @@ pipeline {
                 }
             }
             post {
+
                 failure {
                     error 'Failure during Installation of latest CX build'
+                }
+                success{
+                    println("Checkmarx installation was completed successfully")
                 }
             }
         }
@@ -251,6 +263,9 @@ pipeline {
                 }
             }
             post {
+                success{
+                    println("Team city copy was completed successfully")
+                }
                 failure {
                     error 'failed to copy teamcity plugin'
                 }
@@ -270,6 +285,9 @@ pipeline {
                 sleep(180)
             }
             post {
+                success{
+                    println("Team city installation completed successfully")
+                }
                 failure {
                     error 'Failure during Installation of latest teamcity plugin'
                 }
@@ -292,6 +310,9 @@ pipeline {
             post {
                 always {
                     junit 'TeamCity/target/surefire-reports/**/*.xml'
+                }
+                success{
+                    println("Team city tests were completed successfully")
                 }
             }
         }
