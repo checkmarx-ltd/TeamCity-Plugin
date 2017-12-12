@@ -58,7 +58,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
             validateNumericLargerThanZero(CxParam.SCAN_TIMEOUT_IN_MINUTES, properties, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, result);
         }
 
-        if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SAST_CONFIG))) {
+        if(!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SCAN_CONTROL))) {
 
 
             if (TRUE.equals(properties.get(CxParam.IS_SYNCHRONOUS))) {

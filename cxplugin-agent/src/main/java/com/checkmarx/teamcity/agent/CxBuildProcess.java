@@ -559,7 +559,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(SAST_SUMMARY_RESULTS_LINK, String.valueOf(projectStateLink))
                     .replace(SAST_SCAN_RESULTS_LINK, String.valueOf(scanResultsUrl))
                     .replace(SAST_PDF_LINK, String.valueOf(sastPDFLink))
-                    .replace(THRESHOLD_ENABLED, String.valueOf(config.isThresholdsEnabled()))
+                    .replace(THRESHOLD_ENABLED, String.valueOf(config.isSASTThresholdEnabled()))
                     .replace(HIGH_THRESHOLD, String.valueOf(config.getHighThreshold()))
                     .replace(MEDIUM_THRESHOLD, String.valueOf(config.getMediumThreshold()))
                     .replace(LOW_THRESHOLD, String.valueOf(config.getLowThreshold()))
