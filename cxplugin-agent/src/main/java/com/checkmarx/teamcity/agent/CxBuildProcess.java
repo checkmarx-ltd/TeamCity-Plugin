@@ -476,12 +476,12 @@ public class CxBuildProcess extends CallableBuildProcess {
     private boolean assertVulnerabilities(ScanResults scanResults, OSASummaryResults osaSummaryResults, StringBuilder res) {
 
         boolean failByThreshold = false;
-        if (config.isSASTThresholdEnabled() && scanResults != null) {
+        if (config.isSASTThresholdEffectivelyEnabled() && scanResults != null) {
             failByThreshold = isFail(scanResults.getHighSeverityResults(), config.getHighThreshold(), res, "high", "CxSAST ");
             failByThreshold |= isFail(scanResults.getMediumSeverityResults(), config.getMediumThreshold(), res, "medium", "CxSAST ");
             failByThreshold |= isFail(scanResults.getLowSeverityResults(), config.getLowThreshold(), res, "low", "CxSAST ");
         }
-        if (config.isOSAThresholdEnabled() && osaSummaryResults != null) {
+        if (config.isOSAThresholdEffectivelyEnabled() && osaSummaryResults != null) {
             failByThreshold |= isFail(osaSummaryResults.getTotalHighVulnerabilities(), config.getOsaHighThreshold(), res, "high", "CxOSA ");
             failByThreshold |= isFail(osaSummaryResults.getTotalMediumVulnerabilities(), config.getOsaMediumThreshold(), res, "medium", "CxOSA ");
             failByThreshold |= isFail(osaSummaryResults.getTotalLowVulnerabilities(), config.getOsaLowThreshold(), res, "low", "CxOSA ");
@@ -559,7 +559,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(SAST_SUMMARY_RESULTS_LINK, String.valueOf(projectStateLink))
                     .replace(SAST_SCAN_RESULTS_LINK, String.valueOf(scanResultsUrl))
                     .replace(SAST_PDF_LINK, String.valueOf(sastPDFLink))
-                    .replace(THRESHOLD_ENABLED, String.valueOf(config.isSASTThresholdEnabled()))
+                    .replace(THRESHOLD_ENABLED, String.valueOf(config.isSASTThresholdEffectivelyEnabled()))
                     .replace(HIGH_THRESHOLD, String.valueOf(config.getHighThreshold()))
                     .replace(MEDIUM_THRESHOLD, String.valueOf(config.getMediumThreshold()))
                     .replace(LOW_THRESHOLD, String.valueOf(config.getLowThreshold()))
@@ -599,7 +599,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     .replace(OSA_LOW_RESULTS, String.valueOf(osaSummaryResults.getTotalLowVulnerabilities()))
                     .replace(OSA_SUMMARY_RESULTS_LINK, String.valueOf(osaProjectSummaryLink))
                     .replace(OSA_PDF_LINK, String.valueOf(osaPDFLink))
-                    .replace(OSA_THRESHOLD_ENABLED, String.valueOf(config.isOSAThresholdEnabled()))
+                    .replace(OSA_THRESHOLD_ENABLED, String.valueOf(config.isOSAThresholdEffectivelyEnabled()))
                     .replace(OSA_HIGH_THRESHOLD, String.valueOf(config.getOsaHighThreshold()))
                     .replace(OSA_MEDIUM_THRESHOLD, String.valueOf(config.getOsaMediumThreshold()))
                     .replace(OSA_LOW_THRESHOLD, String.valueOf(config.getOsaLowThreshold()))

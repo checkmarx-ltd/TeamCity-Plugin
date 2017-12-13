@@ -401,11 +401,11 @@ public class CxScanConfiguration {
         return inti;
     }
 
-    public boolean isSASTThresholdEnabled() {
+    public boolean isSASTThresholdEffectivelyEnabled() {
         return isThresholdsEnabled() && (getLowThreshold() != null || getMediumThreshold() != null || getHighThreshold() != null);
     }
 
-    public boolean isOSAThresholdEnabled() {
+    public boolean isOSAThresholdEffectivelyEnabled() {
         return isOsaEnabled() && isOsaThresholdsEnabled() && (getOsaHighThreshold() != null || getOsaMediumThreshold() != null || getOsaLowThreshold() != null);
     }
 }
