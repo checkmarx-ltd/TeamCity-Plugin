@@ -1,12 +1,9 @@
 package com.checkmarx.teamcity.common.client;
 
 import com.checkmarx.teamcity.common.CxSelectOption;
+import com.checkmarx.teamcity.common.client.dto.*;
 import com.checkmarx.teamcity.common.client.rest.dto.*;
 import com.checkmarx.v7.*;
-import com.checkmarx.teamcity.common.client.dto.CreateScanResponse;
-import com.checkmarx.teamcity.common.client.dto.LocalScanConfiguration;
-import com.checkmarx.teamcity.common.client.dto.ReportType;
-import com.checkmarx.teamcity.common.client.dto.ScanResults;
 import com.checkmarx.teamcity.common.client.exception.CxClientException;
 import org.slf4j.Logger;
 
@@ -45,7 +42,7 @@ public interface CxClientService {
 
     ScanResults retrieveScanResults(long projectId) throws CxClientException;
 
-    CreateOSAScanResponse createOSAScan(long projectId, File zipFile) throws CxClientException, IOException;
+    CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws CxClientException, IOException;
 
     OSAScanStatus waitForOSAScanToFinish(String scanId, long scanTimeoutInMin, ScanWaitHandler<OSAScanStatus> waitHandler) throws CxClientException, InterruptedException, IOException;
 

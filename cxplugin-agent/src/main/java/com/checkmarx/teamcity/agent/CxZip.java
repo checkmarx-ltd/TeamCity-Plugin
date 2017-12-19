@@ -55,7 +55,7 @@ public class CxZip {
         }
 
         buildLogger.info("Zipping complete with " + numOfZippedFiles + " files, total compressed size: " +
-                FileUtils.byteCountToDisplaySize(tempFile.length() / 8 * 6)); // We print here the size of compressed sources before encoding to base 64
+                FileUtils.byteCountToDisplaySize(tempFile.length()));
         buildLogger.info("Temporary file with zipped sources was created at: '" + tempFile.getAbsolutePath() + "'");
 
         return tempFile;

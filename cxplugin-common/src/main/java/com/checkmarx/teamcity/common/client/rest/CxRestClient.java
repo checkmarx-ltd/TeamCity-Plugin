@@ -2,6 +2,7 @@ package com.checkmarx.teamcity.common.client.rest;
 
 
 import com.checkmarx.teamcity.common.client.dto.LoginRequest;
+import com.checkmarx.teamcity.common.client.dto.OSAFile;
 import com.checkmarx.teamcity.common.client.exception.CxClientException;
 import com.checkmarx.teamcity.common.client.rest.dto.*;
 import com.fasterxml.jackson.databind.JavaType;
@@ -16,17 +17,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -43,17 +39,17 @@ public class CxRestClient {
     private final String password;
     private String ROOT_PATH = "{hostName}/CxRestAPI/";
 
-    public static final String OSA_SCAN_PROJECT_PATH = "projects/{projectId}/scans";
+    public static final String OSA_SCAN_PROJECT_PATH = "osa/scans";
     public static final String OSA_SCAN_STATUS_PATH = "osa/scans/{scanId}";
     public static final String OSA_SCAN_SUMMARY_PATH = "osa/reports";
     public static final String OSA_SCAN_LIBRARIES_PATH = "/osa/libraries";
     public static final String OSA_SCAN_VULNERABILITIES_PATH = "/osa/vulnerabilities";
     private static final String AUTHENTICATION_PATH = "auth/login";
-    public static final String OSA_ZIPPED_FILE_KEY_NAME = "OSAZippedSourceCode";
     public static final String CSRF_TOKEN_HEADER = "CXCSRFToken";
     public static final String SCAN_ID_QUERY_PARAM = "?scanId=";
     public static final String ITEM_PER_PAGE_QUERY_PARAM = "&itemsPerPage=";
     public static final long MAX_ITEMS = 1000000;
+    public static final String ORIGIN = "TeamCity";
 
 
     private HttpClient apacheClient;
@@ -132,15 +128,12 @@ public class CxRestClient {
         }
     }
 
-    public CreateOSAScanResponse createOSAScan(long projectId, File zipFile) throws IOException, CxClientException {
+    public CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws IOException, CxClientException {
         //create scan request
-        HttpPost post = new HttpPost(ROOT_PATH + OSA_SCAN_PROJECT_PATH.replace("{projectId}", String.valueOf(projectId)));
-        FileInputStream fileInputStream = new FileInputStream(zipFile);
-        InputStreamBody streamBody = new InputStreamBody(fileInputStream, ContentType.APPLICATION_OCTET_STREAM, OSA_ZIPPED_FILE_KEY_NAME);
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        builder.addPart(OSA_ZIPPED_FILE_KEY_NAME, streamBody);
-        HttpEntity entity = builder.build();
+        HttpPost post = new HttpPost(ROOT_PATH + OSA_SCAN_PROJECT_PATH);
+        CreateOSAScanRequest req = new CreateOSAScanRequest(projectId, ORIGIN, osaFileList);
+        StringEntity entity = new StringEntity(convertToJson(req));
+        entity.setContentType("application/json");
         post.setEntity(entity);
         HttpResponse response = null;
 
@@ -148,12 +141,11 @@ public class CxRestClient {
             //send scan request
             response = apacheClient.execute(post);
             //verify scan request
-            validateResponse(response, 202, "Fail to create OSA scan");
+            validateResponse(response, 202, "Failed to create OSA scan");
             //extract response as object and return the link
             return convertToObject(response, CreateOSAScanResponse.class);
         } finally {
             post.releaseConnection();
-            IOUtils.closeQuietly(fileInputStream);
             HttpClientUtils.closeQuietly(response);
         }
     }
@@ -290,6 +282,16 @@ public class CxRestClient {
         } catch (IOException e) {
             log.debug("Failed to parse json response: [" + json + "]", e);
             throw new CxClientException("Failed to parse json response: " + e.getMessage());
+        }
+    }
+
+    private String convertToJson(Object o) throws CxClientException {
+        String json = "";
+        try {
+            return mapper.writeValueAsString(o);
+        } catch (IOException e) {
+            log.debug("Failed convert object to json: [" + json + "]", e);
+            throw new CxClientException("Failed convert object to json: " + e.getMessage());
         }
     }
 

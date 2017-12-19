@@ -271,10 +271,29 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <c:set var="onclick">
                 jQuery('#osaThresholdSection').toggle();
                 jQuery('#globalOsaThresholdSection').toggle();
+                jQuery('#osaFilterPatterns').toggle();
+                BS.MultilineProperties.updateVisible();
             </c:set>
             <props:checkboxProperty name="${optionsBean.osaEnabled}" onclick="${onclick}"/>
         </td>
     </tr>
+    <tbody id="osaFilterPatterns" ${hideOsaSection}>
+        <tr>
+            <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
+                <bs:helpIcon
+                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
+            </label></th>
+            <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
+                                         cols="50" className="longField"/></td>
+        </tr>
+        <tr>
+            <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Include Wildcard Patterns
+                <bs:helpIcon
+                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan"/>
+            </label></th>
+            <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
+        </tr>
+    </tbody>
 </l:settingsGroup>
 
 <l:settingsGroup className="cx-title" title="Control Checkmarx Scan">

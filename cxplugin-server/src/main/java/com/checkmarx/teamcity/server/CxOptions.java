@@ -114,6 +114,16 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getOsaFilterPatterns() {
+        return OSA_FILTER_PATTERNS;
+    }
+
+    @NotNull
+    public String getOsaArchiveIncludePatterns() {
+        return OSA_ARCHIVE_INCLUDE_PATTERNS;
+    }
+
+    @NotNull
     public String getIsSynchronous() {
         return IS_SYNCHRONOUS;
     }

@@ -30,6 +30,7 @@ public abstract class CxConstants {
                     "!**/*.htmls,   !**/*.ihtml,     !**/*.mht,      !**/*.mhtm,     !**/*.mhtml,   !**/*.ssi,   !**/*.stm,\n" +
                     "!**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/*.iml\n";
 
+    public static final String DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS = "*.zip, *.tgz, *.war, *.ear";
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection successful";
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";

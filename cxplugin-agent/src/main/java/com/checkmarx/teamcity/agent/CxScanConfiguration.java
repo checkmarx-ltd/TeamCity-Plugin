@@ -45,6 +45,8 @@ public class CxScanConfiguration {
     private Integer lowThreshold;
     private boolean generatePDFReport = false;
     private boolean osaEnabled = false;
+    private String osaFilterPattern;
+    private String osaArchiveIncludePatterns;
     private boolean osaThresholdsEnabled = false;
     /**
      * Configure a threshold for the CxOSA High Severity Vulnerabilities.
@@ -100,6 +102,8 @@ public class CxScanConfiguration {
         ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
         ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         ret.setOsaEnabled(TRUE.equals(buildParameters.get(OSA_ENABLED)));
+        ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
+        ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
 
 
         if(TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
@@ -343,6 +347,22 @@ public class CxScanConfiguration {
 
     public void setOsaEnabled(boolean osaEnabled) {
         this.osaEnabled = osaEnabled;
+    }
+
+    public String getOsaFilterPattern() {
+        return osaFilterPattern;
+    }
+
+    public void setOsaFilterPattern(String osaFilterPattern) {
+        this.osaFilterPattern = osaFilterPattern;
+    }
+
+    public String getOsaArchiveIncludePatterns() {
+        return osaArchiveIncludePatterns;
+    }
+
+    public void setOsaArchiveIncludePatterns(String osaArchiveIncludePatterns) {
+        this.osaArchiveIncludePatterns = osaArchiveIncludePatterns;
     }
 
     public boolean isOsaThresholdsEnabled() {

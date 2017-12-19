@@ -1,12 +1,9 @@
 package com.checkmarx.teamcity.common.client;
 
 import com.checkmarx.teamcity.common.CxSelectOption;
+import com.checkmarx.teamcity.common.client.dto.*;
 import com.checkmarx.teamcity.common.client.rest.dto.*;
 import com.checkmarx.v7.*;
-import com.checkmarx.teamcity.common.client.dto.CreateScanResponse;
-import com.checkmarx.teamcity.common.client.dto.LocalScanConfiguration;
-import com.checkmarx.teamcity.common.client.dto.ReportType;
-import com.checkmarx.teamcity.common.client.dto.ScanResults;
 import com.checkmarx.teamcity.common.client.exception.CxClientException;
 import com.checkmarx.teamcity.common.client.rest.CxRestClient;
 
@@ -412,9 +409,9 @@ public class CxClientServiceImpl implements CxClientService {
         }
     }
 
-    public CreateOSAScanResponse createOSAScan(long projectId, File zipFile) throws CxClientException, IOException {
+    public CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws CxClientException, IOException {
         restClient.login();
-        return restClient.createOSAScan(projectId, zipFile);
+        return restClient.createOSAScan(projectId, osaFileList);
     }
 
 

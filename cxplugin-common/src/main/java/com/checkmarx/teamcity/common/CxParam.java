@@ -23,6 +23,8 @@ public abstract class CxParam {
     public static final String IS_INCREMENTAL = "cxIsIncremental";
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
+    public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
+    public static final String OSA_ARCHIVE_INCLUDE_PATTERNS = "cxOsaArchiveIncludePatterns";
     public static final String IS_SYNCHRONOUS = "cxIsSynchronous";
     public static final String THRESHOLD_ENABLED = "cxThresholdEnabled";
     public static final String HIGH_THRESHOLD = "cxHighThreshold";

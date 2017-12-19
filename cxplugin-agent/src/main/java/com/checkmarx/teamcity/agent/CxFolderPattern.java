@@ -37,7 +37,7 @@ public abstract class CxFolderPattern {
             if (p.length() > 0) {
                 result.append("!**/");
                 result.append(p);
-                result.append("/**/*, ");
+                result.append("/**, ");
             }
         }
         buildLogger.info("Exclude folders converted to: '" + result.toString() + "'");

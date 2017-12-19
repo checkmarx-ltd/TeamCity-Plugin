@@ -1,5 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
+import com.checkmarx.teamcity.common.client.dto.OSAFile;
+import com.checkmarx.teamcity.agent.osa.OSAScanner;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.checkmarx.teamcity.common.client.*;
@@ -35,7 +37,6 @@ import static com.checkmarx.teamcity.common.CxResultsConst.*;
 public class CxBuildProcess extends CallableBuildProcess {
 
     private static final long MAX_ZIP_SIZE_BYTES = 209715200;
-    private static final long MAX_OSA_ZIP_SIZE_BYTES = 2146483647;
     private static final String TEMP_FILE_NAME_TO_ZIP = "CxZippedSource";
     private static final String REPORT_NAME = "CxSASTReport";
     private static final String OSA_REPORT_NAME = "CxOSAReport";
@@ -271,20 +272,29 @@ public class CxBuildProcess extends CallableBuildProcess {
     private CreateOSAScanResponse createOSAScan() throws IOException, InterruptedException, CxClientException {
 
         logger.info("Creating OSA scan");
-        logger.info("Zipping dependencies");
-        //prepare sources (zip it) for the OSA scan and send it to OSA scan
-        String patternExclusion = "!Checkmarx/Reports/*.*";
-        File zipForOSA = zipWorkspaceFolder("", patternExclusion, MAX_OSA_ZIP_SIZE_BYTES, false);
+        logger.info("Scanning for CxOSA compatible files");
+        OSAScanner osaScanner = new OSAScanner(config.getOsaFilterPattern(), config.getOsaArchiveIncludePatterns(), logger);
+        List<OSAFile> osaFiles = osaScanner.scanFiles(checkoutDirectory, FileUtils.getTempDirectory(), 4);
+        logger.info("Found " + osaFiles.size() + " Compatible Files for OSA Scan");
+        writeToOsaListToTemp(osaFiles);
         logger.info("Sending OSA scan request");
-        CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), zipForOSA);
+        CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), osaFiles);
         osaProjectSummaryLink = CxPluginHelper.composeProjectOSASummaryLink(config.getUrl(), createScanResponse.getProjectId());
         logger.info("OSA scan created successfully");
-        if (zipForOSA.exists() && !zipForOSA.delete()) {
-            logger.warn("Failed to delete temporary zip file: " + zipForOSA.getAbsolutePath());
-        }
-        logger.info("Temporary file deleted");
 
         return osaScan;
+    }
+
+    private void writeToOsaListToTemp(List<OSAFile> osaFileList) {
+        try {
+            File temp = new File(FileUtils.getTempDirectory(), "CxOSAFileList.json");
+            ObjectMapper om = new ObjectMapper();
+            om.writeValue(temp, osaFileList);
+            logger.info("OSA file list saved to file: ["+temp.getAbsolutePath()+"]");
+        } catch (Exception e) {
+            logger.info("Failed to write OSA file list to temp directory: " + e.getMessage());
+        }
+
     }
 
 
@@ -312,6 +322,9 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("CxSAST low threshold: " + (config.getLowThreshold() == null ? "[No Threshold]" : config.getLowThreshold()));
         }
         if (config.isOsaEnabled()) {
+            logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
+            logger.info("CxOSA archive include patterns: " + config.getOsaArchiveIncludePatterns());
+
             logger.info("CxOSA thresholds enabled: " + config.isOsaThresholdsEnabled());
             if (config.isOsaThresholdsEnabled()) {
                 logger.info("CxOSA high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));

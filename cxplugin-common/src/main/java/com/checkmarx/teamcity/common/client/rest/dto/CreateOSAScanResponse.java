@@ -9,17 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateOSAScanResponse {
 
-
-    private String link;
     private String scanId;
-
-    public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
-    }
 
     public String getScanId() {
         return scanId;
