@@ -289,7 +289,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <tr>
             <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Include Wildcard Patterns
                 <bs:helpIcon
-                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan"/>
+                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear"/>
             </label></th>
             <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
         </tr>

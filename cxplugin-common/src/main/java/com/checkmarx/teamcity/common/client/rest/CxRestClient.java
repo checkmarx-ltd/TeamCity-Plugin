@@ -37,7 +37,7 @@ public class CxRestClient {
 
     private final String username;
     private final String password;
-    private String ROOT_PATH = "{hostName}/CxRestAPI/";
+    private String rootPath = "{hostName}/CxRestAPI/";
 
     public static final String OSA_SCAN_PROJECT_PATH = "osa/scans";
     public static final String OSA_SCAN_STATUS_PATH = "osa/scans/{scanId}";
@@ -56,7 +56,7 @@ public class CxRestClient {
     private CookieStore cookieStore;
     private String cookies;
     private String csrfToken;
-    ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
 
     private final HttpRequestInterceptor requestFilter = new HttpRequestInterceptor() {
@@ -95,7 +95,7 @@ public class CxRestClient {
     public CxRestClient(String hostname, String username, String password) {
         this.username = username;
         this.password = password;
-        this.ROOT_PATH = ROOT_PATH.replace("{hostName}", hostname);
+        this.rootPath = rootPath.replace("{hostName}", hostname);
         //create httpclient
         cookieStore = new BasicCookieStore();
 
@@ -112,7 +112,7 @@ public class CxRestClient {
         csrfToken = null;
         HttpResponse loginResponse = null;
         //create login request
-        HttpPost loginPost = new HttpPost(ROOT_PATH + AUTHENTICATION_PATH);
+        HttpPost loginPost = new HttpPost(rootPath + AUTHENTICATION_PATH);
         StringEntity requestEntity = new StringEntity(mapper.writeValueAsString(new LoginRequest(username, password)), ContentType.APPLICATION_JSON);
         loginPost.setEntity(requestEntity);
         try {
@@ -130,7 +130,7 @@ public class CxRestClient {
 
     public CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws IOException, CxClientException {
         //create scan request
-        HttpPost post = new HttpPost(ROOT_PATH + OSA_SCAN_PROJECT_PATH);
+        HttpPost post = new HttpPost(rootPath + OSA_SCAN_PROJECT_PATH);
         CreateOSAScanRequest req = new CreateOSAScanRequest(projectId, ORIGIN, osaFileList);
         StringEntity entity = new StringEntity(convertToJson(req));
         entity.setContentType("application/json");
@@ -153,7 +153,7 @@ public class CxRestClient {
 
     public OSAScanStatus getOSAScanStatus(String scanId) throws CxClientException, IOException {
 
-        String resolvedPath = ROOT_PATH + OSA_SCAN_STATUS_PATH.replace("{scanId}", String.valueOf(scanId));
+        String resolvedPath = rootPath + OSA_SCAN_STATUS_PATH.replace("{scanId}", String.valueOf(scanId));
         HttpGet getRequest = new HttpGet(resolvedPath);
         HttpResponse response = null;
 
@@ -244,7 +244,7 @@ public class CxRestClient {
     }
 
     private HttpGet createHttpRequest(String relativePath, String mediaType) {
-        String resolvedPath = ROOT_PATH + relativePath;
+        String resolvedPath = rootPath + relativePath;
         HttpGet getRequest = new HttpGet(resolvedPath);
         getRequest.setHeader("Accept", mediaType);
         return getRequest;

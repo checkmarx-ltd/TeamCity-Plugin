@@ -2,22 +2,26 @@ package com.checkmarx.teamcity.agent.osa;
 
 import com.checkmarx.teamcity.agent.CxBuildLoggerAdapter;
 import com.checkmarx.teamcity.common.client.dto.OSAFile;
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.impl.FileVolumeManager;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +40,11 @@ public class OSAScanner implements Serializable {
 
     private static final String[] EXTRACTABLE_EXTENSIONS = {"jar", "war", "ear", "sca", "gem", "whl", "egg", "tar", "tar.gz", "tgz", "zip", "rar"};
     private static final String[] ALL_EXTENSIONS = ArrayUtils.addAll(SUPPORTED_EXTENSIONS, EXTRACTABLE_EXTENSIONS);
+    private static final String[] ZIP_EXTENSIONS = {"zip", "jar", "war", "ear", "egg", "whl", "sca"};
+    private static final String[] TAR_EXTENSIONS = {"tar", "gem"};
+    private static final String[] GZ_EXTENSIONS = {"tgz", "tar.gz"};
+    private static final String[] TAR_AND_GZ_EXTENSIONS = ArrayUtils.addAll(TAR_EXTENSIONS, GZ_EXTENSIONS);
+    private static final String[] RAR_EXTENSIONS = {"rar"};
 
 
     private List<String> archiveInclude = new ArrayList<String>();
@@ -113,7 +122,7 @@ public class OSAScanner implements Serializable {
 
             if(isCandidateForExtract(virtualFullPath)) {
                 //this directory should be created by the extractToTempDir() if there is any files to extract
-                File nestedTempDir = new File (tempDir.getAbsolutePath() + "/" + file.getName() + "_extracted");
+                File nestedTempDir = new File (tempDir.getAbsolutePath() + "/" + file.getName() + "_");
 
                 boolean extracted = extractToTempDir(nestedTempDir, file, virtualFullPath);
                 if(!extracted) {
@@ -134,7 +143,27 @@ public class OSAScanner implements Serializable {
     }
 
     //extract the OSA compatible files and archives to temporary directory. also filters by includes/excludes
-    private boolean extractToTempDir(File nestedTempDir, File zip, String virtualPath)  {
+    private boolean extractToTempDir(File nestedTempDir, File archive, String virtualPath)  {
+
+        //uses zip4j
+        if(isExtension(archive.getName(), ZIP_EXTENSIONS)) {
+            return extractZipToTempDir(nestedTempDir, archive, virtualPath);
+        }
+
+        //uses common-compression
+        if(isExtension(archive.getName(),TAR_AND_GZ_EXTENSIONS)) {
+            return extractTarOrGZToTempDir(nestedTempDir, archive, virtualPath);
+        }
+
+        //uses junrar
+        if(isExtension(archive.getName(), RAR_EXTENSIONS)) {
+            return extractRarToTempDir(nestedTempDir, archive, virtualPath);
+        }
+
+        return nestedTempDir.exists();
+    }
+
+    private boolean extractZipToTempDir(File nestedTempDir, File zip, String virtualPath)  {
 
         try {
             ZipFile zipFile = new ZipFile(zip);
@@ -168,13 +197,106 @@ public class OSAScanner implements Serializable {
                 try {
                     zipFile.extractFile(fileHeader, nestedTempDir.getAbsolutePath());
                 } catch (ZipException e) {
-                    logger.warn("Failed to extract archive: ["+zip.getAbsolutePath()+"]: " + e.getMessage());
+                    String message = e.getMessage().contains("Negative seek offset") ? "Missing or empty archive file" : e.getMessage();
+                    logger.warn("Failed to extract archive: ["+zip.getAbsolutePath()+"]: " + message);
                 }
             }
 
         } catch (ZipException e) {
-            logger.warn("Failed to extract archive: ["+zip.getAbsolutePath()+"]: " + e.getMessage());
+            String message = e.getMessage().contains("Negative seek offset") ? "Missing or empty archive file" : e.getMessage();
+            logger.warn("Failed to extract archive: ["+zip.getAbsolutePath()+"]: " + message);
             return false;
+        }
+
+        return nestedTempDir.exists();
+    }
+
+    private boolean extractTarOrGZToTempDir(File nestedTempDir, File tar, String virtualPath)  {
+        ArchiveInputStream tarInputStream = null;
+        try {
+            tarInputStream = getArchiveInputStream(tar);
+            ArchiveEntry entry;
+            while ((entry = tarInputStream.getNextEntry()) != null) {
+                String fileName = entry.getName();
+                if (!entry.isDirectory() && (isCandidateForSha1(virtualPath + "/" + fileName) || isCandidateForExtract(virtualPath + "/" + fileName))) {
+                    byte[] buffer = new byte[(int) entry.getSize()];
+                    tarInputStream.read(buffer, 0, buffer.length);
+                    FileUtils.writeByteArrayToFile(new File(nestedTempDir +"/" + fileName), buffer);
+                }
+            }
+
+        } catch (IOException e) {
+            logger.warn("Failed to extract archive: ["+tar.getAbsolutePath()+"]: " + e.getMessage(), e);
+
+        } finally {
+            IOUtils.closeQuietly(tarInputStream);
+        }
+
+        return nestedTempDir.exists();
+    }
+
+    private ArchiveInputStream getArchiveInputStream(File archive) throws IOException {
+        if(isExtension(archive.getName(), TAR_EXTENSIONS)) {
+            return new TarArchiveInputStream(new FileInputStream(archive));
+        }
+
+        if(isExtension(archive.getName(), GZ_EXTENSIONS)) {
+            return  new TarArchiveInputStream(
+                    new GzipCompressorInputStream(
+                            new BufferedInputStream(
+                                    new FileInputStream(archive))));
+        }
+
+        return new ZipArchiveInputStream(new FileInputStream(archive));
+    }
+
+    private boolean extractRarToTempDir(File nestedTempDir, File rar, String virtualPath)  {
+
+        Archive archive = null;
+
+        try {
+            archive = new Archive(new FileVolumeManager(rar));
+
+            List<com.github.junrar.rarfile.FileHeader> fileHeaders = archive.getFileHeaders();
+            List<com.github.junrar.rarfile.FileHeader> filtered = new ArrayList<com.github.junrar.rarfile.FileHeader>();
+
+            for (com.github.junrar.rarfile.FileHeader fileHeader : fileHeaders) {
+
+                String fileName = fileHeader.getFileNameString();
+                if (!fileHeader.isDirectory() && (isCandidateForSha1(virtualPath + "/" + fileName) || isCandidateForExtract(virtualPath + "/" + fileName))) {
+                    filtered.add(fileHeader);
+                }
+            }
+
+            //now, extract the relevant files (if any):
+            if (filtered.size() < 1) {
+                return false;
+            }
+
+            //create the temp dir to extract to
+            nestedTempDir.mkdirs();
+            if (!nestedTempDir.exists()) {
+                logger.warn("Failed to extract archive: [" + rar.getAbsolutePath() + "]: failed to create temp dir: [" + nestedTempDir.getAbsolutePath() + "]");
+                return false;
+            }
+
+            //extract
+            for (com.github.junrar.rarfile.FileHeader fileHeader : filtered) {
+                try {
+                    InputStream headerInputStream = archive.getInputStream(fileHeader);
+                    File destinationFile = new File(nestedTempDir + "/" + fileHeader.getFileNameString());
+                    FileUtils.copyInputStreamToFile(headerInputStream, destinationFile);
+                } catch (RarException e) {
+                    logger.warn("Failed to extract archive: [" + rar.getAbsolutePath() + "]: " + e.getMessage(), e);
+                }
+            }
+
+        } catch (RarException e) {
+            logger.warn("Failed to extract archive: ["+rar.getAbsolutePath()+"]: " + e.getMessage(), e);
+        } catch (IOException e) {
+            logger.warn("Failed to extract archive: ["+rar.getAbsolutePath()+"]: " + e.getMessage(), e);
+        }  finally {
+            IOUtils.closeQuietly(archive);
         }
 
         return nestedTempDir.exists();
@@ -210,7 +332,7 @@ public class OSAScanner implements Serializable {
         relativePath = relativePath.replaceAll("\\\\", "/");
         boolean isMatch = true;
 
-        if(!FilenameUtils.isExtension(relativePath, extensions)) {
+        if(!isExtension(relativePath, extensions)) {
             return false;
         }
 
@@ -265,6 +387,16 @@ public class OSAScanner implements Serializable {
         }
 
         return extractTempDir;
+    }
+
+
+    private boolean isExtension(String filename, String[] extensions) {
+        for (String extension : extensions) {
+            if(filename.endsWith("." + extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //convert comma separated values to include/exclude lists.
