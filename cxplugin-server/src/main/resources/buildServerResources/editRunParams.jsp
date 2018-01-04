@@ -281,15 +281,16 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <tr>
             <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
                 <bs:helpIcon
-                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
+                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
             </label></th>
             <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
                                          cols="50" className="longField"/></td>
         </tr>
         <tr>
-            <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Include Wildcard Patterns
+            <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
                 <bs:helpIcon
-                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear"/>
+                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
+                                   Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar"/>
             </label></th>
             <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
         </tr>

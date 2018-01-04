@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class CxClientServiceImpl implements CxClientService {
 
-    private static Logger log = LoggerFactory.getLogger(CxClientServiceImpl.class);
+    private Logger log = LoggerFactory.getLogger(CxClientServiceImpl.class);
     private String sessionId;
     private CxSDKWebServiceSoap client;
     private CxRestClient restClient;
@@ -41,8 +41,8 @@ public class CxClientServiceImpl implements CxClientService {
     private static String SDK_PATH = "/cxwebinterface/sdk/CxSDKWebService.asmx";
     public static final String DEFAULT_PRESET_NAME = "Checkmarx Default";
 
-    private static int generateReportTimeOutInSec = 500;
-    private static int waitForScanToFinishRetry = 5;
+    private int generateReportTimeOutInSec = 500;
+    private int waitForScanToFinishRetry = 5;
 
     public CxClientServiceImpl(URL url, String username, String password) {
         this.url = url;
@@ -57,7 +57,7 @@ public class CxClientServiceImpl implements CxClientService {
     }
 
     public void setLogger(Logger log) {
-        CxClientServiceImpl.log = log;
+        this.log = log;
         restClient.setLogger(log);
     }
 
@@ -485,20 +485,20 @@ public class CxClientServiceImpl implements CxClientService {
         return restClient.getOSAVulnerabilities(scanId);
     }
 
-    public static int getWaitForScanToFinishRetry() {
+    public int getWaitForScanToFinishRetry() {
         return waitForScanToFinishRetry;
     }
 
-    public static void setWaitForScanToFinishRetry(int waitForScanToFinishRetry) {
-        CxClientServiceImpl.waitForScanToFinishRetry = waitForScanToFinishRetry;
+    public void setWaitForScanToFinishRetry(int waitForScanToFinishRetry) {
+        this.waitForScanToFinishRetry = waitForScanToFinishRetry;
     }
 
-    public static int getGenerateReportTimeOutInSec() {
+    public int getGenerateReportTimeOutInSec() {
         return generateReportTimeOutInSec;
     }
 
-    public static void setGenerateReportTimeOutInSec(int generateReportTimeOutInSec) {
-        CxClientServiceImpl.generateReportTimeOutInSec = generateReportTimeOutInSec;
+    public void setGenerateReportTimeOutInSec(int generateReportTimeOutInSec) {
+        this.generateReportTimeOutInSec = generateReportTimeOutInSec;
     }
 
     public String getSessionId() {

@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class CxRestClient {
 
-    private static Logger log = LoggerFactory.getLogger(CxRestClient.class);
+    private Logger log = LoggerFactory.getLogger(CxRestClient.class);
 
     private final String username;
     private final String password;
@@ -103,7 +103,7 @@ public class CxRestClient {
     }
 
     public void setLogger(Logger log) {
-        CxRestClient.log = log;
+        this.log = log;
     }
 
 

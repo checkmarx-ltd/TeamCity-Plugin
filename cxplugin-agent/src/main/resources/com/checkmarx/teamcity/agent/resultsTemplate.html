@@ -2083,6 +2083,12 @@
 
         var libraryIdToName = libraryDictionary(osaLibraries);
 
+        //create uniquness by key: cve + libraryId
+        var osaCveMap = {};
+        for (var i = 0; i < severityCveList.length; i++) {
+            osaCveMap[severityCveList[i].cveName + "," + severityCveList[i].libraryId] = severityCveList[i];
+        }
+
         //generate table title
         var severityTitle = generateCveTableTitle(severity);
 
@@ -2102,12 +2108,13 @@
 
         //add rows to table
         var row;
-        for (i = 0; i < severityCveList.length; i++) {
-            row = table.insertRow(i + 1);
-            row.insertCell(0).innerHTML = severityCveList[i].cveName;
-            row.insertCell(1).innerHTML = formatDate(severityCveList[i].publishDate, "dd-mm-yyyy");
-            row.insertCell(2).innerHTML = libraryIdToName[severityCveList[i].libraryId];
-
+        var i = 1;
+        for (var key in osaCveMap) {
+            row = table.insertRow(i);
+            row.insertCell(0).innerHTML = osaCveMap[key].cveName;
+            row.insertCell(1).innerHTML = formatDate(osaCveMap[key].publishDate, "dd-mm-yyyy");
+            row.insertCell(2).innerHTML = libraryIdToName[osaCveMap[key].libraryId];
+            i++;
         }
     }
 

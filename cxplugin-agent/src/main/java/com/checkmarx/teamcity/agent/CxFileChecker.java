@@ -1,8 +1,5 @@
 package com.checkmarx.teamcity.agent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -10,7 +7,6 @@ import java.io.FilenameFilter;
  * Created by Galn on 28/02/2017.
  */
 public abstract class CxFileChecker {
-    public static final Logger log = LoggerFactory.getLogger(CxFileChecker.class);
 
     public static void deleteFile(String folder, String prefix){
 
@@ -28,7 +24,6 @@ public abstract class CxFileChecker {
             String temp = folder + File.separator + file;
             fileDelete = new File(temp);
             boolean isDeleted = fileDelete.delete();
-            log.warn("file : " + temp + " is deleted : " + isDeleted);
         }
     }
 

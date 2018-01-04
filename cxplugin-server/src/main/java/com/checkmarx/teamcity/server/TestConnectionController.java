@@ -32,7 +32,7 @@ public class TestConnectionController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(TestConnectionController.class);
 
-    private static Gson gson = new Gson();
+    private Gson gson = new Gson();
 
     public TestConnectionController(@NotNull SBuildServer server,
                                     @NotNull WebControllerManager webControllerManager) {

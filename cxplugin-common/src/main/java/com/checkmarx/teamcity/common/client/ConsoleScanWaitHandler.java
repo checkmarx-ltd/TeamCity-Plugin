@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsoleScanWaitHandler implements ScanWaitHandler<CxWSResponseScanStatus> {
 
-    private static Logger log = LoggerFactory.getLogger(ConsoleScanWaitHandler.class);
+    private Logger log = LoggerFactory.getLogger(ConsoleScanWaitHandler.class);
 
     private long startTime;
     private long scanTimeoutInMin;
@@ -25,7 +25,7 @@ public class ConsoleScanWaitHandler implements ScanWaitHandler<CxWSResponseScanS
     }
 
     public void setLogger(Logger log) {
-        ConsoleScanWaitHandler.log = log;
+        this.log = log;
     }
 
     public void onFail(CxWSResponseScanStatus scanStatus) throws CxClientException {
