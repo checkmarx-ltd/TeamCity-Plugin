@@ -342,6 +342,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         consoleScanWaitHandler.setLogger(logger);
         logger.info("Waiting for CxSAST scan to finish.");
         long timeout = config.getScanTimeoutInMinutes() == null ? 0 : config.getScanTimeoutInMinutes();
+        client.loginToServer();
         client.waitForScanToFinish(createScanResponse.getRunId(), timeout, consoleScanWaitHandler);
         logger.info("Scan finished. Retrieving scan results");
 
