@@ -430,7 +430,7 @@ public class CxClientServiceImpl implements CxClientService {
         int retry = waitForScanToFinishRetry;
 
         while (scanTimeoutInMin <= 0 || (System.currentTimeMillis() / 60000) <= timeToStop) {
-            Thread.sleep(10000); //Get status every 10 sec
+            Thread.sleep(20000); //Get status every 20 sec
 
             try {
                 scanStatus = restClient.getOSAScanStatus(scanId);
