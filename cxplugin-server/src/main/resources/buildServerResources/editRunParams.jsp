@@ -290,7 +290,8 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
                 <bs:helpIcon
                         iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
-                                   Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar"/>
+                                   Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
+                                   Leave empty to extract all archives"/>
             </label></th>
             <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
         </tr>
