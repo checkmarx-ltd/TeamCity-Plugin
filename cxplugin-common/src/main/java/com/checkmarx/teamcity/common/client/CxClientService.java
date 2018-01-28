@@ -48,10 +48,6 @@ public interface CxClientService {
 
     OSASummaryResults retrieveOSAScanSummaryResults(String scanId) throws CxClientException, IOException;
 
-    String retrieveOSAScanHtmlResults(String scanId) throws CxClientException, IOException;
-
-    byte[] retrieveOSAScanPDFResults(String scanId) throws CxClientException, IOException;
-
     List<Library> getOSALibraries(String scanId) throws CxClientException, IOException;
 
     List<CVE> getOSAVulnerabilities(String scanId) throws CxClientException, IOException;

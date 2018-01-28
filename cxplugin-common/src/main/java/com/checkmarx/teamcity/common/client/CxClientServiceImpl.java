@@ -469,14 +469,6 @@ public class CxClientServiceImpl implements CxClientService {
         return restClient.getOSAScanSummaryResults(scanId);
     }
 
-    public String retrieveOSAScanHtmlResults(String scanId) throws CxClientException, IOException {
-        return restClient.getOSAScanHtmlResults(scanId);
-    }
-
-    public byte[] retrieveOSAScanPDFResults(String scanId) throws CxClientException, IOException {
-        return restClient.getOSAScanPDFResults(scanId);
-    }
-
     public List<Library> getOSALibraries(String scanId) throws CxClientException, IOException {
         return restClient.getOSALibraries(scanId);
     }
