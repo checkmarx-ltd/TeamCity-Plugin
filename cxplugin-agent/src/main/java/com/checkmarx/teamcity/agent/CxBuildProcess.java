@@ -462,7 +462,8 @@ public class CxBuildProcess extends CallableBuildProcess {
     private void publishJson(String name, Object jsonObj) throws IOException {
         String fileName = name + ".json";
         File jsonFile = new File(buildDirectory, fileName);
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, jsonObj);
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObj);
+        FileUtils.writeStringToFile(jsonFile, json);
         publishArtifact(jsonFile.getAbsolutePath());
         logger.info(name + " json location: " + buildDirectory + "/" + fileName);
     }
