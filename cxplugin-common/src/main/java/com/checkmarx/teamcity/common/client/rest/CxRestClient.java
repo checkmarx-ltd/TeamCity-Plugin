@@ -2,7 +2,6 @@ package com.checkmarx.teamcity.common.client.rest;
 
 
 import com.checkmarx.teamcity.common.client.dto.LoginRequest;
-import com.checkmarx.teamcity.common.client.dto.OSAFile;
 import com.checkmarx.teamcity.common.client.exception.CxClientException;
 import com.checkmarx.teamcity.common.client.rest.dto.*;
 import com.fasterxml.jackson.databind.JavaType;
@@ -38,7 +37,7 @@ public class CxRestClient {
     private final String password;
     private String rootPath = "{hostName}/CxRestAPI/";
 
-    public static final String OSA_SCAN_PROJECT_PATH = "osa/scans";
+    public static final String OSA_SCAN_PROJECT_PATH = "osa/inventory";
     public static final String OSA_SCAN_STATUS_PATH = "osa/scans/{scanId}";
     public static final String OSA_SCAN_SUMMARY_PATH = "osa/reports";
     public static final String OSA_SCAN_LIBRARIES_PATH = "/osa/libraries";
@@ -128,10 +127,10 @@ public class CxRestClient {
         }
     }
 
-    public CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws IOException, CxClientException {
+    public CreateOSAScanResponse createOSAScan(long projectId, String osaDependenciesJson) throws IOException, CxClientException {
         //create scan request
         HttpPost post = new HttpPost(rootPath + OSA_SCAN_PROJECT_PATH);
-        CreateOSAScanRequest req = new CreateOSAScanRequest(projectId, ORIGIN, osaFileList);
+        CreateOSAScanRequest req = new CreateOSAScanRequest(projectId, osaDependenciesJson);
         StringEntity entity = new StringEntity(convertToJson(req));
         post.setEntity(entity);
         post.addHeader("Content-type", "application/json;v=1");
@@ -141,7 +140,7 @@ public class CxRestClient {
             //send scan request
             response = apacheClient.execute(post);
             //verify scan request
-            validateResponse(response, 202, "Failed to create OSA scan");
+            validateResponse(response, 201, "Failed to create OSA scan");
             //extract response as object and return the link
             return convertToObject(response, CreateOSAScanResponse.class);
         } finally {
@@ -155,6 +154,7 @@ public class CxRestClient {
 
         String resolvedPath = rootPath + OSA_SCAN_STATUS_PATH.replace("{scanId}", String.valueOf(scanId));
         HttpGet getRequest = new HttpGet(resolvedPath);
+        getRequest.addHeader("Content-type", "application/json;v=1");
         HttpResponse response = null;
 
         try {

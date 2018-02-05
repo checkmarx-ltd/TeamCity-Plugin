@@ -409,9 +409,9 @@ public class CxClientServiceImpl implements CxClientService {
         }
     }
 
-    public CreateOSAScanResponse createOSAScan(long projectId, List<OSAFile> osaFileList) throws CxClientException, IOException {
+    public CreateOSAScanResponse createOSAScan(long projectId, String osaDependenciesJson) throws CxClientException, IOException {
         restClient.login();
-        return restClient.createOSAScan(projectId, osaFileList);
+        return restClient.createOSAScan(projectId, osaDependenciesJson);
     }
 
 

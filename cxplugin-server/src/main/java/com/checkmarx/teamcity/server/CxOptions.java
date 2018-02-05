@@ -124,6 +124,11 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getOsaInstallBeforeScan() {
+        return OSA_INSTALL_BEFORE_SCAN;
+    }
+
+    @NotNull
     public String getIsSynchronous() {
         return IS_SYNCHRONOUS;
     }

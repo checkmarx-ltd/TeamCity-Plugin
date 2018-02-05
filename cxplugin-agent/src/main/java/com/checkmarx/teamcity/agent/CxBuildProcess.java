@@ -1,7 +1,6 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.teamcity.common.client.dto.OSAFile;
-import com.checkmarx.teamcity.agent.osa.OSAScanner;
+import com.checkmarx.teamcity.common.CxPluginUtils;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.checkmarx.teamcity.common.client.*;
@@ -16,6 +15,7 @@ import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.whitesource.fs.ComponentScan;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxResultsConst.*;
@@ -271,23 +272,24 @@ public class CxBuildProcess extends CallableBuildProcess {
 
         logger.info("Creating OSA scan");
         logger.info("Scanning for CxOSA compatible files");
-        OSAScanner osaScanner = new OSAScanner(config.getOsaFilterPattern(), config.getOsaArchiveIncludePatterns(), logger);
-        List<OSAFile> osaFiles = osaScanner.scanFiles(checkoutDirectory, FileUtils.getTempDirectory(), 4);
-        logger.info("Found " + osaFiles.size() + " Compatible Files for OSA Scan");
-        writeToOsaListToTemp(osaFiles);
+        Properties scannerProperties = CxPluginUtils.generateOSAScanConfiguration(config.getOsaFilterPattern(),
+                                                                                    config.getOsaArchiveIncludePatterns(),
+                                                                                    checkoutDirectory.getAbsolutePath(), config.isOsaInstallBeforeScan());
+        ComponentScan componentScan = new ComponentScan(scannerProperties);
+        String osaDependenciesJson = componentScan.scan();
+        writeToOsaListToTemp(osaDependenciesJson);
         logger.info("Sending OSA scan request");
-        CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), osaFiles);
+        CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), osaDependenciesJson);
         osaProjectSummaryLink = CxPluginHelper.composeProjectOSASummaryLink(config.getUrl(), createScanResponse.getProjectId());
         logger.info("OSA scan created successfully");
 
         return osaScan;
     }
 
-    private void writeToOsaListToTemp(List<OSAFile> osaFileList) {
+    private void writeToOsaListToTemp(String osaDependenciesJson) {
         try {
             File temp = new File(FileUtils.getTempDirectory(), "CxOSAFileList.json");
-            ObjectMapper om = new ObjectMapper();
-            om.writeValue(temp, osaFileList);
+            FileUtils.writeStringToFile(temp, osaDependenciesJson, Charset.defaultCharset());
             logger.info("OSA file list saved to file: ["+temp.getAbsolutePath()+"]");
         } catch (Exception e) {
             logger.info("Failed to write OSA file list to temp directory: " + e.getMessage());
@@ -322,6 +324,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         if (config.isOsaEnabled()) {
             logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
             logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
+            logger.info("CxOSA install NMP and Bower before scan: " + config.isOsaInstallBeforeScan());
 
             logger.info("CxOSA thresholds enabled: " + config.isOsaThresholdsEnabled());
             if (config.isOsaThresholdsEnabled()) {
