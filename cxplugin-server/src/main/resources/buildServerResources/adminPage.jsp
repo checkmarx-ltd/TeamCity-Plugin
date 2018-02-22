@@ -89,7 +89,7 @@
     }
   });
 </script>
-<script type="text/javascript" src="${teamcityPluginResourcesPath}/testConnection.js"></script>
+<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
 
 <c:if test="${cxGlobalIsSynchronous != 'true'}">
@@ -107,7 +107,7 @@
 
     <bs:messages key="settingsSaved"/>
 
-    <form id="globalSettingsForm" action="/admin/checkmarxSettings.html" method="post"
+    <form id="globalSettingsForm" action="<c:url value='/admin/checkmarxSettings.html'/>" method="post"
           onsubmit="{return SettingsForm.save()}">
 
       <table class="runnerFormTable">
