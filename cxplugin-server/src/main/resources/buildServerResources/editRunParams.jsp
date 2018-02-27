@@ -296,9 +296,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
         </tr>
         <tr>
-            <th><label for="${optionsBean.osaInstallBeforeScan}">Install NPM and Bower before scan
+            <th><label for="${optionsBean.osaInstallBeforeScan}">Execute NPM and Bower install packages command before Scan
                 <bs:helpIcon
-                        iconTitle="Install NPM and Bower before scan"/>
+                        iconTitle="Checked in order to perform NPM and Bower install packages command before initiate OSA scan"/>
             </label></th>
             <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
         </tr>

@@ -277,7 +277,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                                                                                     checkoutDirectory.getAbsolutePath(), config.isOsaInstallBeforeScan());
         ComponentScan componentScan = new ComponentScan(scannerProperties);
         String osaDependenciesJson = componentScan.scan();
-        writeToOsaListToTemp(osaDependenciesJson);
+        publishOsaDependenciesJson(osaDependenciesJson);
         logger.info("Sending OSA scan request");
         CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), osaDependenciesJson);
         osaProjectSummaryLink = CxPluginHelper.composeProjectOSASummaryLink(config.getUrl(), createScanResponse.getProjectId());
@@ -286,13 +286,14 @@ public class CxBuildProcess extends CallableBuildProcess {
         return osaScan;
     }
 
-    private void writeToOsaListToTemp(String osaDependenciesJson) {
+    private void publishOsaDependenciesJson(String osaDependenciesJson) {
         try {
-            File temp = new File(FileUtils.getTempDirectory(), "CxOSAFileList.json");
-            FileUtils.writeStringToFile(temp, osaDependenciesJson, Charset.defaultCharset());
-            logger.info("OSA file list saved to file: ["+temp.getAbsolutePath()+"]");
+            File file = new File(buildDirectory, "CxOSAFileList.json");
+            FileUtils.writeStringToFile(file, osaDependenciesJson);
+            publishArtifact(file.getAbsolutePath());
+            logger.info("OSA dependencies json saved to file: ["+file.getAbsolutePath()+"]");
         } catch (Exception e) {
-            logger.info("Failed to write OSA file list to temp directory: " + e.getMessage());
+            logger.info("Failed to save OSA dependencies json to file: " + e.getMessage());
         }
 
     }

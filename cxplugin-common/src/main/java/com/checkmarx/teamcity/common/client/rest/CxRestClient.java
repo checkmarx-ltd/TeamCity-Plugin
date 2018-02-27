@@ -48,6 +48,7 @@ public class CxRestClient {
     public static final String ITEM_PER_PAGE_QUERY_PARAM = "&itemsPerPage=";
     public static final long MAX_ITEMS = 1000000;
     public static final String ORIGIN = "TeamCity";
+    public static final String ORIGIN_HEADER = "cxOrigin";
 
 
     private HttpClient apacheClient;
@@ -59,6 +60,8 @@ public class CxRestClient {
 
     private final HttpRequestInterceptor requestFilter = new HttpRequestInterceptor() {
         public void process(HttpRequest httpRequest, HttpContext httpContext) throws HttpException, IOException {
+            httpRequest.addHeader(ORIGIN_HEADER, ORIGIN);
+
             if (csrfToken != null) {
                 httpRequest.addHeader(CSRF_TOKEN_HEADER, csrfToken);
             }
