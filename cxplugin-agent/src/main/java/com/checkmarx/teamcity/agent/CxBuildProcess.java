@@ -15,6 +15,7 @@ import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.whitesource.fs.ComponentScan;
 
 import javax.xml.bind.JAXBContext;
@@ -275,8 +276,20 @@ public class CxBuildProcess extends CallableBuildProcess {
         Properties scannerProperties = CxPluginUtils.generateOSAScanConfiguration(config.getOsaFilterPattern(),
                                                                                     config.getOsaArchiveIncludePatterns(),
                                                                                     checkoutDirectory.getAbsolutePath(), config.isOsaInstallBeforeScan());
+
+
+        //we do this in order to redirect the logs from the filesystem agent component to the build console
+        String appenderName = "cxAppender_" + agentRunningBuild.getBuildId();
+        Logger.getRootLogger().addAppender(new CxAppender(agentRunningBuild.getBuildLogger(), appenderName));
+
         ComponentScan componentScan = new ComponentScan(scannerProperties);
-        String osaDependenciesJson = componentScan.scan();
+        String osaDependenciesJson;
+        try {
+            osaDependenciesJson = componentScan.scan();
+        } finally {
+            Logger.getRootLogger().removeAppender(appenderName);
+        }
+
         publishOsaDependenciesJson(osaDependenciesJson);
         logger.info("Sending OSA scan request");
         CreateOSAScanResponse osaScan = client.createOSAScan(createScanResponse.getProjectId(), osaDependenciesJson);
@@ -288,7 +301,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private void publishOsaDependenciesJson(String osaDependenciesJson) {
         try {
-            File file = new File(buildDirectory, "CxOSAFileList.json");
+            File file = new File(buildDirectory, "CxOSADependencies.json");
             FileUtils.writeStringToFile(file, osaDependenciesJson);
             publishArtifact(file.getAbsolutePath());
             logger.info("OSA dependencies json saved to file: ["+file.getAbsolutePath()+"]");
