@@ -45,7 +45,16 @@ public abstract class CxPluginUtils {
         }
 
         if(StringUtils.isNotEmpty(archiveIncludes)) {
+            String[] archivePatterns = archiveIncludes.split("\\s*,\\s*"); //split by comma and trim (spaces + newline)
+            for (int i = 0; i < archivePatterns.length; i++) {
+                if(StringUtils.isNotEmpty(archivePatterns[i]) && archivePatterns[i].startsWith("*.")) {
+                    archivePatterns[i] = "**/" + archivePatterns[i];
+                }
+            }
+            archiveIncludes = String.join(",", archivePatterns);
             ret.put("archiveIncludes", archiveIncludes);
+        } else {
+            ret.put("archiveIncludes", "**/.*jar,**/*.war,**/*.ear,**/*.sca,**/*.gem,**/*.whl,**/*.egg,**/*.tar,**/*.tar.gz,**/*.tgz,**/*.zip,**/*.rar");
         }
 
         ret.put("archiveExtractionDepth", "4");

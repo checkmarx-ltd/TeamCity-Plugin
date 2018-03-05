@@ -5,9 +5,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  * Created by: dorg.
  * Date: 04/03/2018.
