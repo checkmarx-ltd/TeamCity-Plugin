@@ -8,6 +8,13 @@ import java.util.Properties;
 
 public abstract class CxPluginUtils {
 
+    private static final String[] SUPPORTED_EXTENSIONS = {"jar", "war", "ear", "aar", "dll", "exe", "msi", "nupkg", "egg", "whl", "tar.gz", "gem", "deb", "udeb",
+            "dmg", "drpm", "rpm", "pkg.tar.xz", "swf", "swc", "air", "apk", "zip", "gzip", "tar.bz2", "tgz", "c", "cc", "cp", "cpp", "css", "c++", "h", "hh", "hpp",
+            "hxx", "h++", "m", "mm", "pch", "java", "c#", "cs", "csharp", "go", "goc", "js", "plx", "pm", "ph", "cgi", "fcgi", "psgi", "al", "perl", "t", "p6m", "p6l", "nqp,6pl", "6pm",
+            "p6", "php", "py", "rb", "swift", "clj", "cljx", "cljs", "cljc"};
+
+    public static final String DEFAULT_ARCHIVE_INCLUDES = "**/.*jar,**/*.war,**/*.ear,**/*.sca,**/*.gem,**/*.whl,**/*.egg,**/*.tar,**/*.tar.gz,**/*.tgz,**/*.zip,**/*.rar";
+
 
     public static boolean isEmptyString(String s) {
         return s != null && "".equals(s);
@@ -44,6 +51,8 @@ public abstract class CxPluginUtils {
             ret.put("excludes",excludesString);
         }
 
+        ret.put("acceptExtensionsList", SUPPORTED_EXTENSIONS);
+
         if(StringUtils.isNotEmpty(archiveIncludes)) {
             String[] archivePatterns = archiveIncludes.split("\\s*,\\s*"); //split by comma and trim (spaces + newline)
             for (int i = 0; i < archivePatterns.length; i++) {
@@ -54,7 +63,7 @@ public abstract class CxPluginUtils {
             archiveIncludes = String.join(",", archivePatterns);
             ret.put("archiveIncludes", archiveIncludes);
         } else {
-            ret.put("archiveIncludes", "**/.*jar,**/*.war,**/*.ear,**/*.sca,**/*.gem,**/*.whl,**/*.egg,**/*.tar,**/*.tar.gz,**/*.tgz,**/*.zip,**/*.rar");
+            ret.put("archiveIncludes", DEFAULT_ARCHIVE_INCLUDES);
         }
 
         ret.put("archiveExtractionDepth", "4");
