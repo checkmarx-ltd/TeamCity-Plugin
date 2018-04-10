@@ -41,8 +41,16 @@
     <dependency>
       <groupId>org.whitesource</groupId>
       <artifactId>whitesource-fs-agent</artifactId>
-      <version>18.3.1-SNAPSHOT</version>
+      <version>18.3.1</version>
       <exclusions>
+        <exclusion>
+          <groupId>org.simpleframework</groupId>
+          <artifactId>simple-xml</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>guru.nidi</groupId>
+          <artifactId>graphviz-java</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
