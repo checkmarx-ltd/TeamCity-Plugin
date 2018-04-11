@@ -44,8 +44,12 @@
       <version>18.3.1</version>
       <exclusions>
         <exclusion>
-          <groupId>org.simpleframework</groupId>
-          <artifactId>simple-xml</artifactId>
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xpp3</groupId>
+          <artifactId>xpp3</artifactId>
         </exclusion>
         <exclusion>
           <groupId>guru.nidi</groupId>
