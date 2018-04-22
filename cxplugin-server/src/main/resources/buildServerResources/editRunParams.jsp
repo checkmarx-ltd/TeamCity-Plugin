@@ -281,7 +281,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <tr>
             <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
                 <bs:helpIcon
-                        iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files. Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
+                        iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
             </label></th>
             <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
                                          cols="50" className="longField"/></td>
