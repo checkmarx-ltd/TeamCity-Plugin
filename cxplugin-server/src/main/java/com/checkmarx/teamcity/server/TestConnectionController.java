@@ -1,10 +1,10 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.CxSelectOption;
-import com.checkmarx.teamcity.common.client.CxClientService;
-import com.checkmarx.teamcity.common.client.CxClientServiceImpl;
-import com.checkmarx.teamcity.common.client.exception.CxClientException;
+import com.checkmarx.teamcity.common.CxParam;
+import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.dto.Team;
+import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -13,6 +13,7 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -34,6 +35,11 @@ public class TestConnectionController extends BaseController {
 
     private Gson gson = new Gson();
 
+    private String result = "";
+    private List<Preset> presets;
+    private List<Team> teams;
+    private CxShragaClient shraga;
+
     public TestConnectionController(@NotNull SBuildServer server,
                                     @NotNull WebControllerManager webControllerManager) {
         super(server);
@@ -44,61 +50,55 @@ public class TestConnectionController extends BaseController {
     @Override
     protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws Exception {
 
+        result = "";
         if (!"POST".equals(httpServletRequest.getMethod())) {
             httpServletResponse.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return null;
         }
 
         TestConnectionResponse res = new TestConnectionResponse();
-        res.setPresetList(Collections.singletonList(new CxSelectOption("0", NO_PRESET_MESSAGE)));
-        res.setTeamPathList(Collections.singletonList(new CxSelectOption("0", NO_TEAM_MESSAGE)));
+        res.setPresetList(Collections.singletonList(new Preset(CxParam.NO_PRESET_ID, NO_PRESET_MESSAGE)));
+        res.setTeamPathList(Collections.singletonList(new Team(CxParam.GENERATE_PDF_REPORT, NO_TEAM_MESSAGE)));
 
-        try {
 
             TestConnectionRequest credi = extractRequestBody(httpServletRequest);
 
             //create client and perform login
             try {
-                CxClientServiceImpl.testConnection(credi.getServerUrl(), credi.getUsername(), credi.getPassword());
-            } catch (CxClientException e) {
-                res.setMessage(e.getMessage());
-                httpServletResponse.getWriter().write(gson.toJson(res));
-                httpServletResponse.setContentType("application/json");
-                httpServletResponse.setStatus(200);
+                if(loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())){
+                    presets = shraga.getPresetList();
+                    teams = shraga.getTeamList();
+                    if (presets == null || teams == null) {
+                        throw new Exception("invalid preset teamPath");
+                    }
+
+                    res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
+                    writeHttpServletResponse(httpServletResponse, res);
+                    return null;
+                }
+                else{
+                    result = result.contains("Failed to authenticate")? "Failed to authenticate": result;
+                    result = result.startsWith("Login failed.")? result: "Login failed. " + result;
+
+                    res.setMessage(result);
+                    writeHttpServletResponse(httpServletResponse, res);
+                    return null;
+
+                }
+            } catch (Exception e) {
+                log.error("Error occurred in test connection", e);
+                res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
+                writeHttpServletResponse(httpServletResponse, res);
                 return null;
             }
 
 
-            CxClientService client = new CxClientServiceImpl(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword());
-            client.loginToServer();
+    }
 
-            List<CxSelectOption> presets = null;
-            List<CxSelectOption> teams = null;
-
-            if(!credi.isGlobal()) {
-                //get presets from server and convert to id/value
-                presets = client.getPresetListForSelect();
-
-                //get teams from server and convert to id/value
-                teams = client.getTeamListForSelect();
-            }
-
-            //write response
-            res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
-            httpServletResponse.getWriter().write(gson.toJson(res));
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.setStatus(200);
-            return null;
-
-        } catch (Exception e) {
-            log.error("Error occurred in test connection", e);
-            res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
-            httpServletResponse.getWriter().write(gson.toJson(res));
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.setStatus(200);
-            return null;
-        }
-
+    private void writeHttpServletResponse(HttpServletResponse httpServletResponse, TestConnectionResponse res) throws IOException {
+        httpServletResponse.getWriter().write(gson.toJson(res));
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setStatus(200);
     }
 
     private TestConnectionRequest extractRequestBody(HttpServletRequest request) throws IOException {
@@ -121,6 +121,18 @@ public class TestConnectionController extends BaseController {
 
         } catch (Exception e) {
             return password;
+        }
+    }
+
+    private boolean loginToServer(URL url, String username, String password) {
+        try {
+            shraga = new CxShragaClient(url.toString().trim(), username, password, CxConstants.ORIGIN_TEAMCITY, false, log);
+            shraga.login();
+
+            return true;
+        } catch (Exception ex) {
+            result = ex.getMessage();
+            return false;
         }
     }
 

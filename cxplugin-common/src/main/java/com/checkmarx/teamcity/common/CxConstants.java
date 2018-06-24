@@ -8,13 +8,8 @@ public abstract class CxConstants {
     public static final String RUNNER_DISPLAY_NAME = "Checkmarx";
 
     public final static String REPORT_HTML_NAME = "report.html";
-    public final static String REPORT_XML_NAME = "ScanReport.xml";
-    public final static String REPORT_PDF_NAME = "ScanReport.pdf";
-    public final static String REPORT_XML_PATH = RUNNER_DISPLAY_NAME + "/" + REPORT_XML_NAME;
 
     public static final String TRUE = "true";
-    public static final String FALSE = "false";
-    public static final String SAVE = "save";
 
     public static final String DEFAULT_SERVER_URL = "http://localhost";
     public static final String DEFAULT_FILTER_PATTERN =
@@ -34,11 +29,8 @@ public abstract class CxConstants {
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection successful";
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
-    public static final String CHECKMARX_SERVER_NOT_FOUND_MESSAGE = "Checkmarx server was not found in specified address";
-    public static final String INVALID_URL_MESSAGE = "Invalid URL";
     public final static String NO_PRESET_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see presets list";
     public final static String NO_TEAM_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see teams list";
-    public final static String GENERAL_ERROR_MESSAGE = "Some error occurred. Check server logs for more information";
     public final static String UNABLE_TO_CONNECT_MESSAGE = "Unable to connect to the server. Please check the server logs for further information";
 
     public static final String URL_NOT_EMPTY_MESSAGE = "Server URL must not be empty";
@@ -56,6 +48,8 @@ public abstract class CxConstants {
 
     public static final String TEAMCITY_SERVER_URL = "cx.teamcity.server.url";
     public static final String TEAMCITY_PLUGIN_VERSION = "cx.teamcity.plugin.version";
+
+    public static final String ORIGIN_TEAMCITY = "TeamCity";
 
 
 }

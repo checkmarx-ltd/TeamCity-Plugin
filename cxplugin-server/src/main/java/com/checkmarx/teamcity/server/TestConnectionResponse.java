@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.server;
 
-import com.checkmarx.teamcity.common.CxSelectOption;
+import com.cx.restclient.dto.Team;
+import com.cx.restclient.sast.dto.Preset;
 
 import java.util.List;
 
@@ -11,11 +12,11 @@ public class TestConnectionResponse {
 
     public boolean success = false;
     public String message;
-    public List<CxSelectOption> presetList;
-    public List<CxSelectOption> teamPathList;
+    public List<Preset> presetList;
+    public List<Team> teamPathList;
 
 
-    public TestConnectionResponse(boolean success, String message, List<CxSelectOption> presetList, List<CxSelectOption> teamPathList) {
+    public TestConnectionResponse(boolean success, String message, List<Preset> presetList, List<Team> teamPathList) {
         this.success = success;
         this.message = message;
         this.presetList = presetList;
@@ -41,19 +42,19 @@ public class TestConnectionResponse {
         this.message = message;
     }
 
-    public List<CxSelectOption> getPresetList() {
+    public List<Preset> getPresetList() {
         return presetList;
     }
 
-    public void setPresetList(List<CxSelectOption> presetList) {
+    public void setPresetList(List<Preset> presetList) {
         this.presetList = presetList;
     }
 
-    public List<CxSelectOption> getTeamPathList() {
+    public List<Team> getTeamPathList() {
         return teamPathList;
     }
 
-    public void setTeamPathList(List<CxSelectOption> teamPathList) {
+    public void setTeamPathList(List<Team> teamPathList) {
         this.teamPathList = teamPathList;
     }
 }

@@ -1,146 +1,71 @@
 package com.checkmarx.teamcity.common.client.dto;
 
-import java.util.List;
+import com.cx.restclient.osa.dto.OSAResults;
+import com.cx.restclient.sast.dto.SASTResults;
 
-/**
- * Created by: Dorg.
- * Date: 15/09/2016.
- */
-public class ScanResults {
+public class ScanResults{
 
-    private long projectId;
+    private SASTResults sastResults;
+    private OSAResults osaResults;
 
-    private long scanID;
+    private Exception sastCreateException = null;
+    private Exception sastWaitException = null;
+    private Exception osaCreateException = null;
+    private Exception osaWaitException = null;
 
-    private int riskLevelScore;
-
-    private int highSeverityResults;
-
-    private int mediumSeverityResults;
-
-    private int lowSeverityResults;
-
-    private int infoSeverityResults;
-
-    private String scanDetailedReport;
-
-    private String scanStart;
-    private String scanTime;
-    private String filesScanned;
-    private String linesOfCodeScanned;
-    private List<CxXMLResults.Query> queryList;
-
-    public long getProjectId() {
-        return projectId;
+    public ScanResults() {
     }
 
-    public void setProjectId(long projectId) {
-        this.projectId = projectId;
+    public ScanResults(SASTResults sastResults, OSAResults osaResults) {
+        this.sastResults = sastResults;
+        this.osaResults = osaResults;
     }
 
-    public long getScanID() {
-        return scanID;
+    public SASTResults getSastResults() {
+        return sastResults;
     }
 
-    public void setScanID(long scanID) {
-        this.scanID = scanID;
+    public void setSastResults(SASTResults sastResults) {
+        this.sastResults = sastResults;
     }
 
-    public int getRiskLevelScore() {
-        return riskLevelScore;
+    public OSAResults getOsaResults() {
+        return osaResults;
     }
 
-    public void setRiskLevelScore(int riskLevelScore) {
-        this.riskLevelScore = riskLevelScore;
+    public void setOsaResults(OSAResults osaResults) {
+        this.osaResults = osaResults;
     }
 
-    public int getHighSeverityResults() {
-        return highSeverityResults;
+    public Exception getSastCreateException() {
+        return sastCreateException;
     }
 
-    public void setHighSeverityResults(int highSeverityResults) {
-        this.highSeverityResults = highSeverityResults;
+    public void setSastCreateException(Exception sastCreateException) {
+        this.sastCreateException = sastCreateException;
     }
 
-    public int getMediumSeverityResults() {
-        return mediumSeverityResults;
+    public Exception getSastWaitException() {
+        return sastWaitException;
     }
 
-    public void setMediumSeverityResults(int mediumSeverityResults) {
-        this.mediumSeverityResults = mediumSeverityResults;
+    public void setSastWaitException(Exception sastWaitException) {
+        this.sastWaitException = sastWaitException;
     }
 
-    public int getLowSeverityResults() {
-        return lowSeverityResults;
+    public Exception getOsaCreateException() {
+        return osaCreateException;
     }
 
-    public void setLowSeverityResults(int lowSeverityResults) {
-        this.lowSeverityResults = lowSeverityResults;
+    public void setOsaCreateException(Exception osaCreateException) {
+        this.osaCreateException = osaCreateException;
     }
 
-    public int getInfoSeverityResults() {
-        return infoSeverityResults;
+    public Exception getOsaWaitException() {
+        return osaWaitException;
     }
 
-    public void setInfoSeverityResults(int infoSeverityResults) {
-        this.infoSeverityResults = infoSeverityResults;
-    }
-
-    public void setScanDetailedReport(String scanDetailedReport) {
-        this.scanDetailedReport = scanDetailedReport;
-    }
-
-    public String getScanDetailedReport() {
-        return scanDetailedReport;
-    }
-
-    public void setScanDetailedReport(CxXMLResults reportObj) {
-        this.scanStart = reportObj.getScanStart();
-        this.scanTime = reportObj.getScanTime();
-        this.linesOfCodeScanned = reportObj.getLinesOfCodeScanned();
-        this.filesScanned = reportObj.getFilesScanned();
-
-        this.queryList = reportObj.getQuery();
-
-    }
-
-    public void setScanStart(String scanStart) {
-        this.scanStart = scanStart;
-    }
-
-    public String getScanTime() {
-        return scanTime;
-    }
-
-    public void setScanTime(String scanTime) {
-        this.scanTime = scanTime;
-    }
-
-    public String getFilesScanned() {
-        return filesScanned;
-    }
-
-    public void setFilesScanned(String filesScanned) {
-        this.filesScanned = filesScanned;
-    }
-
-    public String getLinesOfCodeScanned() {
-        return linesOfCodeScanned;
-    }
-
-    public void setLinesOfCodeScanned(String linesOfCodeScanned) {
-        this.linesOfCodeScanned = linesOfCodeScanned;
-    }
-
-    public List<CxXMLResults.Query> getQueryList() {
-        return queryList;
-    }
-
-    public void setQueryList(List<CxXMLResults.Query> queryList) {
-        this.queryList = queryList;
-    }
-
-    public String getScanStart() {
-        return scanStart;
+    public void setOsaWaitException(Exception osaWaitException) {
+        this.osaWaitException = osaWaitException;
     }
 }

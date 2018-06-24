@@ -26,56 +26,5 @@
       <artifactId>commons-codec</artifactId>
       <version>1.10</version>
     </dependency>
-    <dependency>
-      <groupId>com.checkmarx.components</groupId>
-      <artifactId>zipper</artifactId>
-      <version>1.2.1</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.whitesource</groupId>
-      <artifactId>whitesource-fs-agent</artifactId>
-      <version>18.3.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>stax</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xpp3</groupId>
-          <artifactId>xpp3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>guru.nidi</groupId>
-          <artifactId>graphviz-java</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>wss-agent-api-client</artifactId>
-          <groupId>org.whitesource</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>spring-web</artifactId>
-          <groupId>org.springframework</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
 </project>

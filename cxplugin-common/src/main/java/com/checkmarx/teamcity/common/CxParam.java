@@ -36,6 +36,9 @@ public abstract class CxParam {
     public static final String OSA_MEDIUM_THRESHOLD = "cxOsaMediumThreshold";
     public static final String OSA_LOW_THRESHOLD = "cxOsaLowThreshold";
 
+    public static final String NO_TEAM_PATH = "noTeamPath";
+    public static final int NO_PRESET_ID = -1;
+
     public static final String GLOBAL_SERVER_URL = "cxGlobalServerUrl";
     public static final String GLOBAL_USERNAME = "cxGlobalUsername";
     public static final String GLOBAL_PASSWORD = "cxGlobalPassword";

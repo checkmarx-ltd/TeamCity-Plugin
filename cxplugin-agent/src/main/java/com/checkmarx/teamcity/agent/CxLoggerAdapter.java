@@ -2,8 +2,6 @@ package com.checkmarx.teamcity.agent;
 
 
 import jetbrains.buildServer.agent.BuildProgressLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
@@ -12,11 +10,11 @@ import org.slf4j.helpers.MessageFormatter;
  * Created by: Dorg.
  * Date: 14/09/2016.
  */
-public class CxBuildLoggerAdapter extends MarkerIgnoringBase {
+public class CxLoggerAdapter extends MarkerIgnoringBase {
 
     private BuildProgressLogger buildLogger;
 
-    public CxBuildLoggerAdapter(BuildProgressLogger log) {
+    public CxLoggerAdapter(BuildProgressLogger log) {
         this.name = "Build Logger";
         this.buildLogger = log;
     }

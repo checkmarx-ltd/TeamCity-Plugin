@@ -1,11 +1,7 @@
 package com.checkmarx.teamcity.server;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
-import com.checkmarx.teamcity.common.CxPluginUtils;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.StatefulObject;
 import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
@@ -13,11 +9,12 @@ import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExt
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.checkmarx.teamcity.common.CxConstants;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
@@ -38,7 +35,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
 
         //put default project name as the build name
-        if(CxPluginUtils.isEmptyString(properties.get(CxParam.PROJECT_NAME))) {
+        if(StringUtils.isEmpty(properties.get(CxParam.PROJECT_NAME))) {
             properties.put(CxParam.PROJECT_NAME, form.getName());
         }
 

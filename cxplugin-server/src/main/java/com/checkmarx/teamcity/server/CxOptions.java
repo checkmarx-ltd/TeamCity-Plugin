@@ -1,14 +1,15 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.CxSelectOption;
-import com.checkmarx.teamcity.common.client.CxClientService;
-import com.checkmarx.teamcity.common.client.CxClientServiceImpl;
+import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.dto.Team;
+import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,8 +18,9 @@ import static com.checkmarx.teamcity.common.CxParam.*;
 
 public class CxOptions {
 
-    private List<CxSelectOption> teamList = Collections.singletonList(new CxSelectOption("0", CxConstants.NO_TEAM_MESSAGE));
-    private List<CxSelectOption> presetList = Collections.singletonList(new CxSelectOption("0", CxConstants.NO_PRESET_MESSAGE));
+    public static final Logger log = LoggerFactory.getLogger(CxOptions.class);
+    private List<Team> teamList = Collections.singletonList(new Team(NO_TEAM_PATH, CxConstants.NO_TEAM_MESSAGE));
+    private List<Preset> presetList = Collections.singletonList(new Preset(NO_PRESET_ID, CxConstants.NO_PRESET_MESSAGE));
 
 
     @NotNull
@@ -62,7 +64,7 @@ public class CxOptions {
     }
 
     @NotNull
-    public List<CxSelectOption> getPresetList() {
+    public List<Preset> getPresetList() {
         return presetList;
     }
 
@@ -73,7 +75,7 @@ public class CxOptions {
     }
 
     @NotNull
-    public List<CxSelectOption> getTeamList() {
+    public List<Team> getTeamList() {
         return teamList;
     }
 
@@ -250,14 +252,15 @@ public class CxOptions {
             if (EncryptUtil.isScrambled(password)) {
                 password = EncryptUtil.unscramble(password);
             }
-            CxClientService client = new CxClientServiceImpl(new URL(serverUrl), username, password);
-            client.loginToServer();
-            presetList = client.getPresetListForSelect();
-            teamList = client.getTeamListForSelect();
+            CxShragaClient shraga = new CxShragaClient(serverUrl.trim(), username, password,CxConstants.ORIGIN_TEAMCITY, false,log );
+            shraga.login();
+            presetList = shraga.getPresetList();
+            teamList = shraga.getTeamList();
 
-        } catch (Exception e) {
-            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + e.getMessage());
-
+        }
+        catch (Exception ex) {
+            String result = ex.getMessage();
+            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
         }
     }
 
