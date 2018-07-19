@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.whitesource</groupId>
       <artifactId>whitesource-fs-agent</artifactId>
-      <version>18.3.1</version>
+      <version>18.3.1.1</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>

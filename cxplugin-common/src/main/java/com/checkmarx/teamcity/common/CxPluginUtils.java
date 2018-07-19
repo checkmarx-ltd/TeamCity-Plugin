@@ -73,7 +73,8 @@ public abstract class CxPluginUtils {
 
         if(installBeforeScan) {
             ret.put("npm.runPreStep", "true");
-            ret.put("bower.runPreStep", "true");
+            ret.put("npm.ignoreScripts", "true");
+            ret.put("bower.runPreStep", "false");
         }
 
         ret.put("d", scanFolder);

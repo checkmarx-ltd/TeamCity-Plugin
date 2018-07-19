@@ -338,7 +338,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         if (config.isOsaEnabled()) {
             logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
             logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
-            logger.info("CxOSA install NMP and Bower before scan: " + config.isOsaInstallBeforeScan());
+            logger.info("CxOSA install NPM before scan: " + config.isOsaInstallBeforeScan());
 
             logger.info("CxOSA thresholds enabled: " + config.isOsaThresholdsEnabled());
             if (config.isOsaThresholdsEnabled()) {
