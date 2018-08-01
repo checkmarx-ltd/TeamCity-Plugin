@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>8.80.0-SNAPSHOT</version>
+    <version>8.90.0-SNAPSHOT</version>
   </parent>
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
