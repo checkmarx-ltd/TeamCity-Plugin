@@ -35,6 +35,7 @@ public abstract class CxParam {
     public static final String OSA_HIGH_THRESHOLD = "cxOsaHighThreshold";
     public static final String OSA_MEDIUM_THRESHOLD = "cxOsaMediumThreshold";
     public static final String OSA_LOW_THRESHOLD = "cxOsaLowThreshold";
+    public static final String PROJECT_POLICY_VIOLATION = "cxProjectPolicyViolation";
 
     public static final String NO_TEAM_PATH = "noTeamPath";
     public static final int NO_PRESET_ID = -1;
@@ -54,13 +55,14 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_HIGH_THRESHOLD = "cxGlobalOsaHighThreshold";
     public static final String GLOBAL_OSA_MEDIUM_THRESHOLD = "cxGlobalOsaMediumThreshold";
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
+    public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
 
 
     public static final String[] GLOBAL_CONFIGS = {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
             GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_HIGH_THRESHOLD,
             GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED, GLOBAL_OSA_HIGH_THRESHOLD,
-            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD
+            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_PROJECT_POLICY_VIOLATION
     };
 
 

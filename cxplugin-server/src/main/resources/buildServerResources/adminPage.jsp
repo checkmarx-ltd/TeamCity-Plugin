@@ -198,6 +198,15 @@
         <tr id="scanControlSection" ${hideScanControlSection}>
           <td colspan="2">
             <table class="scanControlSectionTable" width="101%">
+
+              <tr>
+                <th><label for="cxGlobalProjectPolicyViolation">Enable Project's OSA Policy Enforcement
+                  <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
+                </th>
+                <td><forms:checkbox name="cxGlobalProjectPolicyViolation" value="${cxGlobalProjectPolicyViolation}"
+                                    checked="${cxGlobalProjectPolicyViolation}"/></td>
+              </tr>
+
               <tr>
                 <th><label for="cxGlobalThresholdEnabled">Enable CxSAST Vulnerability Thresholds
                   <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>

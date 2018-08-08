@@ -36,9 +36,9 @@
       <version>2.6.6</version>
     </dependency>
     <dependency>
-      <groupId>com.checkmarx.client</groupId>
-      <artifactId>checkmarx-client</artifactId>
-      <version>8.80.0-20180717.065934-31</version>
+      <groupId>com.checkmarx</groupId>
+      <artifactId>cx-client-common</artifactId>
+      <version>8.90.0-20180807.135020-2</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>
@@ -61,16 +61,28 @@
           <groupId>org.whitesource</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>spring-web</artifactId>
-          <groupId>org.springframework</groupId>
-        </exclusion>
-        <exclusion>
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-classic</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
       </exclusions>
     </dependency>

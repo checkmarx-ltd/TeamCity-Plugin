@@ -1,10 +1,10 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.client.dto.ScanResults;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.common.CxPARAM;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ScanResults;
 import com.cx.restclient.dto.ThresholdResult;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.osa.dto.OSAResults;
@@ -63,7 +63,9 @@ public class CxBuildProcess extends CallableBuildProcess {
         boolean sastCreated = false;
         boolean osaCreated = false;
 
-        ScanResults ret = new ScanResults(new SASTResults(), new OSAResults());
+        ScanResults ret = new ScanResults();
+        ret.setSastResults(new SASTResults());
+        ret.setOsaResults(new OSAResults());
         try {
 
             Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
@@ -152,10 +154,13 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
             publishArtifact(htmlFile.getAbsolutePath());
             //assert if expected exception is thrown  OR when vulnerabilities under threshold
+            StringBuilder thresholdAndPolicySB = new StringBuilder("");
+            boolean isPolicyViolated = shraga.isPolicyViolated(thresholdAndPolicySB);
             ThresholdResult thresholdResult = shraga.getThresholdResult();
+            thresholdAndPolicySB.append(thresholdResult.getFailDescription());
             if (thresholdResult.isFail() || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
-                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null) {
-                printScanBuildFailure(thresholdResult.getFailDescription(), ret, logger);
+                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null || isPolicyViolated) {
+                printScanBuildFailure(thresholdAndPolicySB.toString(), ret, logger);
                 return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_SUCCESS;
@@ -203,6 +208,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("CxOSA enabled: " + config.getOsaEnabled());
 
         logger.info("Is synchronous scan: " + config.getSynchronous());
+        logger.info("Is project's OSA policy enforcement enabled: " + config.getEnablePolicyViolations());
         logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());
         if (config.getSastThresholdsEnabled()) {
             logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? "[No Threshold]" : config.getSastHighThreshold()));

@@ -245,6 +245,18 @@ public class CxOptions {
         return GLOBAL_OSA_LOW_THRESHOLD;
     }
 
+    @NotNull
+    public String getProjectPolicyViolation() {
+        return PROJECT_POLICY_VIOLATION;
+    }
+
+    @NotNull
+    public String getGlobalProjectPolicyViolation() {
+        return GLOBAL_PROJECT_POLICY_VIOLATION;
+    }
+
+
+
 
     public void testConnection(String serverUrl, String username, String password) {
 

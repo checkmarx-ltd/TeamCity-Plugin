@@ -62,6 +62,7 @@ public class CxConfigHelper {
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
         ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
 
+
         String thresholdEnabled = THRESHOLD_ENABLED;
         String highThreshold = HIGH_THRESHOLD;
         String mediumThreshold = MEDIUM_THRESHOLD;
@@ -73,6 +74,7 @@ public class CxConfigHelper {
         String osaLowThreshold = LOW_THRESHOLD;
 
         String isSynchronous = IS_SYNCHRONOUS;
+        String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
 
         Map<String,String> parameters = buildParameters;
 
@@ -88,11 +90,12 @@ public class CxConfigHelper {
              osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
+            enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
             parameters = globalParameters;
         }
 
         ret.setSynchronous(TRUE.equals(parameters.get(isSynchronous)));
-
+        ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
         if (ret.getSynchronous()) {
 
             ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));

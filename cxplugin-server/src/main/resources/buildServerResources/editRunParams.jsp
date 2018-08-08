@@ -55,6 +55,13 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     <c:set var="globalThresholdEnabled" value="false"/>
 </c:if>
 
+<c:if test="${propertiesBean.properties[optionsBean.globalProjectPolicyViolation] == 'true'}">
+    <c:set var="globalProjectPolicydEnabled" value="true"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.globalProjectPolicyViolation] != 'true'}">
+    <c:set var="globalProjectPolicydEnabled" value="false"/>
+</c:if>
+
 <c:if test="${propertiesBean.properties[optionsBean.globalOsaThresholdEnabled] == 'true'}">
     <c:set var="globalOsaThresholdEnabled" value="true"/>
 </c:if>
@@ -72,6 +79,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.isSynchronous] != 'true'}">
     <c:set var="hideScanControlSection" value="${optionsBean.noDisplay}"/>
 </c:if>
+
 <c:if test="${propertiesBean.properties[optionsBean.thresholdEnabled] != 'true' }">
     <c:set var="hideThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
@@ -296,9 +304,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
         </tr>
         <tr>
-            <th><label for="${optionsBean.osaInstallBeforeScan}">Execute NPM install packages command before scan
+            <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
                 <bs:helpIcon
-                        iconTitle="Checked in order to perform NPM install packages command before initiate OSA scan"/>
+                        iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
             </label></th>
             <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
         </tr>
@@ -339,7 +347,15 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td colspan="2">
 
             <table class="scanControlSectionTable" width="101%">
+                <tr>
+                    <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's OSA Policy Enforcement
+                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
+                    </th>
+                    <td>
+                        <props:checkboxProperty name="${optionsBean.projectPolicyViolation}"/>
 
+                    </td>
+                </tr>
                 <tr>
                     <th><label for="${optionsBean.thresholdEnabled}">Enable CxSAST Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
@@ -436,7 +452,13 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     <tr ${globalIsSynchronus ? '' : optionsBean.noDisplay}>
         <td colspan="2">
             <table class="scanControlSectionTable" width="101%">
-
+                <tr>
+                    <th>Enable project's policy enforcement
+                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the project's policy is violated."/></th>
+                    <td>
+                        <input type="checkbox" disabled ${globalProjectPolicydEnabled ? 'checked' : ''}/>
+                    </td>
+                </tr>
                 <tr>
                     <th>Enable CxSAST Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>

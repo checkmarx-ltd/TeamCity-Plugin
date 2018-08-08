@@ -1,7 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.teamcity.common.client.dto.ScanResults;
 
+import com.cx.restclient.dto.ScanResults;
 
 public abstract class CxPluginUtils {
     public static void printScanBuildFailure(String thDescription, ScanResults ret, CxLoggerAdapter logger) {
@@ -22,6 +22,8 @@ public abstract class CxPluginUtils {
             logger.error("-----------------------------------------------------------------------------------------\n");
             logger.error("");
         }
+
+
     }
 
     private static void logError(Exception ex, org.slf4j.Logger log){
