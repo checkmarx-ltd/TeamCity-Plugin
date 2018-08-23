@@ -22,7 +22,6 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
         List<InvalidProperty> result = new Vector<>();
-
         if (!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SERVER))) {
             final String cxServerUrl = properties.get(CxParam.SERVER_URL);
             if (PropertiesUtil.isEmptyOrNull(cxServerUrl)) {

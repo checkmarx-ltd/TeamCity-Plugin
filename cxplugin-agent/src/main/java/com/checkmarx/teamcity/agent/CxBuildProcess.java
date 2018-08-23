@@ -197,29 +197,30 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("URL: " + config.getUrl());
         logger.info("Username: " + config.getUsername());
         logger.info("Project name: " + config.getProjectName());
-        logger.info("Preset ID: " + config.getPresetId());
         logger.info("Team ID: " + config.getTeamId());
-        logger.info("Folder exclusions: " + config.getSastFolderExclusions());
-        logger.info("Filter pattern: " + config.getSastFilterPattern());
-        logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());
-        logger.info("Scan comment: " + config.getScanComment());
-        logger.info("Is incremental scan: " + config.getIncremental());
-        logger.info("Generate PDF report: " + config.getGeneratePDFReport());
-        logger.info("CxOSA enabled: " + config.getOsaEnabled());
-
         logger.info("Is synchronous scan: " + config.getSynchronous());
-        logger.info("Is project's OSA policy enforcement enabled: " + config.getEnablePolicyViolations());
-        logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());
-        if (config.getSastThresholdsEnabled()) {
-            logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? "[No Threshold]" : config.getSastHighThreshold()));
-            logger.info("CxSAST medium threshold: " + (config.getSastMediumThreshold() == null ? "[No Threshold]" : config.getSastMediumThreshold()));
-            logger.info("CxSAST low threshold: " + (config.getSastLowThreshold() == null ? "[No Threshold]" : config.getSastLowThreshold()));
+        logger.info("CxSAST enabled: " + config.getSastEnabled());
+        if(config.getSastEnabled()){
+            logger.info("Preset ID: " + config.getPresetId());
+            logger.info("Folder exclusions: " + config.getSastFolderExclusions());
+            logger.info("Filter pattern: " + config.getSastFilterPattern());
+            logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());
+            logger.info("Scan comment: " + config.getScanComment());
+            logger.info("Is incremental scan: " + config.getIncremental());
+            logger.info("Generate PDF report: " + config.getGeneratePDFReport());
+            logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());
+            if (config.getSastThresholdsEnabled()) {
+                logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? "[No Threshold]" : config.getSastHighThreshold()));
+                logger.info("CxSAST medium threshold: " + (config.getSastMediumThreshold() == null ? "[No Threshold]" : config.getSastMediumThreshold()));
+                logger.info("CxSAST low threshold: " + (config.getSastLowThreshold() == null ? "[No Threshold]" : config.getSastLowThreshold()));
+            }
         }
+        logger.info("CxOSA enabled: " + config.getOsaEnabled());
+        logger.info("Is project's OSA policy enforcement enabled: " + config.getEnablePolicyViolations());
         if (config.getOsaEnabled()) {
             logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
             logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
             logger.info("CxOSA install NPM before scan: " + config.getOsaRunInstall());
-
             logger.info("CxOSA thresholds enabled: " + config.getOsaThresholdsEnabled());
             if (config.getOsaThresholdsEnabled()) {
                 logger.info("CxOSA high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));

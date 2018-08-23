@@ -21,7 +21,8 @@ public class CxConfigHelper {
 
         CxScanConfig ret = new CxScanConfig();
 
-        ret.setSastEnabled(true);
+        //to support builds that were configured before this parameter, allow sast scan if parameter is null.
+        ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
@@ -43,20 +44,23 @@ public class CxConfigHelper {
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
-        if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
-            ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
-            ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
-            ret.setSastScanTimeoutInMinutes(convertToIntegerIfNotNull(globalParameters.get(GLOBAL_SCAN_TIMEOUT_IN_MINUTES), GLOBAL_SCAN_TIMEOUT_IN_MINUTES));
+        if(ret.getSastEnabled()){
+            if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
+                ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
+                ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
+                ret.setSastScanTimeoutInMinutes(convertToIntegerIfNotNull(globalParameters.get(GLOBAL_SCAN_TIMEOUT_IN_MINUTES), GLOBAL_SCAN_TIMEOUT_IN_MINUTES));
 
-        } else {
-            ret.setSastFolderExclusions(buildParameters.get(EXCLUDE_FOLDERS));
-            ret.setSastFilterPattern(buildParameters.get(FILTER_PATTERNS));
-            ret.setSastScanTimeoutInMinutes(convertToIntegerIfNotNull(buildParameters.get(SCAN_TIMEOUT_IN_MINUTES), SCAN_TIMEOUT_IN_MINUTES));
+            } else {
+                ret.setSastFolderExclusions(buildParameters.get(EXCLUDE_FOLDERS));
+                ret.setSastFilterPattern(buildParameters.get(FILTER_PATTERNS));
+                ret.setSastScanTimeoutInMinutes(convertToIntegerIfNotNull(buildParameters.get(SCAN_TIMEOUT_IN_MINUTES), SCAN_TIMEOUT_IN_MINUTES));
+            }
+
+            ret.setScanComment(buildParameters.get(SCAN_COMMENT));
+            ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
+            ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        ret.setScanComment(buildParameters.get(SCAN_COMMENT));
-        ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
-        ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         ret.setOsaEnabled(TRUE.equals(buildParameters.get(OSA_ENABLED)));
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
@@ -98,12 +102,15 @@ public class CxConfigHelper {
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
         if (ret.getSynchronous()) {
 
-            ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
-            if (ret.getSastThresholdsEnabled()) {
-                ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
-                ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
-                ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
+            if(ret.getSastEnabled()){
+                ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
+                if (ret.getSastThresholdsEnabled()) {
+                    ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
+                    ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
+                    ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
+                }
             }
+
 
             if (ret.getOsaEnabled()) {
                 ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));

@@ -37,6 +37,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultSastConfig] == 'true'}">
     <c:set var="hideSastConfigSection" value="${optionsBean.noDisplay}"/>
 </c:if>
+<c:if test="${propertiesBean.properties[optionsBean.sastEnabled] != 'true'}">
+    <c:set var="hideCxSast" value="${optionsBean.noDisplay}"/>
+</c:if>
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultSastConfig] != 'true'}">
     <c:set var="hideDefaultSastConfigSection" value="${optionsBean.noDisplay}"/>
 </c:if>
@@ -174,99 +177,117 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 
 <l:settingsGroup className="cx-title" title="Checkmarx Scan CxSAST">
-
     <tr>
-        <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
+        <th><label for="${optionsBean.sastEnabled}">Enable CxSAST Scan</label>
+        </th>
         <td>
             <c:set var="onclick">
-                jQuery('#sastConfigSection').toggle();
-                jQuery('#defaultSastConfigSection').toggle();
-                BS.MultilineProperties.updateVisible();
+                jQuery('#sastContainer').toggle();
+                BS.VisibilityHandlers.updateVisibility('sastContainer');
             </c:set>
-            <props:checkboxProperty name="${optionsBean.useDefaultSastConfig}" onclick="${onclick}"/>
+            <props:checkboxProperty name="${optionsBean.sastEnabled}" onclick="${onclick}"/>
         </td>
     </tr>
+    <tr id="sastContainer" ${hideCxSast}>
+    <td colspan="2">
+    <table width="101%">
+        <tr>
+            <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
+            <td>
+                <c:set var="onclick">
+                    jQuery('#sastConfigSection').toggle();
+                    jQuery('#defaultSastConfigSection').toggle();
+                    BS.MultilineProperties.updateVisible();
+                </c:set>
+                <props:checkboxProperty name="${optionsBean.useDefaultSastConfig}" onclick="${onclick}"/>
+            </td>
+        </tr>
 
 
-    <tbody id="sastConfigSection" ${hideSastConfigSection}>
+        <tbody id="sastConfigSection" ${hideSastConfigSection}>
 
-    <tr>
-        <th><label for="${optionsBean.excludeFolders}">Folder Exclusion
-            <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
+        <tr>
+            <th><label for="${optionsBean.excludeFolders}">Folder Exclusion
+                <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
                                                                                                 Entries in this list are automatically converted to exclude wildcard patterns and appended to the full pattern list provided in the advanced section"/>
-        </label></th>
-        <td><props:textProperty name="${optionsBean.excludeFolders}" className="longField"/></td>
-    </tr>
-    <tr>
-        <th><label for="${optionsBean.filterPatterns}">Include/Exclude Wildcard Patterns
-            <bs:helpIcon
-                    iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
-        </label></th>
-        <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true" rows="5"
-                                     cols="50" className="longField"/></td>
-    </tr>
-    <tr>
-        <th><label for="${optionsBean.scanTimeoutInMinutes}">Scan Timeout in Minutes
-            <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scanTimeoutInMinutes}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scanTimeoutInMinutes}"></span>
-        </td>
-    </tr>
+            </label></th>
+            <td><props:textProperty name="${optionsBean.excludeFolders}" className="longField"/></td>
+        </tr>
+        <tr>
+            <th><label for="${optionsBean.filterPatterns}">Include/Exclude Wildcard Patterns
+                <bs:helpIcon
+                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
+            </label></th>
+            <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true" rows="5"
+                                         cols="50" className="longField"/></td>
+        </tr>
+        <tr>
+            <th><label for="${optionsBean.scanTimeoutInMinutes}">Scan Timeout in Minutes
+                <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></label></th>
+            <td>
+                <props:textProperty name="${optionsBean.scanTimeoutInMinutes}" className="longField"/>
+                <span class="error" id="error_${optionsBean.scanTimeoutInMinutes}"></span>
+            </td>
+        </tr>
 
     </tbody>
 
-    <tbody id="defaultSastConfigSection" ${hideDefaultSastConfigSection}>
+        <tbody id="defaultSastConfigSection" ${hideDefaultSastConfigSection}>
 
-    <tr>
-        <th>Folder Exclusion
-            <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
+        <tr>
+            <th>Folder Exclusion
+                <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
                             Entries in this list are automatically converted to exclude wildcard patterns and appended to the full pattern list provided in the advanced section"/>
-        </th>
-        <td><input type="text" class="longField" disabled
-                   value="${propertiesBean.properties[optionsBean.globalExcludeFolders]}"></td>
+            </th>
+            <td><input type="text" class="longField" disabled
+                       value="${propertiesBean.properties[optionsBean.globalExcludeFolders]}"></td>
+        </tr>
+
+        <tr>
+            <th>Include/Exclude Wildcard Patterns
+                <bs:helpIcon
+                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
+            <td>
+                <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <th>Scan Timeout in Minutes
+                <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></th>
+            <td><input type="text" class="longField" disabled
+                       value="${propertiesBean.properties[optionsBean.globalScanTimeoutInMinutes]}"></td>
+        </tr>
+
+        </tbody>
+
+        <tr>
+            <th><label for="${optionsBean.scanComment}">Comment
+                <bs:helpIcon
+                        iconTitle="Comment that can be added to the scan result. May reference build parameters like %teamcity.variable.name%"/></label>
+            </th>
+            <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
+                                         cols="50" className="longField"/></td>
+        </tr>
+
+        <tr>
+            <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
+                <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
+            <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
+        </tr>
+
+        <tr>
+            <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
+                <bs:helpIcon
+                        iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>
+            </th>
+            <td><props:checkboxProperty name="${optionsBean.generatePDFReport}"/></td>
+        </tr>
+        </table>
+    </td>
     </tr>
 
-    <tr>
-        <th>Include/Exclude Wildcard Patterns
-            <bs:helpIcon
-                    iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
-        <td>
-            <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
-        </td>
-    </tr>
 
-    <tr>
-        <th>Scan Timeout in Minutes
-            <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></th>
-        <td><input type="text" class="longField" disabled
-                   value="${propertiesBean.properties[optionsBean.globalScanTimeoutInMinutes]}"></td>
-    </tr>
-
-    </tbody>
-
-    <tr>
-        <th><label for="${optionsBean.scanComment}">Comment
-            <bs:helpIcon
-                    iconTitle="Comment that can be added to the scan result. May reference build parameters like %teamcity.variable.name%"/></label>
-        </th>
-        <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
-                                     cols="50" className="longField"/></td>
-    </tr>
-
-    <tr>
-        <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
-            <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
-        <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
-    </tr>
-
-    <tr>
-        <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
-            <bs:helpIcon
-                    iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>
-        </th>
-        <td><props:checkboxProperty name="${optionsBean.generatePDFReport}"/></td>
-    </tr>
 </l:settingsGroup>
 
 <l:settingsGroup className="cx-title" title="Checkmarx Scan CxOSA">

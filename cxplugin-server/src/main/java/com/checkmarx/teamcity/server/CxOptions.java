@@ -116,6 +116,11 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getSastEnabled() {
+        return SAST_ENABLED;
+    }
+
+    @NotNull
     public String getOsaFilterPatterns() {
         return OSA_FILTER_PATTERNS;
     }

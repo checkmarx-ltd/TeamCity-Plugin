@@ -10,6 +10,7 @@ public abstract class CxConstants {
     public final static String REPORT_HTML_NAME = "report.html";
 
     public static final String TRUE = "true";
+    public static final String FALSE = "false";
 
     public static final String DEFAULT_SERVER_URL = "http://localhost";
     public static final String DEFAULT_FILTER_PATTERN =

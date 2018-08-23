@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+import static com.checkmarx.teamcity.common.CxConstants.TRUE;
+
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
@@ -37,6 +39,10 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         //put default project name as the build name
         if(StringUtils.isEmpty(properties.get(CxParam.PROJECT_NAME))) {
             properties.put(CxParam.PROJECT_NAME, form.getName());
+        }
+        //Default to true in case its an old job configuration.
+        if(properties.get(CxParam.SAST_ENABLED) == null){
+            properties.put(CxParam.SAST_ENABLED,CxConstants.TRUE);
         }
 
         //put all global properties to the config page
@@ -79,6 +85,11 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
             cxPass = "";
         }
         properties.put(CxParam.PASSWORD, cxPass);
+        //the jsp page dosent pass false value, so we need to check if it isnt true, null in this case, set it as false
+        //this way we can distinguish in the build process between an old job (sast enabled == null) and a job where user specified not to run sast (sast_enabled == false)
+        if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
+            properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
+        }
 
         return new ActionErrors();
     }

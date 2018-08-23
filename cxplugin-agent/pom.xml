@@ -10,6 +10,30 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>4.2.6.RELEASE</version>
+      <scope>compile</scope>
+      <exclusions>
+          <exclusion>
+              <artifactId>spring-aop</artifactId>
+              <groupId>org.springframework</groupId>
+          </exclusion>
+          <exclusion>
+              <artifactId>spring-beans</artifactId>
+              <groupId>org.springframework</groupId>
+          </exclusion>
+          <exclusion>
+              <artifactId>spring-context</artifactId>
+              <groupId>org.springframework</groupId>
+          </exclusion>
+          <exclusion>
+              <artifactId>spring-core</artifactId>
+              <groupId>org.springframework</groupId>
+          </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>com.checkmarx.teamcity</groupId>
       <artifactId>cxplugin-common</artifactId>
       <version>${project.version}</version>
