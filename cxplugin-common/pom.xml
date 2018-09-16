@@ -38,7 +38,7 @@
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>8.90.0-20180819.133222-6</version>
+      <version>8.90.0-20180830.124043-8</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>
