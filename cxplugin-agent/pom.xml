@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>8.90.0-SNAPSHOT</version>
+    <version>9.00.0-SNAPSHOT</version>
   </parent>
   <artifactId>cxplugin-agent</artifactId>
   <packaging>jar</packaging>
@@ -15,22 +15,22 @@
       <version>4.2.6.RELEASE</version>
       <scope>compile</scope>
       <exclusions>
-          <exclusion>
-              <artifactId>spring-aop</artifactId>
-              <groupId>org.springframework</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>spring-beans</artifactId>
-              <groupId>org.springframework</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>spring-context</artifactId>
-              <groupId>org.springframework</groupId>
-          </exclusion>
-          <exclusion>
-              <artifactId>spring-core</artifactId>
-              <groupId>org.springframework</groupId>
-          </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
