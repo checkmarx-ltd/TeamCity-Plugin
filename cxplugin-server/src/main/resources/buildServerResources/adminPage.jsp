@@ -200,7 +200,7 @@
             <table class="scanControlSectionTable" width="101%">
 
               <tr>
-                <th><label for="cxGlobalProjectPolicyViolation">Enable Project's OSA Policy Enforcement
+                <th><label for="cxGlobalProjectPolicyViolation">Enable Project's policy enforcement
                   <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
                 </th>
                 <td><forms:checkbox name="cxGlobalProjectPolicyViolation" value="${cxGlobalProjectPolicyViolation}"

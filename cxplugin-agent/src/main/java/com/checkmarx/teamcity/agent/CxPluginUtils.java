@@ -19,14 +19,13 @@ public abstract class CxPluginUtils {
             for (String s : lines) {
                 logger.error(s);
             }
-            logger.error("-----------------------------------------------------------------------------------------\n");
-            logger.error("");
         }
 
-
+        logger.error("-----------------------------------------------------------------------------------------\n");
+        logger.error("");
     }
 
-    private static void logError(Exception ex, org.slf4j.Logger log){
+    private static void logError(Exception ex, org.slf4j.Logger log) {
         if (ex != null) {
             log.error(ex.getMessage());
         }

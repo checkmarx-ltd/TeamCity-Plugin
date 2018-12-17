@@ -3,9 +3,9 @@ package com.checkmarx.teamcity.agent;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.common.CxPARAM;
+import com.cx.restclient.common.ShragaUtils;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScanResults;
-import com.cx.restclient.dto.ThresholdResult;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.osa.dto.OSAResults;
 import com.cx.restclient.sast.dto.SASTResults;
@@ -15,6 +15,7 @@ import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -30,7 +31,7 @@ import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
  */
 public class CxBuildProcess extends CallableBuildProcess {
 
-//    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
+    //    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
     private static final String REPORT_NAME = "CxSASTReport";
 
     private final BuildRunnerContext buildRunnerContext;
@@ -82,12 +83,12 @@ public class CxBuildProcess extends CallableBuildProcess {
                 //TODO run.setResult(Result.FAILURE);
             }
             try {
-                shraga = new CxShragaClient(config,logger);
+                shraga = new CxShragaClient(config, logger);
                 shraga.init();
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new RunBuildException("Failed to init CxClient: " + e.getMessage(), e);
             }
-            if(config.getSastEnabled()){
+            if (config.getSastEnabled()) {
                 try {
                     shraga.createSASTScan();
                     sastCreated = true;
@@ -136,7 +137,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     logger.error(e.getMessage());
                 }
             }
-            if(osaCreated){
+            if (osaCreated) {
                 try {
                     OSAResults osaResults = shraga.waitForOSAResults();
                     ret.setOsaResults(osaResults);
@@ -145,6 +146,11 @@ public class CxBuildProcess extends CallableBuildProcess {
                     logger.error(e.getMessage());
                 }
             }
+
+            if (config.getEnablePolicyViolations()) {
+                shraga.printIsProjectViolated();
+            }
+
             String summaryStr = shraga.generateHTMLSummary();
             File htmlFile = new File(buildDirectory, REPORT_HTML_NAME);
             try {
@@ -153,14 +159,14 @@ public class CxBuildProcess extends CallableBuildProcess {
                 logger.error("Failed to generate full html report: " + e.getMessage());
             }
             publishArtifact(htmlFile.getAbsolutePath());
-            //assert if expected exception is thrown  OR when vulnerabilities under threshold
-            StringBuilder thresholdAndPolicySB = new StringBuilder("");
-            boolean isPolicyViolated = shraga.isPolicyViolated(thresholdAndPolicySB);
-            ThresholdResult thresholdResult = shraga.getThresholdResult();
-            thresholdAndPolicySB.append(thresholdResult.getFailDescription());
-            if (thresholdResult.isFail() || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
-                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null || isPolicyViolated) {
-                printScanBuildFailure(thresholdAndPolicySB.toString(), ret, logger);
+
+            //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
+            String buildFailureResult = ShragaUtils.getBuildFailureResult(config,ret.getSastResults(), ret.getOsaResults());
+
+            if (!StringUtils.isEmpty(buildFailureResult) || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
+                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null)
+            {
+                printScanBuildFailure(buildFailureResult, ret, logger);
                 return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_SUCCESS;
@@ -200,7 +206,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Team ID: " + config.getTeamId());
         logger.info("Is synchronous scan: " + config.getSynchronous());
         logger.info("CxSAST enabled: " + config.getSastEnabled());
-        if(config.getSastEnabled()){
+        if (config.getSastEnabled()) {
             logger.info("Preset ID: " + config.getPresetId());
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
@@ -215,8 +221,8 @@ public class CxBuildProcess extends CallableBuildProcess {
                 logger.info("CxSAST low threshold: " + (config.getSastLowThreshold() == null ? "[No Threshold]" : config.getSastLowThreshold()));
             }
         }
+        logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
         logger.info("CxOSA enabled: " + config.getOsaEnabled());
-        logger.info("Is project's OSA policy enforcement enabled: " + config.getEnablePolicyViolations());
         if (config.getOsaEnabled()) {
             logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
             logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
@@ -233,14 +239,14 @@ public class CxBuildProcess extends CallableBuildProcess {
 
 
     private void publishPDFReport(SASTResults sastResults) throws IOException {
-        publishArtifact(buildDirectory+ CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
+        publishArtifact(buildDirectory + CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
         sastPDFLink = compileLinkToArtifact(sastResults.getPdfFileName());
         sastResults.setSastPDFLink(sastPDFLink);
     }
 
     private void publishXMLReport(SASTResults sastResults) throws IOException {
         String xmlFileName = REPORT_NAME + ".xml";
-        File xmlFile = new File(buildDirectory+ CxPARAM.CX_REPORT_LOCATION, xmlFileName);
+        File xmlFile = new File(buildDirectory + CxPARAM.CX_REPORT_LOCATION, xmlFileName);
         FileUtils.writeByteArrayToFile(xmlFile, sastResults.getRawXMLReport());
         publishArtifact(xmlFile.getAbsolutePath());
     }

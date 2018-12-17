@@ -369,7 +369,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
             <table class="scanControlSectionTable" width="101%">
                 <tr>
-                    <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's OSA Policy Enforcement
+                    <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's policy enforcement
                         <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
                     </th>
                     <td>
@@ -474,7 +474,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td colspan="2">
             <table class="scanControlSectionTable" width="101%">
                 <tr>
-                    <th>Enable Project's OSA Policy Enforcement
+                    <th>Enable Project's policy enforcement
                         <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalProjectPolicydEnabled ? 'checked' : ''}/>
