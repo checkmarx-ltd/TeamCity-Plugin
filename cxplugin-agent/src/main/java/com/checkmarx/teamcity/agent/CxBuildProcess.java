@@ -84,8 +84,20 @@ public class CxBuildProcess extends CallableBuildProcess {
             try {
                 shraga = new CxShragaClient(config,logger);
                 shraga.init();
-            } catch (Exception e){
-                throw new RunBuildException("Failed to init CxClient: " + e.getMessage(), e);
+            } catch (Exception ex){
+                if (ex.getMessage().contains("Server is unavailable")) {
+                    try {
+                        shraga.getTeamList();
+                    } catch (CxClientException e) {
+                        throw new IOException(e);
+                    }
+                    String errorMsg = "Connection Failed.\n" +
+                            "Possible reason: Plugin version incompatible with CxSAST v8.7 or lower.\n" +
+                            "If your CxSAST version is v8.8 or greater, please recheck connection details or contact support.";
+                    throw new RunBuildException(ex.getMessage() + ": " + errorMsg);
+                }
+
+                throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
             }
             if(config.getSastEnabled()){
                 try {

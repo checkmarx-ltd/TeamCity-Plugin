@@ -13,7 +13,6 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
-import org.apache.tools.ant.taskdefs.condition.Http;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -61,36 +60,41 @@ public class TestConnectionController extends BaseController {
         res.setTeamPathList(Collections.singletonList(new Team(CxParam.GENERATE_PDF_REPORT, NO_TEAM_MESSAGE)));
 
 
-            TestConnectionRequest credi = extractRequestBody(httpServletRequest);
+        TestConnectionRequest credi = extractRequestBody(httpServletRequest);
 
-            //create client and perform login
-            try {
-                if(loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())){
-                    presets = shraga.getPresetList();
+        //create client and perform login
+        try {
+            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())) {
+                try {
                     teams = shraga.getTeamList();
-                    if (presets == null || teams == null) {
-                        throw new Exception("invalid preset teamPath");
-                    }
-
-                    res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
-                    writeHttpServletResponse(httpServletResponse, res);
-                    return null;
+                } catch (Exception e) {
+                    throw new Exception("Possible reason: Plugin version incompatible with CxSAST v8.7 or lower.\n" +
+                            "If your CxSAST version is v8.8 or greater, please recheck connection details or contact support.\n");
                 }
-                else{
-                    result = result.contains("Failed to authenticate")? "Failed to authenticate": result;
-                    result = result.startsWith("Login failed.")? result: "Login failed. " + result;
+                presets = shraga.getPresetList();
 
-                    res.setMessage(result);
-                    writeHttpServletResponse(httpServletResponse, res);
-                    return null;
-
+                if (presets == null || teams == null) {
+                    throw new Exception("invalid preset teamPath");
                 }
-            } catch (Exception e) {
-                log.error("Error occurred in test connection", e);
-                res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
+
+                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
                 writeHttpServletResponse(httpServletResponse, res);
                 return null;
+            } else {
+                result = result.contains("Failed to authenticate") ? "Failed to authenticate" : result;
+                result = result.startsWith("Login failed.") ? result : "Login failed. " + result;
+
+                res.setMessage(result);
+                writeHttpServletResponse(httpServletResponse, res);
+                return null;
+
             }
+        } catch (Exception e) {
+            log.error("Error occurred in test connection", e);
+            res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
+            writeHttpServletResponse(httpServletResponse, res);
+            return null;
+        }
 
 
     }
