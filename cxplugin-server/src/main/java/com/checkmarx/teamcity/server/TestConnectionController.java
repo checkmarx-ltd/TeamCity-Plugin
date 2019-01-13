@@ -66,8 +66,17 @@ public class TestConnectionController extends BaseController {
             //create client and perform login
             try {
                 if(loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())){
+                    try {
+                        teams = shraga.getTeamList();
+                    } catch (Exception e) {
+                        throw new Exception("Connection Failed.\n" +
+                                "Validate the provided login credentials and server URL are correct.\n" +
+                                "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.\n" +
+                                "Error: " + e.getMessage());
+                    }
+
                     presets = shraga.getPresetList();
-                    teams = shraga.getTeamList();
+
                     if (presets == null || teams == null) {
                         throw new Exception("invalid preset teamPath");
                     }
