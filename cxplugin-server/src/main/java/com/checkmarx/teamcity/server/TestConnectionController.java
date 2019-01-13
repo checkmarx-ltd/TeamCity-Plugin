@@ -68,10 +68,12 @@ public class TestConnectionController extends BaseController {
                 try {
                     teams = shraga.getTeamList();
                 } catch (Exception e) {
-                    throw new Exception("Connection Failed.\n" +
+                    log.error("Error occurred in test connection", e);
+                    res.setMessage("Connection Failed.\n" +
                             "Validate the provided login credentials and server URL are correct.\n" +
-                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.\n" +
-                            "Error: " + e.getMessage());
+                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.");
+                    writeHttpServletResponse(httpServletResponse, res);
+                    return null;
                 }
                 presets = shraga.getPresetList();
 
