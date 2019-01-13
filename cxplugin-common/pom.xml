@@ -72,6 +72,10 @@
           <artifactId>spring-web</artifactId>
           <groupId>org.springframework</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>vertx-core</artifactId>
+          <groupId>io.vertx</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
   </dependencies>

@@ -68,8 +68,9 @@ public class TestConnectionController extends BaseController {
                 try {
                     teams = shraga.getTeamList();
                 } catch (Exception e) {
-                    throw new Exception("Possible reason: Plugin version incompatible with CxSAST v8.7 or lower.\n" +
-                            "If your CxSAST version is v8.8 or greater, please recheck connection details or contact support.\n" +
+                    throw new Exception("Connection Failed.\n" +
+                            "Validate the provided login credentials and server URL are correct.\n" +
+                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.\n" +
                             "Error: " + e.getMessage());
                 }
                 presets = shraga.getPresetList();
