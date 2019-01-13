@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
+import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
 public class TestConnectionController extends BaseController {
 
@@ -70,10 +71,8 @@ public class TestConnectionController extends BaseController {
                     teams = shraga.getTeamList();
                 } catch (Exception e) {
                     log.error("Error occurred in test connection", e);
-                    res.setMessage("Connection Failed.\n" +
-                            "Validate the provided login credentials and server URL are correct.\n" +
-                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.");
-                            writeHttpServletResponse(httpServletResponse, res);
+                    res.setMessage(CONNECTION_FAILED_COMPATIBILITY);
+                    writeHttpServletResponse(httpServletResponse, res);
                     return null;
                 }
 

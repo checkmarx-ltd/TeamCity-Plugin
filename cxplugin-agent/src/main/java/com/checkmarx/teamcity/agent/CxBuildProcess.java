@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static com.checkmarx.teamcity.agent.CxPluginUtils.printScanBuildFailure;
 import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
+import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
 /**
  * Created by: Dorg.
@@ -85,17 +86,14 @@ public class CxBuildProcess extends CallableBuildProcess {
             try {
                 shraga = new CxShragaClient(config, logger);
                 shraga.init();
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 if (ex.getMessage().contains("Server is unavailable")) {
                     try {
-                        shraga.getTeamList();
+                        shraga.login();
                     } catch (CxClientException e) {
                         throw new IOException(e);
                     }
-                    String errorMsg = "Connection Failed.\n" +
-                            "Validate the provided login credentials and server URL are correct.\n" +
-                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.";
-                    throw new RunBuildException(ex.getMessage() + ": " + errorMsg);
+                    throw new RunBuildException(CONNECTION_FAILED_COMPATIBILITY);
                 }
 
                 throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
@@ -173,11 +171,10 @@ public class CxBuildProcess extends CallableBuildProcess {
             publishArtifact(htmlFile.getAbsolutePath());
 
             //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
-            String buildFailureResult = ShragaUtils.getBuildFailureResult(config,ret.getSastResults(), ret.getOsaResults());
+            String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
 
             if (!StringUtils.isEmpty(buildFailureResult) || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
-                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null)
-            {
+                    ret.getOsaCreateException() != null || ret.getOsaWaitException() != null) {
                 printScanBuildFailure(buildFailureResult, ret, logger);
                 return BuildFinishedStatus.FINISHED_FAILED;
             }
