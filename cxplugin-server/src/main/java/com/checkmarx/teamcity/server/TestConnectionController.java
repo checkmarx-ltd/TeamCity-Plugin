@@ -61,45 +61,46 @@ public class TestConnectionController extends BaseController {
         res.setTeamPathList(Collections.singletonList(new Team(CxParam.GENERATE_PDF_REPORT, NO_TEAM_MESSAGE)));
 
 
-            TestConnectionRequest credi = extractRequestBody(httpServletRequest);
+        TestConnectionRequest credi = extractRequestBody(httpServletRequest);
 
-            //create client and perform login
-            try {
-                if(loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())){
-                    try {
-                        teams = shraga.getTeamList();
-                    } catch (Exception e) {
-                        throw new Exception("Connection Failed.\n" +
-                                "Validate the provided login credentials and server URL are correct.\n" +
-                                "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.\n" +
-                                "Error: " + e.getMessage());
-                    }
-
-                    presets = shraga.getPresetList();
-
-                    if (presets == null || teams == null) {
-                        throw new Exception("invalid preset teamPath");
-                    }
-
-                    res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
-                    writeHttpServletResponse(httpServletResponse, res);
+        //create client and perform login
+        try {
+            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())) {
+                try {
+                    teams = shraga.getTeamList();
+                } catch (Exception e) {
+                    log.error("Error occurred in test connection", e);
+                    res.setMessage("Connection Failed.\n" +
+                            "Validate the provided login credentials and server URL are correct.\n" +
+                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.");
+                            writeHttpServletResponse(httpServletResponse, res);
                     return null;
                 }
-                else{
-                    result = result.contains("Failed to authenticate")? "Failed to authenticate": result;
-                    result = result.startsWith("Login failed.")? result: "Login failed. " + result;
 
-                    res.setMessage(result);
-                    writeHttpServletResponse(httpServletResponse, res);
-                    return null;
+                presets = shraga.getPresetList();
 
+                if (presets == null || teams == null) {
+                    throw new Exception("invalid preset teamPath");
                 }
-            } catch (Exception e) {
-                log.error("Error occurred in test connection", e);
-                res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
+
+                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
                 writeHttpServletResponse(httpServletResponse, res);
                 return null;
+            } else {
+                result = result.contains("Failed to authenticate") ? "Failed to authenticate" : result;
+                result = result.startsWith("Login failed.") ? result : "Login failed. " + result;
+
+                res.setMessage(result);
+                writeHttpServletResponse(httpServletResponse, res);
+                return null;
+
             }
+        } catch (Exception e) {
+            log.error("Error occurred in test connection", e);
+            res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
+            writeHttpServletResponse(httpServletResponse, res);
+            return null;
+        }
 
 
     }
@@ -122,7 +123,7 @@ public class TestConnectionController extends BaseController {
     private String resolvePasswordPlainText(String password, boolean global) {
 
         try {
-            if(!global) {
+            if (!global) {
                 password = RSACipher.decryptWebRequestData(password);
             }
 
