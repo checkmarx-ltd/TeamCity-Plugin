@@ -92,7 +92,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     } catch (CxClientException e) {
                         throw new IOException(e);
                     }
-                    throw new RunBuildException(ex.getMessage() + ": " + CONNECTION_FAILED_COMPATIBILITY);
+                    throw new RunBuildException(CONNECTION_FAILED_COMPATIBILITY);
                 }
 
                 throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
