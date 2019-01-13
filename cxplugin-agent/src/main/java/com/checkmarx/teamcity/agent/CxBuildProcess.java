@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static com.checkmarx.teamcity.agent.CxPluginUtils.printScanBuildFailure;
 import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
+import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
 /**
  * Created by: Dorg.
@@ -30,7 +31,7 @@ import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
  */
 public class CxBuildProcess extends CallableBuildProcess {
 
-//    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
+    //    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
     private static final String REPORT_NAME = "CxSASTReport";
 
     private final BuildRunnerContext buildRunnerContext;
@@ -82,24 +83,21 @@ public class CxBuildProcess extends CallableBuildProcess {
                 //TODO run.setResult(Result.FAILURE);
             }
             try {
-                shraga = new CxShragaClient(config,logger);
+                shraga = new CxShragaClient(config, logger);
                 shraga.init();
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 if (ex.getMessage().contains("Server is unavailable")) {
                     try {
-                        shraga.getTeamList();
+                        shraga.login();
                     } catch (CxClientException e) {
                         throw new IOException(e);
                     }
-                    String errorMsg = "Connection Failed.\n" +
-                            "Validate the provided login credentials and server URL are correct.\n" +
-                            "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.";
-                    throw new RunBuildException(ex.getMessage() + ": " + errorMsg);
+                    throw new RunBuildException(ex.getMessage() + ": " + CONNECTION_FAILED_COMPATIBILITY);
                 }
 
                 throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
             }
-            if(config.getSastEnabled()){
+            if (config.getSastEnabled()) {
                 try {
                     shraga.createSASTScan();
                     sastCreated = true;
@@ -148,7 +146,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     logger.error(e.getMessage());
                 }
             }
-            if(osaCreated){
+            if (osaCreated) {
                 try {
                     OSAResults osaResults = shraga.waitForOSAResults();
                     ret.setOsaResults(osaResults);
@@ -212,7 +210,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Team ID: " + config.getTeamId());
         logger.info("Is synchronous scan: " + config.getSynchronous());
         logger.info("CxSAST enabled: " + config.getSastEnabled());
-        if(config.getSastEnabled()){
+        if (config.getSastEnabled()) {
             logger.info("Preset ID: " + config.getPresetId());
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
@@ -245,14 +243,14 @@ public class CxBuildProcess extends CallableBuildProcess {
 
 
     private void publishPDFReport(SASTResults sastResults) throws IOException {
-        publishArtifact(buildDirectory+ CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
+        publishArtifact(buildDirectory + CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
         sastPDFLink = compileLinkToArtifact(sastResults.getPdfFileName());
         sastResults.setSastPDFLink(sastPDFLink);
     }
 
     private void publishXMLReport(SASTResults sastResults) throws IOException {
         String xmlFileName = REPORT_NAME + ".xml";
-        File xmlFile = new File(buildDirectory+ CxPARAM.CX_REPORT_LOCATION, xmlFileName);
+        File xmlFile = new File(buildDirectory + CxPARAM.CX_REPORT_LOCATION, xmlFileName);
         FileUtils.writeByteArrayToFile(xmlFile, sastResults.getRawXMLReport());
         publishArtifact(xmlFile.getAbsolutePath());
     }

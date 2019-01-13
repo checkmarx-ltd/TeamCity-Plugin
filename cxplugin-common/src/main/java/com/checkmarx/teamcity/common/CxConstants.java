@@ -52,5 +52,4 @@ public abstract class CxConstants {
 
     public static final String ORIGIN_TEAMCITY = "TeamCity";
 
-
-}
+   }
