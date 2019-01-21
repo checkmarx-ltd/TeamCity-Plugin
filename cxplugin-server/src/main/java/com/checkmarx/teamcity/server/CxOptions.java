@@ -263,13 +263,13 @@ public class CxOptions {
 
 
 
-    public void testConnection(String serverUrl, String username, String password) {
+    public void testConnection(String serverUrl, String username, String pssd) {
 
         try {
-            if (EncryptUtil.isScrambled(password)) {
-                password = EncryptUtil.unscramble(password);
+            if (EncryptUtil.isScrambled(pssd)) {
+                pssd = EncryptUtil.unscramble(pssd);
             }
-            CxShragaClient shraga = new CxShragaClient(serverUrl.trim(), username, password,CxConstants.ORIGIN_TEAMCITY, false,log );
+            CxShragaClient shraga = new CxShragaClient(serverUrl.trim(), username, pssd,CxConstants.ORIGIN_TEAMCITY, false,log );
             shraga.login();
             presetList = shraga.getPresetList();
             teamList = shraga.getTeamList();
