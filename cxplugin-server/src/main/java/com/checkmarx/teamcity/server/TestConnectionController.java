@@ -13,7 +13,6 @@ import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
-import org.apache.tools.ant.taskdefs.condition.Http;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class TestConnectionController extends BaseController {
 
         //create client and perform login
         try {
-            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPassword())) {
+            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPssd())) {
                 try {
                     teams = shraga.getTeamList();
                 } catch (Exception e) {
@@ -115,27 +114,27 @@ public class TestConnectionController extends BaseController {
         TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setUsername(StringUtil.trim(ret.getUsername()));
-        ret.setPassword(resolvePasswordPlainText(ret.getPassword(), ret.isGlobal()));
+        ret.setPssd(resolvePasswordPlainText(ret.getPssd(), ret.isGlobal()));
         return ret;
     }
 
-    private String resolvePasswordPlainText(String password, boolean global) {
+    private String resolvePasswordPlainText(String pssd, boolean global) {
 
         try {
             if (!global) {
-                password = RSACipher.decryptWebRequestData(password);
+                pssd = RSACipher.decryptWebRequestData(pssd);
             }
 
-            return EncryptUtil.isScrambled(password) ? EncryptUtil.unscramble(password) : password;
+            return EncryptUtil.isScrambled(pssd) ? EncryptUtil.unscramble(pssd) : pssd;
 
         } catch (Exception e) {
-            return password;
+            return pssd;
         }
     }
 
-    private boolean loginToServer(URL url, String username, String password) {
+    private boolean loginToServer(URL url, String username, String pssd) {
         try {
-            shraga = new CxShragaClient(url.toString().trim(), username, password, CxConstants.ORIGIN_TEAMCITY, false, log);
+            shraga = new CxShragaClient(url.toString().trim(), username, pssd, CxConstants.ORIGIN_TEAMCITY, false, log);
             shraga.login();
 
             return true;

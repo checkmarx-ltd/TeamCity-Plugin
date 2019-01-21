@@ -8,7 +8,7 @@ public class TestConnectionRequest {
 
     private String serverUrl;
     private String username;
-    private String password;
+    private String pssd;
     private boolean global;
 
     public String getServerUrl() {
@@ -27,12 +27,12 @@ public class TestConnectionRequest {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPssd() {
+        return pssd;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPssd(String pssd) {
+        this.pssd = pssd;
     }
 
     public boolean isGlobal() {
