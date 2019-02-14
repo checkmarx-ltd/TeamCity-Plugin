@@ -85,15 +85,6 @@ public class CxBuildProcess extends CallableBuildProcess {
             } catch (Exception e){
                 throw new RunBuildException("Failed to init CxClient: " + e.getMessage(), e);
             }
-            if(config.getSastEnabled()){
-                try {
-                    shraga.createSASTScan();
-                    sastCreated = true;
-                } catch (IOException | CxClientException e) {
-                    ret.setSastCreateException(e);
-                    logger.error(e.getMessage());
-                }
-            }
             if (config.getOsaEnabled()) {
                 //---------------------------
                 //we do this in order to redirect the logs from the filesystem agent component to the build console
@@ -110,6 +101,17 @@ public class CxBuildProcess extends CallableBuildProcess {
                     Logger.getRootLogger().removeAppender(appenderName);
                 }
             }
+
+            if(config.getSastEnabled()){
+                try {
+                    shraga.createSASTScan();
+                    sastCreated = true;
+                } catch (IOException | CxClientException e) {
+                    ret.setSastCreateException(e);
+                    logger.error(e.getMessage());
+                }
+            }
+
             //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");

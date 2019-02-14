@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>8.80.1</version>
+    <version>8.80.1-SNAPSHOT</version>
   </parent>
   <artifactId>cxplugin-common</artifactId>
   <packaging>jar</packaging>
@@ -71,6 +71,10 @@
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>vertx-core</artifactId>
+          <groupId>io.vertx</groupId>
         </exclusion>
       </exclusions>
     </dependency>
