@@ -98,15 +98,8 @@ public class CxBuildProcess extends CallableBuildProcess {
 
                 throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
             }
-            if (config.getSastEnabled()) {
-                try {
-                    shraga.createSASTScan();
-                    sastCreated = true;
-                } catch (IOException | CxClientException e) {
-                    ret.setSastCreateException(e);
-                    logger.error(e.getMessage());
-                }
-            }
+
+            //Create OSA scan
             if (config.getOsaEnabled()) {
                 //---------------------------
                 //we do this in order to redirect the logs from the filesystem agent component to the build console
@@ -123,6 +116,18 @@ public class CxBuildProcess extends CallableBuildProcess {
                     Logger.getRootLogger().removeAppender(appenderName);
                 }
             }
+
+            //Create SAST scan
+            if (config.getSastEnabled()) {
+                try {
+                    shraga.createSASTScan();
+                    sastCreated = true;
+                } catch (IOException | CxClientException e) {
+                    ret.setSastCreateException(e);
+                    logger.error(e.getMessage());
+                }
+            }
+
             //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
@@ -133,6 +138,8 @@ public class CxBuildProcess extends CallableBuildProcess {
 
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             }
+
+            //Get SAST results
             if (sastCreated) {
                 try {
                     SASTResults sastResults = shraga.waitForSASTResults();
@@ -147,6 +154,8 @@ public class CxBuildProcess extends CallableBuildProcess {
                     logger.error(e.getMessage());
                 }
             }
+
+            //Get OSA results
             if (osaCreated) {
                 try {
                     OSAResults osaResults = shraga.waitForOSAResults();
