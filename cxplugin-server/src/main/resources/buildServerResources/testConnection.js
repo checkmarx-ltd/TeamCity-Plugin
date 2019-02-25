@@ -3,7 +3,7 @@ Checkmarx = {
         return {
             serverUrl: $('cxServerUrl').value,
             username: $('cxUsername').value,
-            password: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
+            pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
         };
     },
 
@@ -12,7 +12,7 @@ Checkmarx = {
         return {
             serverUrl: $('cxGlobalServerUrl').value,
             username: $('cxGlobalUsername').value,
-            password: $('cxGlobalPassword').value,
+            pssd: $('cxGlobalPassword').value,
             global: true
 
         }
@@ -70,7 +70,7 @@ Checkmarx = {
             return false;
         }
 
-        if (!credentials.password) {
+        if (!credentials.pssd) {
             messageElm.text('Password must not be empty');
             messageElm.css('color','red');
             return false;
