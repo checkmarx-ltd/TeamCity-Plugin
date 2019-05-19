@@ -8,13 +8,13 @@
     <packaging>pom</packaging>
 
     <properties>
-        <teamcity-version>9.0.3</teamcity-version>
+        <teamcity-version>2018.2</teamcity-version>
     </properties>
 
     <repositories>
         <repository>
             <id>JetBrains</id>
-            <url>http://repository.jetbrains.com/all</url>
+            <url>http://download.jetbrains.com/teamcity-repository</url>
         </repository>
     </repositories>
 
