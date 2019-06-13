@@ -21,29 +21,6 @@
             <artifactId>agent-api</artifactId>
             <version>${teamcity-version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-core</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                        <groupId>org.jetbrains.teamcity.xstream</groupId>
-                        <artifactId>xstream</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>4.3.15.RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-<!--        //TODO: make sure this doesn't cause issues-->
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.4.11.1</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
