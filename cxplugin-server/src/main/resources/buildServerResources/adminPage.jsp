@@ -16,6 +16,12 @@
 </style>
 
 <script type="text/javascript">
+    function sanitizeJS(str) {
+        var temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
   var SettingsForm = OO.extend(BS.AbstractPasswordForm, {
     formElement: function () {
       return $("globalSettingsForm")
@@ -24,52 +30,52 @@
 
       BS.PasswordFormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
         onInvalid_cxGlobalServerUrlError: function (elem) {
-          $("invalid_cxGlobalServerUrl").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalServerUrl"));
         },
 
         onInvalid_cxGlobalUsernameError: function (elem) {
-          $("invalid_cxGlobalUsername").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalUsername"));
         },
 
         onInvalid_cxGlobalPasswordError: function (elem) {
-          $("invalid_cxGlobalPassword").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalPassword"));
         },
 
         onInvalid_cxGlobalScanTimeoutInMinutesError: function (elem) {
-          $("invalid_cxGlobalScanTimeoutInMinutes").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalScanTimeoutInMinutes").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalScanTimeoutInMinutes"));
         },
 
         onInvalid_cxGlobalHighThresholdError: function (elem) {
-          $("invalid_cxGlobalHighThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalHighThreshold"));
         },
 
         onInvalid_cxGlobalMediumThresholdError: function (elem) {
-          $("invalid_cxGlobalMediumThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalMediumThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalMediumThreshold"));
         },
 
         onInvalid_cxGlobalLowThresholdError: function (elem) {
-          $("invalid_cxGlobalLowThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalLowThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalLowThreshold"));
         },
 
         onInvalid_cxGlobalOsaHighThresholdError: function (elem) {
-          $("invalid_cxGlobalOsaHighThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalOsaHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalOsaHighThreshold"));
         },
 
         onInvalid_cxGlobalOsaMediumThresholdError: function (elem) {
-          $("invalid_cxGlobalOsaMediumThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalOsaMediumThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalOsaMediumThreshold"));
         },
 
         onInvalid_cxGlobalOsaLowThresholdError: function (elem) {
-          $("invalid_cxGlobalOsaLowThreshold").innerHTML = elem.firstChild.nodeValue;
+          $("invalid_cxGlobalOsaLowThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalOsaLowThreshold"));
         },
 
