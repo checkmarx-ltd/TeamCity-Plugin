@@ -47,7 +47,6 @@ public abstract class CxConstants {
     public static final String THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Threshold must be 0 or greater, or leave blank for no thresholds";
 
 
-    public static final String TEAMCITY_SERVER_URL = "cx.teamcity.server.url";
     public static final String TEAMCITY_PLUGIN_VERSION = "cx.teamcity.plugin.version";
 
     public static final String ORIGIN_TEAMCITY = "TeamCity";
