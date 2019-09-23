@@ -23,7 +23,6 @@
             <url>http://download.jetbrains.com/teamcity-repository</url>
         </pluginRepository>
     </pluginRepositories>
-
     <build>
         <plugins>
             <plugin>
