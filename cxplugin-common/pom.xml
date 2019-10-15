@@ -33,12 +33,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.9.9</version>
+      <version>2.9.10</version>
     </dependency>
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>9.00.1</version>
+      <version>9.00.3</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>
