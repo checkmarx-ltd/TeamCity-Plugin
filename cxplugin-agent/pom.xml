@@ -5,7 +5,7 @@
     <parent>
         <artifactId>cxplugin</artifactId>
         <groupId>com.checkmarx.teamcity</groupId>
-        <version>9.00.1</version>
+        <version>9.00.2</version>
     </parent>
     <artifactId>cxplugin-agent</artifactId>
     <packaging>jar</packaging>
@@ -14,7 +14,7 @@
             <groupId>com.checkmarx.teamcity</groupId>
             <artifactId>cxplugin-common</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+<!--            <scope>compile</scope>-->
         </dependency>
         <dependency>
             <groupId>org.jetbrains.teamcity</groupId>
