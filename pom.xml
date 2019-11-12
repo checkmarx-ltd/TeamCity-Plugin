@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.checkmarx.teamcity</groupId>
     <artifactId>cxplugin</artifactId>
-    <version>9.00.2</version>
+    <version>9.00.1</version>
     <packaging>pom</packaging>
 
     <properties>
