@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.checkmarx:cx-client-common:9.00.3">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.00.3/cx-client-common-9.00.3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.00.3/cx-client-common-9.00.3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.00.3/cx-client-common-9.00.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
