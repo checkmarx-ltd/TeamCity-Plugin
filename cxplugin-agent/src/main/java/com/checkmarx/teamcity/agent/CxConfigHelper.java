@@ -3,6 +3,8 @@ package com.checkmarx.teamcity.agent;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.DependencyScanResults;
+import com.cx.restclient.dto.DependencyScannerType;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 
 import java.io.File;
@@ -61,7 +63,7 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        ret.setOsaEnabled(TRUE.equals(buildParameters.get(OSA_ENABLED)));
+        ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class,buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
         ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
@@ -112,7 +114,7 @@ public class CxConfigHelper {
             }
 
 
-            if (ret.getOsaEnabled()) {
+            if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
                 ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
                 if (ret.getOsaThresholdsEnabled()) {
                     ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));

@@ -5,7 +5,10 @@ import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.common.CxPARAM;
 import com.cx.restclient.common.ShragaUtils;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.DependencyScanResults;
+import com.cx.restclient.dto.DependencyScannerType;
 import com.cx.restclient.dto.ScanResults;
+import com.cx.restclient.dto.scansummary.ScanSummary;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.osa.dto.OSAResults;
 import com.cx.restclient.sast.dto.SASTResults;
@@ -67,7 +70,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
         ScanResults ret = new ScanResults();
         ret.setSastResults(new SASTResults());
-        ret.setOsaResults(new OSAResults());
+        ret.setDependencyScanResults(new DependencyScanResults());
         try {
 
             Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
@@ -78,7 +81,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
 
             printConfiguration();
-            if (!config.getSastEnabled() && !config.getOsaEnabled()) {
+            if (!config.getSastEnabled() && config.getDependencyScannerType()== DependencyScannerType.NONE) {
                 logger.error("Both SAST and OSA are disabled. exiting");
                 return null;
                 //TODO run.setResult(Result.FAILURE);
@@ -100,16 +103,16 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
 
             //Create OSA scan
-            if (config.getOsaEnabled()) {
+            if (config.getDependencyScannerType() != DependencyScannerType.NONE) {
                 //---------------------------
                 //we do this in order to redirect the logs from the filesystem agent component to the build console
                 String appenderName = "cxAppender_" + agentRunningBuild.getBuildId();
                 Logger.getRootLogger().addAppender(new CxAppender(agentRunningBuild.getBuildLogger(), appenderName));
                 //---------------------------
                 try {
-                    shraga.createOSAScan();
+                    shraga.createDependencyScan();
                     osaCreated = true;
-                } catch (CxClientException | IOException e) {
+                } catch (CxClientException e) {
                     ret.setOsaCreateException(e);
                     logger.error(e.getMessage());
                 } finally {
@@ -158,9 +161,9 @@ public class CxBuildProcess extends CallableBuildProcess {
             //Get OSA results
             if (osaCreated) {
                 try {
-                    OSAResults osaResults = shraga.waitForOSAResults();
-                    ret.setOsaResults(osaResults);
-                } catch (CxClientException | IOException e) {
+                    DependencyScanResults dependencyScanResults = shraga.waitForDependencyScanResults();
+                    ret.setDependencyScanResults(dependencyScanResults);
+                } catch (CxClientException e) {
                     ret.setOsaWaitException(e);
                     logger.error(e.getMessage());
                 }
@@ -180,11 +183,13 @@ public class CxBuildProcess extends CallableBuildProcess {
             publishArtifact(htmlFile.getAbsolutePath());
 
             //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
-            String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
+            //String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
+            ScanSummary scanSummary = new ScanSummary(config,ret);
 
-            if (!StringUtils.isEmpty(buildFailureResult) || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
+
+            if (scanSummary.hasErrors() || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
                     ret.getOsaCreateException() != null || ret.getOsaWaitException() != null) {
-                printScanBuildFailure(buildFailureResult, ret, logger);
+                printScanBuildFailure(scanSummary, ret, logger);
                 return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_SUCCESS;
@@ -240,8 +245,8 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
-        logger.info("CxOSA enabled: " + config.getOsaEnabled());
-        if (config.getOsaEnabled()) {
+        logger.info("Dependency scanner type: " + config.getDependencyScannerType().getDisplayName());
+        if (config.getDependencyScannerType() != DependencyScannerType.NONE) {
             logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
             logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
             logger.info("CxOSA Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
