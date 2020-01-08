@@ -23,6 +23,7 @@ public abstract class CxParam {
     public static final String IS_INCREMENTAL = "cxIsIncremental";
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
+    public static final String SCA_ENABLED = "cxScaEnabled";
     public static final String DEPENDENCY_SCANNER_TYPE = "cxDependencyScannerType";
     public static final String SAST_ENABLED = "cxSastEnabled";
     public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
@@ -58,6 +59,26 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_MEDIUM_THRESHOLD = "cxGlobalOsaMediumThreshold";
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
     public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
+    public static final String GLOBAL_DEPENDENCY_SCAN_ENABLED = "globalDependencyScanEnabled";
+
+    //SCA Params
+    public static final String SCA_API_URL = "ScaApiUrl";
+    public static final String SCA_ACCESS_CONTROL_URL = "ScaAccessControlUrl";
+    public static final String SCA_WEB_APP_URL = "ScaWebAppUrl";
+    public static final String SCA_USERNAME = "ScaUserName";
+    public static final String SCA_PASSWORD = "ScaPassword";
+    public static final String SCA_TENANT = "ScaTenant";
+
+    public static final String SCA_HIGH = "ScaHigh";
+    public static final String SCA_MEDIUM = "ScaMedium";
+    public static final String SCA_LOW = "ScaLow";
+    public static final String SCA_FILES_INCLUDE = "ScaFileInclude";
+    public static final String SCA_FILES_EXCLUDE = "ScaFilesExclude";
+    public static final String SCA_FOLDER_EXCLUDE = "ScaFolderExclude";
+    public static final String SCA_LOCATION_PATH = "ScaLocationPath";
+    public static final String OVERRIDE_GLOBAL_CONFIGURATIONS = "OverrideGlobalConfigurations";
+    public static final String DEPENDENCY_SCAN_ENABLED = "dependencyScanEnabled";
+
 
     public static final String CONNECTION_FAILED_COMPATIBILITY = "Connection Failed.\n" +
             "Validate the provided login credentials and server URL are correct.\n" +

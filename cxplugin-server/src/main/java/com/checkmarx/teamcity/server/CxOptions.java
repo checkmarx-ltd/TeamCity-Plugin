@@ -2,6 +2,8 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.SCAClient;
+import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -114,6 +117,9 @@ public class CxOptions {
     public String getOsaEnabled() {
         return OSA_ENABLED;
     }
+
+    @NotNull
+    public String getDependencyScannerType() { return DEPENDENCY_SCANNER_TYPE ;}
 
     @NotNull
     public String getSastEnabled() {
@@ -260,6 +266,53 @@ public class CxOptions {
         return GLOBAL_PROJECT_POLICY_VIOLATION;
     }
 
+    @NotNull
+    public String getScaEnabled() { return SCA_ENABLED; }
+
+    @NotNull
+    public String getScaApiUrl() { return SCA_API_URL; }
+
+    @NotNull
+    public String getScaAccessControlUrl() { return SCA_ACCESS_CONTROL_URL; }
+
+    @NotNull
+    public String getScaWebAppUrl() { return SCA_WEB_APP_URL; }
+
+    @NotNull
+    public String getScaUserName() { return SCA_USERNAME; }
+
+    @NotNull
+    public String getScaPassword() { return SCA_PASSWORD; }
+
+    @NotNull
+    public String getScaTenant() { return SCA_TENANT; }
+
+    @NotNull
+    public String getOverrideGlobalConfigurations() {return OVERRIDE_GLOBAL_CONFIGURATIONS; }
+
+    @NotNull
+    public String getScaHigh() { return SCA_HIGH; }
+
+    @NotNull
+    public String getScaMedium() { return SCA_MEDIUM; }
+
+    @NotNull
+    public String getScaLow() { return SCA_LOW; }
+
+    @NotNull
+    public String getScaFilesInclude() { return SCA_FILES_INCLUDE; }
+
+    @NotNull
+    public String getScaFilesExclude() { return SCA_FILES_EXCLUDE; }
+
+    @NotNull
+    public String getScaFolderExclude() { return SCA_FOLDER_EXCLUDE; }
+
+    @NotNull
+    public String getScaLocationPath() { return  SCA_LOCATION_PATH; }
+
+    @NotNull
+    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEPENDENCY_SCAN_ENABLED; }
 
 
 
@@ -281,8 +334,19 @@ public class CxOptions {
         }
     }
 
+    /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
+
+    public void testScaConnection() throws MalformedURLException {
+        CxScanConfig cxScanConfig= new CxScanConfig();
+        cxScanConfig.getScaConfig();
+        CxShragaClient.testScaConnection(cxScanConfig,log);
+    }
+
     @NotNull
     public String getNoDisplay() {
         return "style='display:none'";
     }
+
+    @NotNull
+    public String getDependencyScanEnabled() { return DEPENDENCY_SCAN_ENABLED; }
 }

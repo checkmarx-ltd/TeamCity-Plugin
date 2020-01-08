@@ -5,6 +5,7 @@ import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.DependencyScanResults;
 import com.cx.restclient.dto.DependencyScannerType;
+import com.cx.restclient.sca.dto.SCAConfig;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class CxConfigHelper {
              File reportDirectory) throws InvalidParameterException {
 
         CxScanConfig ret = new CxScanConfig();
-
+        SCAConfig scaConfig= new SCAConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
         ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
@@ -121,6 +122,15 @@ public class CxConfigHelper {
                     ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
                     ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
                 }
+                if(ret.getDependencyScannerType().equals(DependencyScannerType.SCA)){
+                    scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
+                    scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
+                    scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
+                    scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
+                    scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
+                    scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+                    ret.setScaConfig(scaConfig);
+                }
             }
 
         }
@@ -150,4 +160,5 @@ public class CxConfigHelper {
         }
         return param;
     }
+
 }

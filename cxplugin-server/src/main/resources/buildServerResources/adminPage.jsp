@@ -1,5 +1,6 @@
 <%@include file="/include.jsp" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
+<%@ taglib prefix="forms" uri="http://www.springframework.org/tags/form" %>
 
 
 <style>
@@ -264,6 +265,13 @@
               </tr>
 
               <tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
+
+              <tr>
+                  <th><label for="cxOsaEnabled">Enable CxOSA Scan
+                      <bs:helpIcon iconTitle="select this radio button in order to use CxOSA as a dependency Scanner"/>
+                  </label></th>
+                  <td><forms:radiobutton name="cxDependencyScannerType" disabled="false" value="${cxDependencyScannerType}"/></td>
+              </tr>
 
               <tr>
                 <th><label for="cxGlobalOsaHighThreshold">High</label></th>

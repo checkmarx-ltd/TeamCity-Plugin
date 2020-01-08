@@ -92,6 +92,15 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
+<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
+    <c:set var="hideDependencyScannerTypeSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
+    <c:set var="hideDependencyScanOptions" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.globalFilterPatterns] != 'true'}">
+    <c:set var="hideGlobalDependencyScanOption" value="${optionsBean.noDisplay}"/>
+</c:if>
 
 
 <l:settingsGroup className="cx-title" title="Checkmarx Server">
@@ -189,148 +198,257 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </td>
     </tr>
     <tr id="sastContainer" ${hideCxSast}>
-    <td colspan="2">
-    <table width="101%">
-        <tr>
-            <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
-            <td>
-                <c:set var="onclick">
-                    jQuery('#sastConfigSection').toggle();
-                    jQuery('#defaultSastConfigSection').toggle();
-                    BS.MultilineProperties.updateVisible();
-                </c:set>
-                <props:checkboxProperty name="${optionsBean.useDefaultSastConfig}" onclick="${onclick}"/>
-            </td>
-        </tr>
+        <td colspan="2">
+            <table width="101%">
+                <tr>
+                    <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
+                    <td>
+                        <c:set var="onclick">
+                            jQuery('#sastConfigSection').toggle();
+                            jQuery('#defaultSastConfigSection').toggle();
+                            BS.MultilineProperties.updateVisible();
+                        </c:set>
+                        <props:checkboxProperty name="${optionsBean.useDefaultSastConfig}" onclick="${onclick}"/>
+                    </td>
+                </tr>
 
 
-        <tbody id="sastConfigSection" ${hideSastConfigSection}>
+                <tbody id="sastConfigSection" ${hideSastConfigSection}>
 
-        <tr>
-            <th><label for="${optionsBean.excludeFolders}">Folder Exclusion
-                <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
+                <tr>
+                    <th><label for="${optionsBean.excludeFolders}">Folder Exclusion
+                        <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
                                                                                                 Entries in this list are automatically converted to exclude wildcard patterns and appended to the full pattern list provided in the advanced section"/>
-            </label></th>
-            <td><props:textProperty name="${optionsBean.excludeFolders}" className="longField"/></td>
-        </tr>
-        <tr>
-            <th><label for="${optionsBean.filterPatterns}">Include/Exclude Wildcard Patterns
-                <bs:helpIcon
-                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
-            </label></th>
-            <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true" rows="5"
-                                         cols="50" className="longField"/></td>
-        </tr>
-        <tr>
-            <th><label for="${optionsBean.scanTimeoutInMinutes}">Scan Timeout in Minutes
-                <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></label></th>
-            <td>
-                <props:textProperty name="${optionsBean.scanTimeoutInMinutes}" className="longField"/>
-                <span class="error" id="error_${optionsBean.scanTimeoutInMinutes}"></span>
-            </td>
-        </tr>
+                    </label></th>
+                    <td><props:textProperty name="${optionsBean.excludeFolders}" className="longField"/></td>
+                </tr>
+                <tr>
+                    <th><label for="${optionsBean.filterPatterns}">Include/Exclude Wildcard Patterns
+                        <bs:helpIcon
+                                iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
+                    </label></th>
+                    <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true" rows="5"
+                                                 cols="50" className="longField"/></td>
+                </tr>
+                <tr>
+                    <th><label for="${optionsBean.scanTimeoutInMinutes}">Scan Timeout in Minutes
+                        <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></label></th>
+                    <td>
+                        <props:textProperty name="${optionsBean.scanTimeoutInMinutes}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.scanTimeoutInMinutes}"></span>
+                    </td>
+                </tr>
 
-    </tbody>
+                </tbody>
 
-        <tbody id="defaultSastConfigSection" ${hideDefaultSastConfigSection}>
+                <tbody id="defaultSastConfigSection" ${hideDefaultSastConfigSection}>
 
-        <tr>
-            <th>Folder Exclusion
-                <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
+                <tr>
+                    <th>Folder Exclusion
+                        <bs:helpIcon iconTitle="Comma separated list of folders to exclude from scan.</br>
                             Entries in this list are automatically converted to exclude wildcard patterns and appended to the full pattern list provided in the advanced section"/>
-            </th>
-            <td><input type="text" class="longField" disabled
-                       value="${propertiesBean.properties[optionsBean.globalExcludeFolders]}"></td>
-        </tr>
+                    </th>
+                    <td><input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalExcludeFolders]}"></td>
+                </tr>
 
-        <tr>
-            <th>Include/Exclude Wildcard Patterns
-                <bs:helpIcon
-                        iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
-            <td>
-                <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
-            </td>
-        </tr>
+                <tr>
+                    <th>Include/Exclude Wildcard Patterns
+                        <bs:helpIcon
+                                iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
+                    <td>
+                        <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
+                    </td>
+                </tr>
 
-        <tr>
-            <th>Scan Timeout in Minutes
-                <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></th>
-            <td><input type="text" class="longField" disabled
-                       value="${propertiesBean.properties[optionsBean.globalScanTimeoutInMinutes]}"></td>
-        </tr>
+                <tr>
+                    <th>Scan Timeout in Minutes
+                        <bs:helpIcon iconTitle="Abort the scan if exceeds specified timeout in minutes"/></th>
+                    <td><input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalScanTimeoutInMinutes]}"></td>
+                </tr>
 
-        </tbody>
+                </tbody>
 
-        <tr>
-            <th><label for="${optionsBean.scanComment}">Comment
-                <bs:helpIcon
-                        iconTitle="Comment that can be added to the scan result. May reference build parameters like %teamcity.variable.name%"/></label>
-            </th>
-            <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
-                                         cols="50" className="longField"/></td>
-        </tr>
+                <tr>
+                    <th><label for="${optionsBean.scanComment}">Comment
+                        <bs:helpIcon
+                                iconTitle="Comment that can be added to the scan result. May reference build parameters like %teamcity.variable.name%"/></label>
+                    </th>
+                    <td><props:multilineProperty name="${optionsBean.scanComment}" linkTitle="" expanded="true" rows="5"
+                                                 cols="50" className="longField"/></td>
+                </tr>
 
-        <tr>
-            <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
-                <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
-            <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
-        </tr>
+                <tr>
+                    <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
+                        <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
+                    <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
+                </tr>
 
-        <tr>
-            <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
-                <bs:helpIcon
-                        iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>
-            </th>
-            <td><props:checkboxProperty name="${optionsBean.generatePDFReport}"/></td>
-        </tr>
-        </table>
-    </td>
+                <tr>
+                    <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
+                        <bs:helpIcon
+                                iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>
+                    </th>
+                    <td><props:checkboxProperty name="${optionsBean.generatePDFReport}"/></td>
+                </tr>
+            </table>
+        </td>
     </tr>
 
 
 </l:settingsGroup>
 
-<l:settingsGroup className="cx-title" title="Checkmarx Scan CxOSA">
+<l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
     <tr>
-        <th><label for="${optionsBean.osaEnabled}">Enable OSA Scan
+        <th><label for="${optionsBean.dependencyScanEnabled}">Enable Dependency Scan<!-- todo: create Dependency Scan Part in the Settings Page -->
             <bs:helpIcon
-                    iconTitle="Open Source Analysis (OSA) helps you manage the security risk involved in using open source libraries in your applications"/></label>
+                    iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
+        </th>
+        <td><props:checkboxProperty name="${optionsBean.dependencyScanEnabled}"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.overrideGlobalConfigurations}">Override global dependency scan settings <!-- todo: create Dependency Scan Part in the Settings Page -->
+            <bs:helpIcon
+                    iconTitle="Override the Global Dependency Scan Configurations"/></label>
         </th>
         <td>
             <c:set var="onclick">
-                jQuery('#osaThresholdSection').toggle();
-                jQuery('#globalOsaThresholdSection').toggle();
-                jQuery('#osaFilterPatterns').toggle();
+                jQuery('#globalDependencyScanOption').toggle();
                 BS.MultilineProperties.updateVisible();
             </c:set>
-            <props:checkboxProperty name="${optionsBean.osaEnabled}" onclick="${onclick}"/>
-        </td>
+            <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="${onclick}"/></td>
     </tr>
-    <tbody id="osaFilterPatterns" ${hideOsaSection}>
-        <tr>
-            <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
+    <tbody id="globalDependencyScanOption" ${hideGlobalDependencyScanOption}>
+    <tr>
+        <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
+            <bs:helpIcon
+                    iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
+        </label></th>
+        <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
+                                     cols="50" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.osaEnabled}">Use CxOSA dependency Scanner
+            <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
+        </label></th>
+        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="OSA"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
+            <bs:helpIcon
+                    iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
+                                        Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
+                                        Leave empty to extract all archives"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+            <bs:helpIcon
+                    iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
+        </label></th>
+        <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaEnabled}">Use SCA dependency Scanner
+            <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
+        </label></th>
+        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="SCA"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaApiUrl}">SCA server URL
+            <bs:helpIcon iconTitle="fill this with the SCA server URL"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaApiUrl}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaAccessControlUrl}">Access control server URL
+            <bs:helpIcon iconTitle="fill this with the SCA Access Control URL"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaWebAppUrl}">SCA web app URL
+            <bs:helpIcon iconTitle="fill this with the SCA web app URL"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaWebAppUrl}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaUserName}">SCA userName
+            <bs:helpIcon iconTitle="fill this with the SCA username"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaUserName}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaPassword}">SCA password
+            <bs:helpIcon iconTitle="fill this with the SCA password"/>
+        </label></th>
+        <td><props:passwordProperty name="${optionsBean.scaPassword}" className="longField"/></td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.scaTenant}">SCA Tenant
+            <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
+    </tr>
+<%--    <tr>
+        <td>
+            <form>
+                <input id="testSCAConnection" type="button" name="TestSCAConnection" value="Connect to Server" onclick=<%=optionsBean.testScaConnection()%>/>
+                <span id="testSCAConnectionMessage"></span>
+                    &lt;%&ndash;Checkmarx.testConnection(Checkmarx.extractCredentials())&ndash;%&gt;
+            </form>
+        </td>
+    </tr>--%>
+<%--    <td>
+        <form>
+            <input id="testSCAConnection" type="button" name="TestSCAConnection" value="Connect to Sca Server"
+                   onclick="${optionsBean.testScaConnection()}"/>
+            <span id="testSCAConnectionMessage"></span>
+        </form>
+    </td>--%>
+        <%--<tr>
+            <th><label for="${optionsBean.osaEnabled}">Enable OSA Scan
                 <bs:helpIcon
-                        iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
-            </label></th>
-            <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
-                                         cols="50" className="longField"/></td>
+                        iconTitle="Open Source Analysis (OSA) helps you manage the security risk involved in using open source libraries in your applications"/></label>
+            </th>
+            <td>
+                <c:set var="onclick">
+                    jQuery('#osaThresholdSection').toggle();
+                    jQuery('#globalOsaThresholdSection').toggle();
+                    jQuery('#osaFilterPatterns').toggle();
+                    BS.MultilineProperties.updateVisible();
+                </c:set>
+                <props:checkboxProperty name="${optionsBean.osaEnabled}" onclick="${onclick}"/>
+            </td>
         </tr>
-        <tr>
-            <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
-                <bs:helpIcon
-                        iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
-                                   Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
-                                   Leave empty to extract all archives"/>
-            </label></th>
-            <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
-        </tr>
-        <tr>
-            <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
-                <bs:helpIcon
-                        iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
-            </label></th>
-            <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
-        </tr>
+        <tbody id="osaFilterPatterns" ${hideOsaSection}>
+            <tr>
+                <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
+                    <bs:helpIcon
+                            iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
+                </label></th>
+                <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
+                                             cols="50" className="longField"/></td>
+            </tr>
+            <tr>
+                <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
+                    <bs:helpIcon
+                            iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
+                                       Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
+                                       Leave empty to extract all archives"/>
+                </label></th>
+                <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
+            </tr>
+            <tr>
+                <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+                    <bs:helpIcon
+                            iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
+                </label></th>
+                <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
+            </tr>--%>
+        <%--</tbody>--%>
     </tbody>
 </l:settingsGroup>
 

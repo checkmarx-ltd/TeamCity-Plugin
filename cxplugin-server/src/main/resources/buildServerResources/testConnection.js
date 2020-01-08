@@ -7,7 +7,6 @@ Checkmarx = {
         };
     },
 
-
     extractGlobalCredentials: function () {
         return {
             serverUrl: $('cxGlobalServerUrl').value,
