@@ -30,6 +30,7 @@ optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword
 optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 
+
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
 </c:if>
@@ -95,11 +96,12 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
     <c:set var="hideDependencyScannerTypeSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
+<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] = 'true'}">
     <c:set var="hideDependencyScanOptions" value="${optionsBean.noDisplay}"/>
 </c:if>
+
 <c:if test="${propertiesBean.properties[optionsBean.globalFilterPatterns] != 'true'}">
-    <c:set var="hideGlobalDependencyScanOption" value="${optionsBean.noDisplay}"/>
+    <c:set var="hidecxGlobalSCAPassword" value="${optionsBean.noDisplay}"/>
 </c:if>
 
 
@@ -350,6 +352,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </label></th>
         <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
     </tr>
+
     <tr>
         <th><label for="${optionsBean.scaEnabled}">Use SCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
@@ -357,99 +360,52 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="SCA"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaApiUrl}">SCA server URL
+        <th><label for="${optionsBean.ScaApiUrl}">SCA server URL
             <bs:helpIcon iconTitle="fill this with the SCA server URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaApiUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaAccessControlUrl}">Access control server URL
+        <th><label for="${optionsBean.ScaAccessControlUrl}">Access control server URL
             <bs:helpIcon iconTitle="fill this with the SCA Access Control URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaWebAppUrl}">SCA web app URL
+        <th><label for="${optionsBean.ScaWebAppUrl}">SCA web app URL
             <bs:helpIcon iconTitle="fill this with the SCA web app URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaWebAppUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaUserName}">SCA userName
+        <th><label for="${optionsBean.ScaUserName}">SCA userName
             <bs:helpIcon iconTitle="fill this with the SCA username"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaUserName}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaPassword}">SCA password
+        <th><label for="${optionsBean.ScaPass}">SCA password
             <bs:helpIcon iconTitle="fill this with the SCA password"/>
         </label></th>
         <td><props:passwordProperty name="${optionsBean.scaPassword}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.scaTenant}">SCA Tenant
+        <th><label for="${optionsBean.ScaTenant}">SCA Tenant
             <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-<%--    <tr>
-        <td>
-            <form>
-                <input id="testSCAConnection" type="button" name="TestSCAConnection" value="Connect to Server" onclick=<%=optionsBean.testScaConnection()%>/>
-                <span id="testSCAConnectionMessage"></span>
-                    &lt;%&ndash;Checkmarx.testConnection(Checkmarx.extractCredentials())&ndash;%&gt;
-            </form>
-        </td>
-    </tr>--%>
-<%--    <td>
-        <form>
-            <input id="testSCAConnection" type="button" name="TestSCAConnection" value="Connect to Sca Server"
-                   onclick="${optionsBean.testScaConnection()}"/>
-            <span id="testSCAConnectionMessage"></span>
-        </form>
-    </td>--%>
-        <%--<tr>
-            <th><label for="${optionsBean.osaEnabled}">Enable OSA Scan
-                <bs:helpIcon
-                        iconTitle="Open Source Analysis (OSA) helps you manage the security risk involved in using open source libraries in your applications"/></label>
-            </th>
-            <td>
-                <c:set var="onclick">
-                    jQuery('#osaThresholdSection').toggle();
-                    jQuery('#globalOsaThresholdSection').toggle();
-                    jQuery('#osaFilterPatterns').toggle();
-                    BS.MultilineProperties.updateVisible();
-                </c:set>
-                <props:checkboxProperty name="${optionsBean.osaEnabled}" onclick="${onclick}"/>
-            </td>
-        </tr>
-        <tbody id="osaFilterPatterns" ${hideOsaSection}>
-            <tr>
-                <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
-                    <bs:helpIcon
-                            iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
-                </label></th>
-                <td><props:multilineProperty name="${optionsBean.osaFilterPatterns}" linkTitle="" expanded="true" rows="5"
-                                             cols="50" className="longField"/></td>
-            </tr>
-            <tr>
-                <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
-                    <bs:helpIcon
-                            iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
-                                       Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
-                                       Leave empty to extract all archives"/>
-                </label></th>
-                <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
-            </tr>
-            <tr>
-                <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
-                    <bs:helpIcon
-                            iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
-                </label></th>
-                <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
-            </tr>--%>
-        <%--</tbody>--%>
-    </tbody>
+    <tr>
+         <td>
+             <form>
+                <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
+                onclick="Checkmarx.testSCAConnection(Checkmarx.extractGlobalSCAparameters())"/>
+                <span id="testSCAConnectionMsg"></span>
+               </form>
+          </td>
+    </tr>
+</tbody>
+
 </l:settingsGroup>
 
 <l:settingsGroup className="cx-title" title="Control Checkmarx Scan">

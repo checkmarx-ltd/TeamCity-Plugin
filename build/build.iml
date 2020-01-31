@@ -17,7 +17,7 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.4.1" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Maven: com.checkmarx:cx-client-common:9.20.SCA-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.29" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.28" level="project" />
     <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.23" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient-win:4.5.10" level="project" />
@@ -41,7 +41,7 @@
     <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.17" level="project" />
-    <orderEntry type="library" name="Maven: com.checkmarx:cx-ws-fs-agent:18.7.2.4" level="project" />
+    <orderEntry type="library" name="Maven: com.checkmarx:cx-ws-fs-agent:20.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-web:4.0.0-milestone2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-web-common:4.0.0-milestone2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:4.0.0-milestone2" level="project" />

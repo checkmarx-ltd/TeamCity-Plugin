@@ -10,4 +10,5 @@
     <bean class="com.checkmarx.teamcity.server.CxAdminConfig"/>
     <bean class="com.checkmarx.teamcity.server.CxBuildStartContextProcessor"/>
     <bean class="com.checkmarx.teamcity.server.TestConnectionController"/>
+    <bean class="com.checkmarx.teamcity.server.TestScaConnectionController"/>
 </beans>

@@ -1,0 +1,15 @@
+com\checkmarx\teamcity\server\CxRunTypePropertiesProcessor.class
+com\checkmarx\teamcity\server\CxAdminPage.class
+com\checkmarx\teamcity\server\CxReportTab.class
+com\checkmarx\teamcity\server\TestScaConnectionRequest.class
+com\checkmarx\teamcity\server\CxBuildStartContextProcessor.class
+com\checkmarx\teamcity\server\TestConnectionRequest.class
+com\checkmarx\teamcity\server\CxAdminPageController.class
+com\checkmarx\teamcity\server\TestScaConnectionController.class
+com\checkmarx\teamcity\server\CxAdminConfig.class
+com\checkmarx\teamcity\server\TestConnectionController.class
+com\checkmarx\teamcity\server\CxRunType.class
+com\checkmarx\teamcity\server\TestConnectionResponse.class
+com\checkmarx\teamcity\server\CxOptions.class
+com\checkmarx\teamcity\server\TestScaConnectionResponse.class
+com\checkmarx\teamcity\server\CxEditRunTypeControllerExtension.class

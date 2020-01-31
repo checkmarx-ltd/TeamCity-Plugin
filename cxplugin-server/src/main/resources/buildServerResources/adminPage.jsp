@@ -1,6 +1,6 @@
 <%@include file="/include.jsp" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
-<%@ taglib prefix="forms" uri="http://www.springframework.org/tags/form" %>
+
 
 
 <style>
@@ -34,12 +34,10 @@
           $("invalid_cxGlobalServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalServerUrl"));
         },
-
         onInvalid_cxGlobalUsernameError: function (elem) {
           $("invalid_cxGlobalUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalUsername"));
         },
-
         onInvalid_cxGlobalPasswordError: function (elem) {
           $("invalid_cxGlobalPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalPassword"));
@@ -80,6 +78,30 @@
           SettingsForm.highlightErrorField($("cxGlobalOsaLowThreshold"));
         },
 
+        onInvalid_cxGlobalSCAServerUrlError: function (elem) {
+          $("invalid_cxGlobalSCAServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalSCAServerUrl"));
+        },
+        onInvalid_cxGlobalSCAWebAppURLError: function (elem) {
+          $("invalid_cxGlobalSCAWebAppURL").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalSCAWebAppURL"));
+        },
+        onInvalid_cxGlobalSCAAccessControlServerURLError: function (elem) {
+          $("invalid_cxGlobalSCAAccessControlServerURL").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalSCAAccessControlServerURL"));
+        },
+        onInvalid_cxGlobalSCAUserNameError: function (elem) {
+          $("invalid_cxGlobalSCAUserName").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalSCAUserName"));
+        },
+        onInvalid_cxGlobalSCAPasswordError: function (elem) {
+          $("invalid_cxGlobalSCAPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalSCAPassword"));
+        },
+         onInvalid_cxGlobalSCATenantError: function (elem) {
+                  $("invalid_cxGlobalSCATenant").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+                  SettingsForm.highlightErrorField($("cxGlobalSCATenant"));
+        },
         onSuccessfulSave: function () {
           SettingsForm.enable();
         },
@@ -107,6 +129,9 @@
 </c:if>
 <c:if test="${cxGlobalOsaThresholdEnabled != 'true'}">
   <c:set var="hideOsaThresholdSection" value="style='display:none'"/>
+</c:if>
+<c:if test="${cxGlobalSCAThresholdEnabled != 'true'}">
+  <c:set var="hideSCAThresholdSection" value="style='display:none'"/>
 </c:if>
 
 <div>
@@ -265,14 +290,6 @@
               </tr>
 
               <tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
-
-              <tr>
-                  <th><label for="cxOsaEnabled">Enable CxOSA Scan
-                      <bs:helpIcon iconTitle="select this radio button in order to use CxOSA as a dependency Scanner"/>
-                  </label></th>
-                  <td><forms:radiobutton name="cxDependencyScannerType" disabled="false" value="${cxDependencyScannerType}"/></td>
-              </tr>
-
               <tr>
                 <th><label for="cxGlobalOsaHighThreshold">High</label></th>
                 <td>
@@ -299,6 +316,77 @@
                 </td>
               </tr>
               </tbody>
+
+
+              <tr>
+                  <th><label for="cxGlobalSCAThresholdEnabled">Enable CxSCA Vulnerability Thresholds
+                    <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                       Leave blank for no thresholds."/></label></th>
+                      <td><forms:checkbox name="cxGlobalSCAThresholdEnabled"
+                       value="${cxGlobalSCAThresholdEnabled}"
+                       checked="${cxGlobalSCAThresholdEnabled}"
+                       onclick="$('SCAThresholdSection').toggle()"/>
+                       </td>
+                </tr>
+
+                            <tbody id="SCAThresholdSection" ${hideSCAThresholdSection}>
+
+                            <tr>
+                              <th><label for="cxGlobalSCAServerUrl">CxSCA server URL<l:star/></label></th>
+                              <td>
+                                <forms:textField name="cxGlobalSCAServerUrl" value="${cxGlobalSCAServerUrl}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCAServerUrl"></span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th><label for="cxGlobalSCAAccessControlServerURL">Access control server URL<l:star/></label></th>
+                              <td>
+                                <forms:textField name="cxGlobalSCAAccessControlServerURL" value="${cxGlobalSCAAccessControlServerURL}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCAAccessControlServerURL"></span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th><label for="cxGlobalSCAWebAppURL">CxSCA web app URL<l:star/></label></th>
+                              <td>
+                                <forms:textField name="cxGlobalSCAWebAppURL" value="${cxGlobalSCAWebAppURL}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCAWebAppURL"></span>
+                              </td>
+                            </tr>
+
+                             <tr>
+                              <th><label for="cxGlobalSCAUserName">CxSCA User Name<l:star/></label></th>
+                              <td>
+                                <forms:textField name="cxGlobalSCAUserName" value="${cxGlobalSCAUserName}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCAUserName"></span>
+                              </td>
+                            </tr>
+                                <tr>
+                              <th><label for="cxGlobalSCAPassword">CxSCA Password<l:star/></label></th>
+                              <td>
+                                <forms:textField  name="cxGlobalSCAPassword" value="${cxGlobalSCAPassword}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCAPassword"></span>
+                              </td>
+                            </tr>
+
+                             <tr>
+                              <th><label for="cxGlobalSCATenant">Tenant<l:star/></label></th>
+                              <td>
+                                <forms:textField name="cxGlobalSCATenant" value="${cxGlobalSCATenant}" className="longField"/>
+                                <span class="error" id="invalid_cxGlobalSCATenant"></span>
+                              </td>
+                            </tr>
+                          <tr>
+                                    <td>
+                                      <form>
+                                        <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
+                                               onclick="Checkmarx.testSCAConnection(Checkmarx.extractGlobalSCAparameters())"/>
+                                        <span id="testSCAConnectionMsg"></span>
+                                      </form>
+                                    </td>
+
+                                  </tr>
+                            </tbody>
+
             </table>
           </td>
         </tr>

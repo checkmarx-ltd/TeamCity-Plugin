@@ -1,0 +1,3 @@
+com\checkmarx\teamcity\common\CxConstants.class
+com\checkmarx\teamcity\common\InvalidParameterException.class
+com\checkmarx\teamcity\common\CxParam.class

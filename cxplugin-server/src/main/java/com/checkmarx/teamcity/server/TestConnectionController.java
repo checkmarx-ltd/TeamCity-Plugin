@@ -29,7 +29,7 @@ import java.util.List;
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
-public class TestConnectionController extends BaseController {
+class TestConnectionController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(TestConnectionController.class);
 

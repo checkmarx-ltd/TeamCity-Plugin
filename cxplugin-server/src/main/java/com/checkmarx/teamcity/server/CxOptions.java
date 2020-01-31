@@ -268,10 +268,8 @@ public class CxOptions {
 
     @NotNull
     public String getScaEnabled() { return SCA_ENABLED; }
-
     @NotNull
     public String getScaApiUrl() { return SCA_API_URL; }
-
     @NotNull
     public String getScaAccessControlUrl() { return SCA_ACCESS_CONTROL_URL; }
 
@@ -349,4 +347,12 @@ public class CxOptions {
 
     @NotNull
     public String getDependencyScanEnabled() { return DEPENDENCY_SCAN_ENABLED; }
+
+    @Override
+    public String toString() {
+        return "CxOptions{" +
+                "teamList=" + teamList +
+                ", presetList=" + presetList +
+                '}';
+    }
 }

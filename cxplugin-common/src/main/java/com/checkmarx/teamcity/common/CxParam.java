@@ -59,15 +59,23 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_MEDIUM_THRESHOLD = "cxGlobalOsaMediumThreshold";
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
     public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
+    public static final String GLOBAL_SCA_API_URL = "cxGlobalSCAServerUrl";
+    public static final String GLOBAL_SCA_ACCESS_CONTROL_URL = "cxGlobalSCAAccessControlServerURLV";
+    public static final String GLOBAL_SCA_WEB_APP_URL = "cxGlobalSCAWebAppURL";
+    public static final String GLOBAL_SCA_USERNAME = "cxGlobalSCAUserName";
+    public static final String GLOBAL_SCA_PASSWORD = "cxGlobalSCAPassword";
+    public static final String GLOBAL_SCA_TENANT = "cxGlobalSCATenant";
+
     public static final String GLOBAL_DEPENDENCY_SCAN_ENABLED = "globalDependencyScanEnabled";
+    public static final String GLOBAL_SCA_THRESHOLD_ENABLED = "cxGlobalSCAThresholdEnabled";
 
     //SCA Params
-    public static final String SCA_API_URL = "ScaApiUrl";
-    public static final String SCA_ACCESS_CONTROL_URL = "ScaAccessControlUrl";
-    public static final String SCA_WEB_APP_URL = "ScaWebAppUrl";
-    public static final String SCA_USERNAME = "ScaUserName";
-    public static final String SCA_PASSWORD = "ScaPassword";
-    public static final String SCA_TENANT = "ScaTenant";
+    public static final String SCA_API_URL = "cxScaApiUrl";
+    public static final String SCA_ACCESS_CONTROL_URL = "cxScaAccessControlUrl";
+    public static final String SCA_WEB_APP_URL = "cxScaWebAppUrl";
+    public static final String SCA_USERNAME = "cxScaUserName";
+    public static final String SCA_PASSWORD = "cxScaPass";
+    public static final String SCA_TENANT = "cxScaTenant";
 
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";
@@ -88,7 +96,8 @@ public abstract class CxParam {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
             GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_HIGH_THRESHOLD,
             GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED, GLOBAL_OSA_HIGH_THRESHOLD,
-            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_PROJECT_POLICY_VIOLATION
+            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_SCA_API_URL,GLOBAL_SCA_ACCESS_CONTROL_URL,
+            GLOBAL_SCA_WEB_APP_URL,GLOBAL_SCA_USERNAME,GLOBAL_SCA_PASSWORD,GLOBAL_SCA_TENANT,GLOBAL_PROJECT_POLICY_VIOLATION
     };
 
 

@@ -1,0 +1,8 @@
+com\checkmarx\teamcity\agent\CallableBuildProcess.class
+com\checkmarx\teamcity\agent\CxAgentBuildRunner.class
+com\checkmarx\teamcity\agent\CxAppender$1.class
+com\checkmarx\teamcity\agent\CxAppender.class
+com\checkmarx\teamcity\agent\CxConfigHelper.class
+com\checkmarx\teamcity\agent\CxPluginUtils.class
+com\checkmarx\teamcity\agent\CxBuildProcess.class
+com\checkmarx\teamcity\agent\CxLoggerAdapter.class

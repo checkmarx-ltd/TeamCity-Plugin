@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.checkmarx:cx-client-common:9.20.SCA-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20191224.073206-2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20200113.100420-5.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20191224.073206-2-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20200113.100420-5-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20191224.073206-2-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/checkmarx/cx-client-common/9.20.SCA-SNAPSHOT/cx-client-common-9.20.SCA-20200113.100420-5-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
