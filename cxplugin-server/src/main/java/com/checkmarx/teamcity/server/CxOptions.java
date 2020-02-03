@@ -280,7 +280,7 @@ public class CxOptions {
     public String getScaUserName() { return SCA_USERNAME; }
 
     @NotNull
-    public String getScaPassword() { return SCA_PASSWORD; }
+    public String getScaPass() { return SCA_PASSWORD; }
 
     @NotNull
     public String getScaTenant() { return SCA_TENANT; }

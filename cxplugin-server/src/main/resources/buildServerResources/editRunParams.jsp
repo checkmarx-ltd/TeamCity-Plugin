@@ -357,40 +357,40 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <th><label for="${optionsBean.scaEnabled}">Use SCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="SCA"/></td>
+        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" checked="true" disabled="false" value="SCA"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaApiUrl}">SCA server URL
+        <th><label for="${optionsBean.scaApiUrl}">SCA server URL
             <bs:helpIcon iconTitle="fill this with the SCA server URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaApiUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaAccessControlUrl}">Access control server URL
+        <th><label for="${optionsBean.scaAccessControlUrl}">Access control server URL
             <bs:helpIcon iconTitle="fill this with the SCA Access Control URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaWebAppUrl}">SCA web app URL
+        <th><label for="${optionsBean.scaWebAppUrl}">SCA web app URL
             <bs:helpIcon iconTitle="fill this with the SCA web app URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaWebAppUrl}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaUserName}">SCA userName
+        <th><label for="${optionsBean.scaUserName}">SCA userName
             <bs:helpIcon iconTitle="fill this with the SCA username"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaUserName}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaPass}">SCA password
+        <th><label for="${optionsBean.scaPass}">SCA password
             <bs:helpIcon iconTitle="fill this with the SCA password"/>
         </label></th>
-        <td><props:passwordProperty name="${optionsBean.scaPassword}" className="longField"/></td>
+        <td><props:passwordProperty name="${optionsBean.scaPass}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.ScaTenant}">SCA Tenant
+        <th><label for="${optionsBean.scaTenant}">SCA Tenant
             <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
