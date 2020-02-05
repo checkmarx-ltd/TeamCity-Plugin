@@ -26,6 +26,17 @@ Checkmarx = {
             global: true
         }
     },
+    extractSCAparameters: function () {
+            return {
+                serverUrl: $('scaApiUrl').value,
+                accessControlServerUrl: $('scaAccessControlUrl').value,
+                webAppURL: $('scaWebAppUrl').value,
+                scaUserName: $('scaUserName').value,
+                scaPassword: $('scaPass').value,
+                scaTenant: $('scaTenant').value,
+                global: true
+            }
+        },
     testConnection: function (credentials) {
         if (Checkmarx.validateCredentials(credentials)) {
             var messageElm = jQuery('#testConnectionMsg');

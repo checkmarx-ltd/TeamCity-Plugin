@@ -24,7 +24,7 @@ public abstract class CxParam {
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
     public static final String SCA_ENABLED = "cxScaEnabled";
-    public static final String DEPENDENCY_SCANNER_TYPE = "cxDependencyScannerType";
+    public static final String DEPENDENCY_SCANNER_TYPE = "dependencyScannerType";
     public static final String SAST_ENABLED = "cxSastEnabled";
     public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
     public static final String OSA_ARCHIVE_INCLUDE_PATTERNS = "cxOsaArchiveIncludePatterns";
@@ -60,7 +60,7 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
     public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
     public static final String GLOBAL_SCA_API_URL = "cxGlobalSCAServerUrl";
-    public static final String GLOBAL_SCA_ACCESS_CONTROL_URL = "cxGlobalSCAAccessControlServerURLV";
+    public static final String GLOBAL_SCA_ACCESS_CONTROL_URL = "cxGlobalSCAAccessControlServerURL";
     public static final String GLOBAL_SCA_WEB_APP_URL = "cxGlobalSCAWebAppURL";
     public static final String GLOBAL_SCA_USERNAME = "cxGlobalSCAUserName";
     public static final String GLOBAL_SCA_PASSWORD = "cxGlobalSCAPassword";
@@ -70,12 +70,12 @@ public abstract class CxParam {
     public static final String GLOBAL_SCA_THRESHOLD_ENABLED = "cxGlobalSCAThresholdEnabled";
 
     //SCA Params
-    public static final String SCA_API_URL = "cxScaApiUrl";
-    public static final String SCA_ACCESS_CONTROL_URL = "cxScaAccessControlUrl";
-    public static final String SCA_WEB_APP_URL = "cxScaWebAppUrl";
-    public static final String SCA_USERNAME = "cxScaUserName";
-    public static final String SCA_PASSWORD = "cxScaPass";
-    public static final String SCA_TENANT = "cxScaTenant";
+    public static final String SCA_API_URL = "scaApiUrl";
+    public static final String SCA_ACCESS_CONTROL_URL = "scaAccessControlUrl";
+    public static final String SCA_WEB_APP_URL = "scaWebAppUrl";
+    public static final String SCA_USERNAME = "scaUserName";
+    public static final String SCA_PASSWORD = "scaPass";
+    public static final String SCA_TENANT = "scaTenant";
 
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";

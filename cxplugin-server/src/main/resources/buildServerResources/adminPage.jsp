@@ -319,9 +319,8 @@
 
 
               <tr>
-                  <th><label for="cxGlobalSCAThresholdEnabled">Enable CxSCA Vulnerability Thresholds
-                    <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
-                       Leave blank for no thresholds."/></label></th>
+                  <th><label for="cxGlobalSCAThresholdEnabled"> CxSCA server credentials
+
                       <td><forms:checkbox name="cxGlobalSCAThresholdEnabled"
                        value="${cxGlobalSCAThresholdEnabled}"
                        checked="${cxGlobalSCAThresholdEnabled}"
