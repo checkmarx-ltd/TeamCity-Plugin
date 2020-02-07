@@ -319,7 +319,7 @@
 
 
               <tr>
-                  <th><label for="cxGlobalSCAThresholdEnabled"> CxSCA server credentials
+                  <th><label for="cxGlobalSCAThresholdEnabled"> Enable CxSCA
 
                       <td><forms:checkbox name="cxGlobalSCAThresholdEnabled"
                        value="${cxGlobalSCAThresholdEnabled}"

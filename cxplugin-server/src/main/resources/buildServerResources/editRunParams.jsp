@@ -187,7 +187,6 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 </l:settingsGroup>
 
-
 <l:settingsGroup className="cx-title" title="Checkmarx Scan CxSAST">
     <tr>
         <th><label for="${optionsBean.sastEnabled}">Enable CxSAST Scan</label>
@@ -302,6 +301,13 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 </l:settingsGroup>
 
+<c:if test="${propertiesBean.properties[optionsBean.dependencyScanEnabled] != 'true'}">
+    <c:set var="hideEditGlobalDependencyScanSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.overrideGlobalConfigurations] != 'true'}">
+    <c:set var="hideGlobalDependencyScanSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+
 <l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
     <tr>
         <th><label for="${optionsBean.dependencyScanEnabled}">Enable Dependency Scan
@@ -309,15 +315,15 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
-         <c:set var="onclick">
-           jQuery('#osaThresholdSection').toggle();
-           jQuery('#globalOsaThresholdSection').toggle();
-           jQuery('#editglobalDependencyScanOption').toggle();
-              BS.MultilineProperties.updateVisible();
-              </c:set>
-        <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="${onclick}"/></td>
+            <c:set var="onclick">
+                jQuery('#editGlobalDependencyScanOption').toggle();
+                if(globalDependencyScanOption.style.display != 'none'){
+                    jQuery('#${optionsBean.overrideGlobalConfigurations}').click();
+                }
+            </c:set>
+            <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="${onclick}"/></td>
     </tr>
-    <tbody id="editglobalDependencyScanOption" ${hideeditGlobalDependencyScanOption}>
+    <tbody id="editGlobalDependencyScanOption" ${hideEditGlobalDependencyScanSection}>
     <tr>
         <th><label for="${optionsBean.overrideGlobalConfigurations}">Override global dependency scan settings
             <bs:helpIcon
@@ -326,14 +332,11 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td>
             <c:set var="onclick">
                 jQuery('#globalDependencyScanOption').toggle();
-                BS.MultilineProperties.updateVisible();
             </c:set>
             <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="${onclick}"/></td>
     </tr>
-</tbody>
 
-  <%--  <jsp:setProperty name="${optionsBean.dependencyScannerType}" property="None"/>--%>
-    <tbody id="globalDependencyScanOption" ${hideGlobalDependencyScanOption}>
+    <tbody id="globalDependencyScanOption" ${hideGlobalDependencyScanSection}>
     <tr>
         <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
             <bs:helpIcon
@@ -359,7 +362,8 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
     </tr>
     <tr>
-        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command
+            before Scan
             <bs:helpIcon
                     iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
         </label></th>
@@ -370,7 +374,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <th><label for="${optionsBean.scaEnabled}">Use SCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}"  disabled="false" value="SCA"/></td>
+        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="SCA"/></td>
     </tr>
     <tr>
         <th><label for="${optionsBean.scaApiUrl}">SCA server URL
@@ -409,15 +413,16 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
     <tr>
-         <td>
-             <form>
+        <td>
+            <form>
                 <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
-                onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
+                       onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
                 <span id="testSCAConnectionMsg"></span>
-               </form>
-          </td>
+            </form>
+        </td>
     </tr>
-</tbody>
+    </tbody>
+    </tbody>
 
 </l:settingsGroup>
 
