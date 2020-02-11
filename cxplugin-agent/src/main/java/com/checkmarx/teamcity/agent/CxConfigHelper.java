@@ -3,7 +3,6 @@ package com.checkmarx.teamcity.agent;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.dto.DependencyScanResults;
 import com.cx.restclient.dto.DependencyScannerType;
 import com.cx.restclient.sca.dto.SCAConfig;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
@@ -64,7 +63,15 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class,buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
+        String rawScannerType = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
+        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)) &&
+                rawScannerType != null &&
+                !rawScannerType.equals("")) {
+            ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));
+        } else {
+            ret.setDependencyScannerType(DependencyScannerType.NONE);
+        }
+
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
         ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
@@ -103,37 +110,37 @@ public class CxConfigHelper {
 
         ret.setSynchronous(TRUE.equals(parameters.get(isSynchronous)));
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
-        if (ret.getSynchronous()) {
 
-            if(ret.getSastEnabled()){
-                ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
-                if (ret.getSastThresholdsEnabled()) {
-                    ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
-                    ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
-                    ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
-                }
+
+        if (ret.getSastEnabled()) {
+            ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
+            if (ret.getSastThresholdsEnabled()) {
+                ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
+                ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
+                ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
             }
-
-
-            if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
-                ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
-                if (ret.getOsaThresholdsEnabled()) {
-                    ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
-                    ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
-                    ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
-                }
-                if(ret.getDependencyScannerType().equals(DependencyScannerType.SCA)){
-                    scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
-                    scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
-                    scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
-                    scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
-                    scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
-                    scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-                    ret.setScaConfig(scaConfig);
-                }
-            }
-
         }
+
+
+        if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
+            ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
+            if (ret.getOsaThresholdsEnabled()) {
+                ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
+                ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
+                ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
+            }
+            if (ret.getDependencyScannerType().equals(DependencyScannerType.SCA)) {
+                scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
+                scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
+                scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
+                scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
+                scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
+                scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+                ret.setScaConfig(scaConfig);
+            }
+        }
+
+
         return ret;
     }
 

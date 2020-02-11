@@ -341,7 +341,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 jQuery('#globalOsaThresholdSection').toggle();
                 jQuery('#globalThresholdEnabled').toggle();*/
 
-                Checkmarx.updateDependencyScanSectionVisibility();
+                updateDependencyScanSectionVisibility();
                 <%-- BS.MultilineProperties.updateVisible();--%>
             </c:set>
         <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="${onclick}"/></td>
@@ -354,7 +354,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </th>
         <td>
             <c:set var="onclick">
-                Checkmarx.updateDependencyScanSectionVisibility();
+                updateDependencyScanSectionVisibility();
                 <%-- BS.MultilineProperties.updateVisible();--%>
             </c:set>
             <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="${onclick}"/>
@@ -366,7 +366,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="Checkmarx.updateDependencyScanSectionVisibility()" value="OSA" id="enableOsa"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="enableOsa"/>
         </td>
     </tr>
     <tr class="dependencyScanInput osaInput">
@@ -399,7 +399,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
         <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
-                                       onclick="Checkmarx.updateDependencyScanSectionVisibility()"/></td>
+                                       onclick="updateDependencyScanSectionVisibility()"/></td>
     </tr>
     <tr class="dependencyScanInput scaInput">
         <th><label for="${optionsBean.scaApiUrl}">SCA server URL
