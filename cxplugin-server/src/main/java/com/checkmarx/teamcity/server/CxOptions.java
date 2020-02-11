@@ -120,7 +120,7 @@ public class CxOptions {
 
     @NotNull
     public String getDependencyScannerType() {
-        return ("OSA".equals(DEPENDENCY_SCANNER_TYPE) || "SCA".equals(DEPENDENCY_SCANNER_TYPE))?DEPENDENCY_SCANNER_TYPE:"None" ;}
+        return (DEPENDENCY_SCANNER_TYPE) ;}
 
     @NotNull
     public String getSastEnabled() {
