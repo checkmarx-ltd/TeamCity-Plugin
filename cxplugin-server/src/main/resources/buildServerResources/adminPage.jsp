@@ -280,7 +280,7 @@
               </tbody>
 
               <tr>
-                <th><label for="cxGlobalOsaThresholdEnabled">Enable CxOSA Vulnerability Thresholds
+                <th><label for="cxGlobalOsaThresholdEnabled">Enable Dependency Scan Vulnerability Thresholds
                   <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
                         Leave blank for no thresholds."/></label></th>
                 <td><forms:checkbox name="cxGlobalOsaThresholdEnabled"
@@ -316,6 +316,7 @@
                 </td>
               </tr>
               </tbody>
+
 
 
               <tr>

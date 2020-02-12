@@ -101,9 +101,6 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.thresholdEnabled] != 'true' }">
     <c:set var="hideThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.osaEnabled] != 'true'}">
-    <c:set var="hideOsaSection" value="${optionsBean.noDisplay}"/>
-</c:if>
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
@@ -507,9 +504,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 </tr>
                 </tbody>
 
-                <tbody id="osaThresholdSection" ${hideOsaSection}>
+                <tbody id="osaThresholdSection">
                 <tr>
-                    <th><label for="${optionsBean.osaThresholdEnabled}">Enable CxOSA Vulnerability Thresholds
+                    <th><label for="${optionsBean.osaThresholdEnabled}">Enable Dependency Scan Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
                         Leave blank for no thresholds."/></label>
                     </th>
@@ -605,9 +602,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 </tr>
                 </tbody>
 
-                <tbody id="globalOsaThresholdSection" ${hideOsaSection}>
+                <tbody id="globalOsaThresholdSection">
                 <tr>
-                    <th>Enable CxOSA Vulnerability Thresholds
+                    <th>Enable Dependency Scan Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
                         Leave blank for no thresholds."/></th>
                     <td>

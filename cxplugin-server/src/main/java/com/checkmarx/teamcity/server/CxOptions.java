@@ -114,13 +114,9 @@ public class CxOptions {
     }
 
     @NotNull
-    public String getOsaEnabled() {
-        return OSA_ENABLED;
-    }
-
-    @NotNull
     public String getDependencyScannerType() {
-        return (DEPENDENCY_SCANNER_TYPE) ;}
+        return DEPENDENCY_SCANNER_TYPE;
+    }
 
     @NotNull
     public String getSastEnabled() {
@@ -267,8 +263,6 @@ public class CxOptions {
         return GLOBAL_PROJECT_POLICY_VIOLATION;
     }
 
-    @NotNull
-    public String getScaEnabled() { return SCA_ENABLED; }
     @NotNull
     public String getScaApiUrl() { return SCA_API_URL; }
     @NotNull

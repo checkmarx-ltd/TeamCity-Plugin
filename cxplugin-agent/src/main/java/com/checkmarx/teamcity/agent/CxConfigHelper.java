@@ -6,6 +6,7 @@ import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.DependencyScannerType;
 import com.cx.restclient.sca.dto.SCAConfig;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -65,8 +66,7 @@ public class CxConfigHelper {
 
         String rawScannerType = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)) &&
-                rawScannerType != null &&
-                !rawScannerType.equals("")) {
+                StringUtils.isNotEmpty(rawScannerType)) {
             ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));
         } else {
             ret.setDependencyScannerType(DependencyScannerType.NONE);

@@ -35,6 +35,8 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
         final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
 
+        PluginDataMigration migration = new PluginDataMigration();
+        migration.migrate(properties);
 
         //put default project name as the build name
         if(StringUtils.isEmpty(properties.get(CxParam.PROJECT_NAME))) {
