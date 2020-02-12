@@ -107,26 +107,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
-    <c:set var="hideDependencyScannerTypeSection" value="${optionsBean.noDisplay}"/>
-</c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] = 'true'}">
-    <c:set var="hideDependencyScanOptions" value="${optionsBean.noDisplay}"/>
-</c:if>
 
-<c:if test="${propertiesBean.properties[optionsBean.globalFilterPatterns] != 'true'}">
-    <c:set var="hidecxGlobalSCAPassword" value="${optionsBean.noDisplay}"/>
-</c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScanEnabled] != 'true'}">
-    <c:set var="hideGlobalDependencyScanEditOption" value="${optionsBean.noDisplay}"/>
-</c:if>
-
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScanEnabled] == 'true'}">
-    <c:set var="hideGlobalDependencyScanEditOption" value="true"/>
-</c:if>
-<c:if test="${propertiesBean.properties[optionsBean.overrideGlobalConfigurations] != 'true'}">
-    <c:set var="hideGlobalDependencyScanOption" value="${optionsBean.noDisplay}"/>
-</c:if>
 
 
 
@@ -336,15 +317,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
-            <c:set var="onclick">
-                /*jQuery('#osaThresholdSection').toggle();
-                jQuery('#globalOsaThresholdSection').toggle();
-                jQuery('#globalThresholdEnabled').toggle();*/
-
-                updateDependencyScanSectionVisibility();
-                <%-- BS.MultilineProperties.updateVisible();--%>
-            </c:set>
-        <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="${onclick}"/></td>
+        <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="updateDependencyScanSectionVisibility()" /></td>
     </tr>
     <tr id="overrideGlobalDSSettings">
         <th>
