@@ -4,6 +4,28 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
+
+
+    <script type="text/javascript">
+    window.updateDependencyScanSectionVisibility = function() {
+        var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
+            overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
+            osaEnabled = jQuery('#enableOsa').prop('checked'),
+            scaEnabled = jQuery('#enableSca').prop('checked'),
+            isOverriding = depScanEnabled && overrideChecked;
+
+        jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
+        jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
+
+        jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
+        jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
+    }
+
+    jQuery(updateDependencyScanSectionVisibility);
+    </script>
+
+
+
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
 
@@ -24,23 +46,7 @@
     }
 
 </style>
-<script>
-    function updateDependencyScanSectionVisibility() {
-        var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
-            overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
-            osaEnabled = jQuery('#enableOsa').prop('checked'),
-            scaEnabled = jQuery('#enableSca').prop('checked'),
-            isOverriding = depScanEnabled && overrideChecked;
 
-        jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
-        jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
-
-        jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
-        jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-    }
-
-    jQuery(updateDependencyScanSectionVisibility);
-</script>
 ${'true'.equals(cxUseDefaultServer) ?
 optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword) :
 optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
@@ -104,8 +110,6 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-
-
 
 
 <l:settingsGroup className="cx-title" title="Checkmarx Server">
@@ -310,6 +314,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
+
         <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="updateDependencyScanSectionVisibility()" /></td>
     </tr>
 

@@ -306,7 +306,7 @@ public class CxOptions {
     public String getScaLocationPath() { return  SCA_LOCATION_PATH; }
 
     @NotNull
-    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEPENDENCY_SCAN_ENABLED; }
+    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS; }
 
     @NotNull
     public static String getGlobalOsaArchiveIncludePatterns() {

@@ -64,7 +64,34 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
+        /*
+            if (dep scan enabled) {
+                if (override global settings) {
+                    dep scanner type = getDepScanType(jobDepScanType)
+                    scaconfig <- job properties
+
+                }
+                else {
+                    dep scanner type = getDepScanType(globalDepScanType)
+                    scaconfig <- global properties
+                }
+                ret.setscaconfig(scaconfig)
+            }
+
+            getDepScanType(){
+            ...
+            }
+         */
         String rawScannerType = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
+        if(TRUE.equals(rawScannerType))
+        {
+            if(TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)) && StringUtils.isNotEmpty(rawScannerType))
+            {
+                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));
+            }
+        }
+
+
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)) &&
                 StringUtils.isNotEmpty(rawScannerType)) {
             ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));

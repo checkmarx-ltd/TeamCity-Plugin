@@ -126,7 +126,6 @@
           if (!wereErrors) {
             $('generalSettings').refresh();
             window.scrollTo(0, 0);
-
           }
         }
       }));
@@ -134,7 +133,7 @@
     }
   });
 </script>
-<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
+<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection2.js'/>"></script>
 
 
 <c:if test="${cxGlobalIsSynchronous != 'true'}">
@@ -296,19 +295,6 @@
               </tbody>
 
             </table>
-
-                <%--  checkbox:Globally define dependency scan settings --%>
-                <%--  checkbox:include /exclude --%>
-                <%--  radiobutton:use cxOsa dependency scanner--%>
-                     <%--  input: archive extract patterns --%>
-                     <%--  checkbox:Execute dependency managers 'install packages' command before Scan --%>
-                <%--  radiobutton:Use CxSCA dependency scanner--%>
-                        <%--  input:sca credentials--%>
-
-                        <%--  Button:testconnection--%>
-
-
-
 
                 <l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
                     <tr>
