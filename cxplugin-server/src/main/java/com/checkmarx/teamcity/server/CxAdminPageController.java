@@ -49,15 +49,12 @@ public class CxAdminPageController extends BaseFormXmlController {
             cxAdminConfig.setConfiguration(config, StringUtil.emptyIfNull(request.getParameter(config)));
         }
 
-        String cxPass = RSACipher.decryptWebRequestData(request.getParameter("encryptedCxGlobalPassword"));
-        if(!EncryptUtil.isScrambled(cxPass)) {
-            try {
-                cxPass = EncryptUtil.scramble(cxPass);
-            } catch (RuntimeException e) {
-                cxPass = "";
-            }
-        }
-        cxAdminConfig.setConfiguration(GLOBAL_PASSWORD, cxPass);
+
+        String sastAndOsaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalPassword");
+        cxAdminConfig.setConfiguration(GLOBAL_PASSWORD, sastAndOsaPassword);
+
+        String scaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSCAPassword");
+        cxAdminConfig.setConfiguration(GLOBAL_SCA_PASSWORD, scaPassword);
 
         try {
             cxAdminConfig.persistConfiguration();
@@ -66,6 +63,18 @@ public class CxAdminPageController extends BaseFormXmlController {
         }
         getOrCreateMessages(request).addMessage("settingsSaved", SUCCESSFUL_SAVE_MESSAGE);
 
+    }
+
+    private String ensurePasswordEncryption(HttpServletRequest request, String requestParamName) {
+        String password = RSACipher.decryptWebRequestData(request.getParameter(requestParamName));
+        if(!EncryptUtil.isScrambled(password)) {
+            try {
+                password = EncryptUtil.scramble(password);
+            } catch (RuntimeException e) {
+                password = "";
+            }
+        }
+        return password;
     }
 
     private ActionErrors validateForm(final HttpServletRequest request) {

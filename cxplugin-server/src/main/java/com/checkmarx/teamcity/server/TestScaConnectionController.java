@@ -88,7 +88,7 @@ public class TestScaConnectionController extends BaseController {
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setAccessControlServerUrl(StringUtil.trim(ret.getAccessControlServerUrl()));
         ret.setScaUserName(StringUtil.trim(ret.getScaUserName()));
-        ret.setScaPassword(StringUtil.trim(ret.getScaPassword()));
+        ret.setScaPassword(CxOptions.decryptPassword(ret.getScaPassword(), ret.isGlobal()));
         ret.setScaTenant(StringUtil.trim(ret.getScaTenant()));
         ret.setWebAppURL(StringUtil.trim(ret.getWebAppURL()));
         //

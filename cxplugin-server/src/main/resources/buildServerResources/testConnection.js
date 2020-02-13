@@ -34,7 +34,7 @@ Checkmarx = {
                 scaUserName: $('scaUserName').value,
                 scaPassword: $('scaPass').value,
                 scaTenant: $('scaTenant').value,
-                global: true
+                global: false
             }
         },
     testConnection: function (credentials) {

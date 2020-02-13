@@ -8,6 +8,7 @@ import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -307,7 +308,30 @@ public class CxOptions {
     @NotNull
     public String getGlobalDependencyScanEnabled() { return GLOBAL_DEPENDENCY_SCAN_ENABLED; }
 
-
+    @NotNull
+    public static String getGlobalOsaArchiveIncludePatterns() {
+        return GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS;
+    }
+    @NotNull
+    public static String getGlobalDependencyScanFilterPatterns() {
+        return GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS;
+    }
+    @NotNull
+    public static String getGlobalExecuteDependencyManager() {
+        return GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
+    }
+    @NotNull
+    public static String getGlobalScaEnabled() {
+        return GLOBAL_SCA_ENABLED;
+    }
+    @NotNull
+    public static String getGlobalOsaEnabled() {
+        return GLOBAL_OSA_ENABLED;
+    }
+    @NotNull
+    public static String getGlobaldependencyScannerType() {
+        return GLOBAL_DEPENDENCY_SCANNER_TYPE;
+    }
 
     public void testConnection(String serverUrl, String username, String pssd) {
 
@@ -349,5 +373,19 @@ public class CxOptions {
                 "teamList=" + teamList +
                 ", presetList=" + presetList +
                 '}';
+    }
+
+    public static String decryptPassword(String password, boolean global) {
+
+        try {
+            if (!global) {
+                password = RSACipher.decryptWebRequestData(password);
+            }
+
+            return EncryptUtil.isScrambled(password) ? EncryptUtil.unscramble(password) : password;
+
+        } catch (Exception e) {
+            return password;
+        }
     }
 }

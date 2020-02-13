@@ -1,7 +1,8 @@
-<%@include file="/include.jsp" %>
+<%@ page import="com.checkmarx.teamcity.common.CxParam" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
-
-
+<%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
+<%@include file="/include.jsp" %>
 
 <style>
   .scanControlSectionTable {
@@ -22,6 +23,21 @@
         temp.textContent = str;
         return temp.innerHTML;
     }
+
+ function updateGlobalDependencyScanSectionVisibility() {
+        var depScanEnabled = jQuery('#globalDependencyScanEnabled').prop('checked'),
+            cxGlobalOsaEnabled = jQuery('#cxGlobalOsaEnabled').prop('checked'),
+            cxGlobalScaEnabled = jQuery('#cxGlobalScaEnabled').prop('checked'),
+            isOverriding = depScanEnabled;
+
+        jQuery('.globalDependencyScanRow')[isOverriding ? 'show' : 'hide']();
+
+        jQuery('.osaInput')[isOverriding && cxGlobalOsaEnabled ? 'show' : 'hide']();
+        jQuery('.scaInput')[isOverriding && cxGlobalScaEnabled ? 'show' : 'hide']();
+    }
+
+    jQuery(updateGlobalDependencyScanSectionVisibility);
+
 
   var SettingsForm = OO.extend(BS.AbstractPasswordForm, {
     formElement: function () {
@@ -279,73 +295,103 @@
               </tr>
               </tbody>
 
-              <tr>
-                <th><label for="cxGlobalOsaThresholdEnabled">Enable Dependency Scan Vulnerability Thresholds
-                  <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
-                        Leave blank for no thresholds."/></label></th>
-                <td><forms:checkbox name="cxGlobalOsaThresholdEnabled"
-                                    value="${cxGlobalOsaThresholdEnabled}"
-                                    checked="${cxGlobalOsaThresholdEnabled}"
-                                    onclick="$('osaThresholdSection').toggle()"/></td>
-              </tr>
+            </table>
 
-              <tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
-              <tr>
-                <th><label for="cxGlobalOsaHighThreshold">High</label></th>
-                <td>
-                  <forms:textField name="cxGlobalOsaHighThreshold" value="${cxGlobalOsaHighThreshold}" className="longField"/>
-                  <span class="error" id="invalid_cxGlobalOsaHighThreshold"></span>
-                </td>
+                <%--  checkbox:Globally define dependency scan settings --%>
+                <%--  checkbox:include /exclude --%>
+                <%--  radiobutton:use cxOsa dependency scanner--%>
+                     <%--  input: archive extract patterns --%>
+                     <%--  checkbox:Execute dependency managers 'install packages' command before Scan --%>
+                <%--  radiobutton:Use CxSCA dependency scanner--%>
+                        <%--  input:sca credentials--%>
 
-              </tr>
-
-              <tr>
-                <th><label for="cxGlobalOsaMediumThreshold">Medium</label></th>
-                <td>
-                  <forms:textField name="cxGlobalOsaMediumThreshold" value="${cxGlobalOsaMediumThreshold}" className="longField"/>
-                  <span class="error" id="invalid_cxGlobalOsaMediumThreshold"></span>
-                </td>
-
-              </tr>
-
-              <tr>
-                <th><label for="cxGlobalOsaLowThreshold">Low</label></th>
-                <td>
-                  <forms:textField name="cxGlobalOsaLowThreshold" value="${cxGlobalOsaLowThreshold}" className="longField"/>
-                  <span class="error" id="invalid_cxGlobalOsaLowThreshold"></span>
-                </td>
-              </tr>
-              </tbody>
+                        <%--  Button:testconnection--%>
 
 
 
-              <tr>
-                  <th><label for="cxGlobalSCAThresholdEnabled"> CxSCA server credentials
 
-                      <td><forms:checkbox name="cxGlobalSCAThresholdEnabled"
-                       value="${cxGlobalSCAThresholdEnabled}"
-                       checked="${cxGlobalSCAThresholdEnabled}"
-                       onclick="$('SCAThresholdSection').toggle()"/>
+                <l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
+                    <tr>
+                        <th><label for="globalDependencyScanEnabled">Globally define dependency scan settings
+                            <bs:helpIcon iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/>
+                        </label>
+                        </th>
+                        <td>
+                            <forms:checkbox name="globalDependencyScanEnabled"  checked="${globalDependencyScanEnabled}" value="${globalDependencyScanEnabled}" onclick="updateGlobalDependencyScanSectionVisibility()"/>
+                        </td>
+                    </tr>
+                  <tr class="globalDependencyScanRow ">
+                    <th><label for="CxGlobalDependencyScanFilterPatterns">Include/Exclude Wildcard Patterns
+                      <bs:helpIcon iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/>
+                    </label>
+                    </th>
+                    <td>
+                      <forms:checkbox name="CxGlobalDependencyScanFilterPatterns" value="${CxGlobalDependencyScanFilterPatterns}"/>
+                    </td>
+                  </tr>
+
+                  <tr class="globalDependencyScanRow">
+                    <th><label for="cxGlobalOsaEnabled"> Enable CxOsa scan
+
+                    <td>
+                      <input type="radio"
+                             name="cxGlobalDependencyScanType"
+                             value="OSA"
+                             checked="${cxGlobalOsaEnabled}"
+                             id="cxGlobalOsaEnabled" onclick="updateGlobalDependencyScanSectionVisibility()"/>
+                    </td>
+                  </tr>
+                  <tbody id="globalOsaFilterPatterns" >
+                  <tr class="globalDependencyScanRow osaInput">
+                    <th><label for="cxGlobalOsaArchiveIncludePatterns">Archive extract patterns</label></th>
+                    <td>
+                      <forms:textField name="cxGlobalOsaArchiveIncludePatterns" value="${cxGlobalOsaArchiveIncludePatterns}" className="longField"/>
+                    </td>
+                  </tr>
+                  <tr class="globalDependencyScanRow osaInput">
+                    <th><label for="cxGlobalExecuteDependencyManager">Execute dependency managers 'install packages' command before Scan
+                    </label>
+                    </th>
+                    <td>
+                      <forms:checkbox name="cxGlobalExecuteDependencyManager" value="${cxGlobalExecuteDependencyManager}"/>
+                    </td>
+                  </tr>
+
+
+
+</tbody>
+
+
+
+
+              <tr class="globalDependencyScanRow">
+                  <th><label for="cxGlobalScaEnabled"> Enable CxSca scan
+                      <td>
+                <input type="radio"
+                       name="cxGlobalDependencyScanType"
+                       value="SCA"
+                       checked="${cxGlobalScaEnabled}"
+                       id="cxGlobalScaEnabled" onclick="updateGlobalDependencyScanSectionVisibility()"/>
                        </td>
                 </tr>
 
-                            <tbody id="SCAThresholdSection" ${hideSCAThresholdSection}>
+                            <tbody id="SCAThresholdSection" >
 
-                            <tr>
+                            <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCAServerUrl">CxSCA server URL<l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAServerUrl" value="${cxGlobalSCAServerUrl}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAServerUrl"></span>
                               </td>
                             </tr>
-                            <tr>
+                            <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCAAccessControlServerURL">Access control server URL<l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAAccessControlServerURL" value="${cxGlobalSCAAccessControlServerURL}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAAccessControlServerURL"></span>
                               </td>
                             </tr>
-                            <tr>
+                            <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCAWebAppURL">CxSCA web app URL<l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAWebAppURL" value="${cxGlobalSCAWebAppURL}" className="longField"/>
@@ -353,29 +399,29 @@
                               </td>
                             </tr>
 
-                             <tr>
+                             <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCAUserName">CxSCA User Name<l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAUserName" value="${cxGlobalSCAUserName}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAUserName"></span>
                               </td>
                             </tr>
-                                <tr>
+                                <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCAPassword">CxSCA Password<l:star/></label></th>
                               <td>
-                                <forms:textField  name="cxGlobalSCAPassword" value="${cxGlobalSCAPassword}" className="longField"/>
+                                <input type="password" id="cxGlobalSCAPassword" name="cxGlobalSCAPassword" value="${cxGlobalSCAPassword}" class="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAPassword"></span>
                               </td>
                             </tr>
 
-                             <tr>
+                             <tr class="globalDependencyScanRow scaInput">
                               <th><label for="cxGlobalSCATenant">Tenant<l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCATenant" value="${cxGlobalSCATenant}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCATenant"></span>
                               </td>
                             </tr>
-                          <tr>
+                          <tr class="globalDependencyScanRow scaInput">
                                     <td>
                                       <form>
                                         <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
@@ -387,7 +433,47 @@
                                   </tr>
                             </tbody>
 
-            </table>
+
+                  <tr class="globalDependencyScanRow">
+                    <th><label for="cxGlobalOsaThresholdEnabled">Enable Dependency Scan Vulnerability Thresholds
+                      <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                        Leave blank for no thresholds."/></label></th>
+                    <td><forms:checkbox name="cxGlobalOsaThresholdEnabled"
+                                        value="${cxGlobalOsaThresholdEnabled}"
+                                        checked="${cxGlobalOsaThresholdEnabled}"
+                                        onclick="$('osaThresholdSection').toggle()"/></td>
+                  </tr>
+
+                  <tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
+                  <tr>
+                    <th><label for="cxGlobalOsaHighThreshold">High</label></th>
+                    <td>
+                      <forms:textField name="cxGlobalOsaHighThreshold" value="${cxGlobalOsaHighThreshold}" className="longField"/>
+                      <span class="error" id="invalid_cxGlobalOsaHighThreshold"></span>
+                    </td>
+
+                  </tr>
+
+                  <tr>
+                    <th><label for="cxGlobalOsaMediumThreshold">Medium</label></th>
+                    <td>
+                      <forms:textField name="cxGlobalOsaMediumThreshold" value="${cxGlobalOsaMediumThreshold}" className="longField"/>
+                      <span class="error" id="invalid_cxGlobalOsaMediumThreshold"></span>
+                    </td>
+
+                  </tr>
+
+                  <tr>
+                    <th><label for="cxGlobalOsaLowThreshold">Low</label></th>
+                    <td>
+                      <forms:textField name="cxGlobalOsaLowThreshold" value="${cxGlobalOsaLowThreshold}" className="longField"/>
+                      <span class="error" id="invalid_cxGlobalOsaLowThreshold"></span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </l:settingsGroup>
+
+
           </td>
         </tr>
       </table>

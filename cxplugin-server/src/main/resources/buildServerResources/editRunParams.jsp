@@ -26,7 +26,7 @@
 </style>
 <script>
     function updateDependencyScanSectionVisibility() {
-        const depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
+        var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
             overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
             osaEnabled = jQuery('#enableOsa').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),

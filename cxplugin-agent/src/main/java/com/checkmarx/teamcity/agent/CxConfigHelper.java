@@ -89,6 +89,8 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
+    // TODO: 2/13/2020  add parameters that is common for two pages
+        String globalExecuteDependencyManager=GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
 
         Map<String,String> parameters = buildParameters;
 
@@ -105,6 +107,7 @@ public class CxConfigHelper {
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
+
             parameters = globalParameters;
         }
 
