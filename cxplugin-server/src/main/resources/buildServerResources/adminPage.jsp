@@ -326,7 +326,7 @@
                     </label>
                     </th>
                     <td>
-                      <forms:checkbox name="CxGlobalDependencyScanFilterPatterns" value="${CxGlobalDependencyScanFilterPatterns}"/>
+                      <forms:checkbox name="CxGlobalDependencyScanFilterPatterns" checked="${CxGlobalDependencyScanFilterPatterns}" value="${CxGlobalDependencyScanFilterPatterns}"/>
                     </td>
                   </tr>
 
@@ -334,11 +334,9 @@
                     <th><label for="cxGlobalOsaEnabled"> Enable CxOsa scan
 
                     <td>
-                      <input type="radio"
-                             name="cxGlobalDependencyScanType"
-                             value="OSA"
-                             checked="${cxGlobalOsaEnabled}"
-                             id="cxGlobalOsaEnabled" onclick="updateGlobalDependencyScanSectionVisibility()"/>
+                          <forms:radioButton id="cxGlobalOsaEnabled" checked="${cxGlobalDependencyScanType == 'OSA'}"
+                                             name="cxGlobalDependencyScanType" value="OSA"
+                                             onclick="updateGlobalDependencyScanSectionVisibility()" />
                     </td>
                   </tr>
                   <tbody id="globalOsaFilterPatterns" >
@@ -353,7 +351,7 @@
                     </label>
                     </th>
                     <td>
-                      <forms:checkbox name="cxGlobalExecuteDependencyManager" value="${cxGlobalExecuteDependencyManager}"/>
+                      <forms:checkbox name="cxGlobalExecuteDependencyManager" checked="${cxGlobalExecuteDependencyManager}" value="${cxGlobalExecuteDependencyManager}"/>
                     </td>
                   </tr>
 
@@ -367,11 +365,9 @@
               <tr class="globalDependencyScanRow">
                   <th><label for="cxGlobalScaEnabled"> Enable CxSca scan
                       <td>
-                <input type="radio"
-                       name="cxGlobalDependencyScanType"
-                       value="SCA"
-                       checked="${cxGlobalScaEnabled}"
-                       id="cxGlobalScaEnabled" onclick="updateGlobalDependencyScanSectionVisibility()"/>
+                          <forms:radioButton id="cxGlobalScaEnabled" checked="${cxGlobalDependencyScanType == 'SCA'}"
+                                             name="cxGlobalDependencyScanType" value="SCA"
+                                             onclick="updateGlobalDependencyScanSectionVisibility()" />
                        </td>
                 </tr>
 
