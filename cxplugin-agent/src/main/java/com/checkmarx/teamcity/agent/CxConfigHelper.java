@@ -82,22 +82,34 @@ public class CxConfigHelper {
             ...
             }
          */
-        String rawScannerType = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
-        if(TRUE.equals(rawScannerType))
+
+//        String rawScannerTypeEditPage = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
+//        String rawScannerTypeAdminPage = globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE);
+        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
         {
-            if(TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)) && StringUtils.isNotEmpty(rawScannerType))
+
+            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
             {
-                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));
+                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
+            } else {
+                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)));
             }
+        }
+        else
+        {
+            ret.setDependencyScannerType(DependencyScannerType.NONE);
         }
 
 
+
+
+        /*String rawScannerType = buildParameters.get(DEPENDENCY_SCANNER_TYPE);
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)) &&
                 StringUtils.isNotEmpty(rawScannerType)) {
             ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, rawScannerType));
         } else {
             ret.setDependencyScannerType(DependencyScannerType.NONE);
-        }
+        }*/
 
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
