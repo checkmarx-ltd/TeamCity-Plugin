@@ -133,7 +133,7 @@
     }
   });
 </script>
-<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection2.js'/>"></script>
+<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
 
 <c:if test="${cxGlobalIsSynchronous != 'true'}">
