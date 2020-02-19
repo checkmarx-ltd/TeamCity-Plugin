@@ -1,4 +1,4 @@
-Checkmarx = {
+window.Checkmarx = {
     extractCredentials: function () {
         return {
             serverUrl: $('cxServerUrl').value,

@@ -37,9 +37,10 @@ public class CxAdminConfig {
         this.properties.put(CxParam.GLOBAL_SERVER_URL, CxConstants.DEFAULT_SERVER_URL);
         this.properties.put(CxParam.GLOBAL_FILTER_PATTERNS, CxConstants.DEFAULT_FILTER_PATTERN);
         this.properties.put(CxParam.GLOBAL_IS_SYNCHRONOUS, CxConstants.TRUE);
+        this.properties.put(CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, CxConstants.DEFAULT_FILTER_PATTERN);
+        this.properties.put(CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS, CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
         configFile.getParentFile().mkdirs();
         PropertiesUtil.storeProperties(this.properties, configFile, "");
-
     }
 
     private void loadConfiguration(@NotNull final File configFile) throws IOException {

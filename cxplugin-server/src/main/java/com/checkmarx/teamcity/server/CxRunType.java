@@ -62,6 +62,8 @@ public class CxRunType extends RunType {
         parameters.put(CxParam.OSA_ARCHIVE_INCLUDE_PATTERNS, CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
         parameters.put(CxParam.IS_SYNCHRONOUS, CxConstants.TRUE);
         parameters.put(CxParam.SAST_ENABLED, CxConstants.TRUE);
+        parameters.put(CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS,CxConstants.DEFAULT_FILTER_PATTERN);
+        parameters.put(CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
         parameters.put(CxParam.SCA_API_URL,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_API_URL));
         parameters.put(CxParam.SCA_USERNAME,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_USERNAME));
         parameters.put(CxParam.SCA_PASSWORD,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_PASSWORD));

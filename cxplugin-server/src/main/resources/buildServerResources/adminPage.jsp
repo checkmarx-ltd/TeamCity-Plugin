@@ -308,14 +308,12 @@
                     </tr>
                   <tr class="globalDependencyScanRow ">
                     <th><label for="CxGlobalDependencyScanFilterPatterns">Include/Exclude Wildcard Patterns
-                      <bs:helpIcon iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/>
+                      <bs:helpIcon iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
                     </label>
                     </th>
-                    <td>
-                      <forms:checkbox name="CxGlobalDependencyScanFilterPatterns" checked="${CxGlobalDependencyScanFilterPatterns}" value="${CxGlobalDependencyScanFilterPatterns}"/>
+                    <td><textarea rows="5" cols="50" name="CxGlobalDependencyScanFilterPatterns" wrap="off">${CxGlobalDependencyScanFilterPatterns}</textarea>
                     </td>
                   </tr>
-
                   <tr class="globalDependencyScanRow">
                     <th><label for="cxGlobalOsaEnabled"> Enable CxOsa scan
 
