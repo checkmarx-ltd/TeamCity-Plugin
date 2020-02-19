@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxParam;
 import com.cx.restclient.CxShragaClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.sca.dto.SCAConfig;
@@ -49,7 +50,7 @@ public class TestScaConnectionController extends BaseController {
 
         CxScanConfig config = new CxScanConfig();
         config.setCxOrigin("TeamCity");
-        //  config.setDisableCertificateValidation(!isEnableCertificateValidation());
+
 
         SCAConfig scaConfig = new SCAConfig();
         scaConfig.setAccessControlUrl(credi.getAccessControlServerUrl());
@@ -68,11 +69,10 @@ public class TestScaConnectionController extends BaseController {
 
         } catch (Exception e) {
             log.error("connection failed", e);
-            res.setMessage(CONNECTION_FAILED_COMPATIBILITY);
+            res.setMessage(CxParam.CONNECTION_FAILED_COMPATIBILITY);
             writeHttpServletResponse(httpServletResponse, res);
             return null;
         }
-        //create client and perform login
     }
 
 

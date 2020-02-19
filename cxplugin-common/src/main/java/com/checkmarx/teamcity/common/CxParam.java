@@ -96,6 +96,8 @@ public abstract class CxParam {
     public static final String CONNECTION_FAILED_COMPATIBILITY = "Connection Failed.\n" +
             "Validate the provided login credentials and server URL are correct.\n" +
             "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.";
+    public static final String SCA_CONNECTION_FAILED_COMPATIBILITY = "Connection Failed.\n" +
+            "Validate the provided login credentials and server URL are correct.";
 
     public static final String[] GLOBAL_CONFIGS = {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,

@@ -316,7 +316,7 @@
                   </tr>
                   <tr class="globalDependencyScanRow">
                     <th><label for="cxGlobalOsaEnabled"> Enable CxOsa scan
-
+                      <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
                     <td>
                           <forms:radioButton id="cxGlobalOsaEnabled" checked="${cxGlobalDependencyScanType == 'OSA'}"
                                              name="cxGlobalDependencyScanType" value="OSA"
@@ -325,7 +325,12 @@
                   </tr>
                   <tbody id="globalOsaFilterPatterns" >
                   <tr class="globalDependencyScanRow osaInput">
-                    <th><label for="cxGlobalOsaArchiveIncludePatterns">Archive extract patterns</label></th>
+                    <th><label for="cxGlobalOsaArchiveIncludePatterns">Archive extract patterns
+                      <bs:helpIcon
+                              iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
+                                        Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
+                                        Leave empty to extract all archives"/>
+                    </label></th>
                     <td>
                       <forms:textField name="cxGlobalOsaArchiveIncludePatterns" value="${cxGlobalOsaArchiveIncludePatterns}" className="longField"/>
                     </td>
@@ -348,6 +353,7 @@
 
               <tr class="globalDependencyScanRow">
                   <th><label for="cxGlobalScaEnabled"> Enable CxSca scan
+                    <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
                       <td>
                           <forms:radioButton id="cxGlobalScaEnabled" checked="${cxGlobalDependencyScanType == 'SCA'}"
                                              name="cxGlobalDependencyScanType" value="SCA"
@@ -358,21 +364,27 @@
                             <tbody id="SCAThresholdSection" >
 
                             <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCAServerUrl">CxSCA server URL<l:star/></label></th>
+                              <th><label for="cxGlobalSCAServerUrl">CxSCA server URL
+                                <bs:helpIcon iconTitle="fill this with the SCA server URL"/>
+                                <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAServerUrl" value="${cxGlobalSCAServerUrl}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAServerUrl"></span>
                               </td>
                             </tr>
                             <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCAAccessControlServerURL">Access control server URL<l:star/></label></th>
+                              <th><label for="cxGlobalSCAAccessControlServerURL">Access control server URL
+                                <bs:helpIcon iconTitle="fill this with the SCA Access Control URL"/>
+                                <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAAccessControlServerURL" value="${cxGlobalSCAAccessControlServerURL}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAAccessControlServerURL"></span>
                               </td>
                             </tr>
                             <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCAWebAppURL">CxSCA web app URL<l:star/></label></th>
+                              <th><label for="cxGlobalSCAWebAppURL">CxSCA web app URL
+                                <bs:helpIcon iconTitle="fill this with the SCA web app URL"/>
+                                <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAWebAppURL" value="${cxGlobalSCAWebAppURL}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAWebAppURL"></span>
@@ -380,14 +392,18 @@
                             </tr>
 
                              <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCAUserName">CxSCA User Name<l:star/></label></th>
+                              <th><label for="cxGlobalSCAUserName">CxSCA User Name
+                                <bs:helpIcon iconTitle="fill this with the SCA username"/>
+                                <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCAUserName" value="${cxGlobalSCAUserName}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAUserName"></span>
                               </td>
                             </tr>
                                 <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCAPassword">CxSCA Password<l:star/></label></th>
+                              <th><label for="cxGlobalSCAPassword">CxSCA Password
+                                <bs:helpIcon iconTitle="fill this with the SCA password"/>
+                                <l:star/></label></th>
                               <td>
                                 <input type="password" id="cxGlobalSCAPassword" name="cxGlobalSCAPassword" value="${cxGlobalSCAPassword}" class="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCAPassword"></span>
@@ -395,7 +411,9 @@
                             </tr>
 
                              <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCATenant">Tenant<l:star/></label></th>
+                              <th><label for="cxGlobalSCATenant">CxSCA Tenant
+                                <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
+                                <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCATenant" value="${cxGlobalSCATenant}" className="longField"/>
                                 <span class="error" id="invalid_cxGlobalSCATenant"></span>
