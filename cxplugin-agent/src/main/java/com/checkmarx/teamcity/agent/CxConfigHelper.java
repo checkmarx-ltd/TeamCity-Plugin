@@ -143,7 +143,8 @@ public class CxConfigHelper {
                 scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
                 scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
                 scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
-                scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
+
+                scaConfig.setPassword(EncryptUtil.unscramble(validateNotEmpty(buildParameters.get(SCA_PASSWORD), SCA_PASSWORD)));
                 scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
                 scaConfig.setTenant(buildParameters.get(SCA_TENANT));
                 ret.setScaConfig(scaConfig);
