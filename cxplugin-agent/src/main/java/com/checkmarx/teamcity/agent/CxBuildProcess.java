@@ -247,14 +247,14 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
         logger.info("Dependency scanner type: " + config.getDependencyScannerType().getDisplayName());
         if (config.getDependencyScannerType() != DependencyScannerType.NONE) {
-            logger.info("CxOSA filter patterns: " + config.getOsaFilterPattern());
-            logger.info("CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
-            logger.info("CxOSA Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
-            logger.info("CxOSA thresholds enabled: " + config.getOsaThresholdsEnabled());
+            logger.info(config.getDependencyScannerType() +" dependency Scan filter patterns: " + config.getOsaFilterPattern());
+            logger.info(config.getDependencyScannerType() +" dependency Scan archive extract patterns: " + config.getOsaArchiveIncludePatterns());
+            logger.info(config.getDependencyScannerType() +" dependency Scan Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
+            logger.info(config.getDependencyScannerType() +" dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
             if (config.getOsaThresholdsEnabled()) {
-                logger.info("CxOSA high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
-                logger.info("CxOSA medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
-                logger.info("CxOSA low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
+                logger.info(config.getDependencyScannerType() +" dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
+                logger.info(config.getDependencyScannerType() +" dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
+                logger.info(config.getDependencyScannerType() +" dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
             }
         }
         logger.info("------------------------------------------------------------------------");

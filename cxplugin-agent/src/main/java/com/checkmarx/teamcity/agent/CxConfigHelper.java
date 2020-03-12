@@ -145,9 +145,7 @@ public class CxConfigHelper {
                 scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
                 scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
                 scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
-                scaConfig.setPassword(decryptPasswordd(buildParameters.get(SCA_PASSWORD),TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS))));
-//                scaConfig.setPassword(EncryptUtil.unscramble(validateNotEmpty(buildParameters.get(SCA_PASSWORD), SCA_PASSWORD)));
-             //   scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
+                scaConfig.setPassword(EncryptUtil.isScrambled(buildParameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(buildParameters.get(SCA_PASSWORD)) : buildParameters.get(SCA_PASSWORD));
                 scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
                 scaConfig.setTenant(buildParameters.get(SCA_TENANT));
                 ret.setScaConfig(scaConfig);
@@ -175,19 +173,6 @@ public class CxConfigHelper {
         return null;
     }
 
-    public static String decryptPasswordd(String password, boolean global) {
-
-        try {
-            if (!global) {
-                password = RSACipher.decryptWebRequestData(password);
-            }
-
-            return EncryptUtil.isScrambled(password) ? EncryptUtil.unscramble(password) : password;
-
-        } catch (Exception e) {
-            return password;
-        }
-    }
     private static String validateNotEmpty(String param, String paramName) throws InvalidParameterException {
         if (param == null || param.length() == 0) {
             throw new InvalidParameterException("Parameter [" + paramName + "] must not be empty");
