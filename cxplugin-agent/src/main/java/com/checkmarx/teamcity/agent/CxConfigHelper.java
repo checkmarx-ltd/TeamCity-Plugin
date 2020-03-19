@@ -93,8 +93,8 @@ public class CxConfigHelper {
 
         String osaThresholdEnabled = OSA_THRESHOLD_ENABLED;
         String osaHighThreshold = OSA_HIGH_THRESHOLD;
-        String osaMediumThreshold = MEDIUM_THRESHOLD;
-        String osaLowThreshold = LOW_THRESHOLD;
+        String osaMediumThreshold = OSA_MEDIUM_THRESHOLD;
+        String osaLowThreshold = OSA_LOW_THRESHOLD;
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
