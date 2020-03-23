@@ -13,7 +13,7 @@
         <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin</sonar.projectKey>
         <sonar.organization>checkmarx-ltd</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.login>65c7f545119b3f89cf6c2637181e886b2f33d178</sonar.login>
+        <sonar.login>8e09b85239cd3fc325216a53a1bd48975b98ed77</sonar.login>
     </properties>
     <repositories>
         <repository>
