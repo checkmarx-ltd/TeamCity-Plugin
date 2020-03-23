@@ -8,6 +8,12 @@
 
     <properties>
         <teamcity-version>2018.2</teamcity-version>
+
+        <!-- properties for scanning this project with SonarCloud-->
+        <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin</sonar.projectKey>
+        <sonar.organization>checkmarx-ltd</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>65c7f545119b3f89cf6c2637181e886b2f33d178</sonar.login>
     </properties>
     <repositories>
         <repository>
