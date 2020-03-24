@@ -11,9 +11,6 @@
 
         <!-- properties for scanning this project with SonarCloud-->
         <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin1</sonar.projectKey>
-        <sonar.moduleKey>
-            ${artifactId}
-        </sonar.moduleKey>
         <sonar.organization>checkmarx-ltd</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>c913f5c96af3571ef1a709ebfa48c492ccff5d8f</sonar.login>
