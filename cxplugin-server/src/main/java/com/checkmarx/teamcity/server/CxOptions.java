@@ -375,17 +375,17 @@ public class CxOptions {
                 '}';
     }
 
-    public static String decryptPassword(String password, boolean global) {
+    public static String decryptPasswordPlainText(String pssd, boolean global) {
 
         try {
             if (!global) {
-                password = RSACipher.decryptWebRequestData(password);
+                pssd = RSACipher.decryptWebRequestData(pssd);
             }
 
-            return EncryptUtil.isScrambled(password) ? EncryptUtil.unscramble(password) : password;
+            return EncryptUtil.isScrambled(pssd) ? EncryptUtil.unscramble(pssd) : pssd;
 
         } catch (Exception e) {
-            return password;
+            return pssd;
         }
     }
 }

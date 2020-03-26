@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
-
 public class TestScaConnectionController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(TestScaConnectionController.class);
@@ -88,7 +86,7 @@ public class TestScaConnectionController extends BaseController {
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setAccessControlServerUrl(StringUtil.trim(ret.getAccessControlServerUrl()));
         ret.setScaUserName(StringUtil.trim(ret.getScaUserName()));
-        ret.setScaPassword(CxOptions.decryptPassword(ret.getScaPassword(), ret.isGlobal()));
+        ret.setScaPassword(CxOptions.decryptPasswordPlainText(ret.getScaPassword(), ret.isGlobal()));
         ret.setScaTenant(StringUtil.trim(ret.getScaTenant()));
         ret.setWebAppURL(StringUtil.trim(ret.getWebAppURL()));
         //

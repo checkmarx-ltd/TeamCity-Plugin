@@ -8,8 +8,6 @@ import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
@@ -114,7 +112,7 @@ class TestConnectionController extends BaseController {
         TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setUsername(StringUtil.trim(ret.getUsername()));
-        ret.setPssd(CxOptions.decryptPassword(ret.getPssd(), ret.isGlobal()));
+        ret.setPssd(CxOptions.decryptPasswordPlainText(ret.getPssd(), ret.isGlobal()));
         return ret;
     }
 
