@@ -3,16 +3,18 @@ package com.checkmarx.teamcity.agent;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.dto.DependencyScanResults;
 import com.cx.restclient.dto.DependencyScannerType;
 import com.cx.restclient.sca.dto.SCAConfig;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Map;
 
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 import static com.checkmarx.teamcity.common.CxParam.*;
+
 
 /**
  * Created by eyala on 6/12/2018.
@@ -64,7 +66,21 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class,buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
+        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
+        {
+
+            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
+            {
+                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
+            } else {
+                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)));
+            }
+        }
+        else
+        {
+            ret.setDependencyScannerType(DependencyScannerType.NONE);
+        }
+
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
         ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
@@ -77,11 +93,13 @@ public class CxConfigHelper {
 
         String osaThresholdEnabled = OSA_THRESHOLD_ENABLED;
         String osaHighThreshold = OSA_HIGH_THRESHOLD;
-        String osaMediumThreshold = MEDIUM_THRESHOLD;
-        String osaLowThreshold = LOW_THRESHOLD;
+        String osaMediumThreshold = OSA_MEDIUM_THRESHOLD;
+        String osaLowThreshold = OSA_LOW_THRESHOLD;
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
+    // TODO: 2/13/2020  add parameters that is common for two pages
+        String globalExecuteDependencyManager=GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
 
         Map<String,String> parameters = buildParameters;
 
@@ -98,42 +116,43 @@ public class CxConfigHelper {
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
+
             parameters = globalParameters;
         }
 
         ret.setSynchronous(TRUE.equals(parameters.get(isSynchronous)));
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
-        if (ret.getSynchronous()) {
 
-            if(ret.getSastEnabled()){
-                ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
-                if (ret.getSastThresholdsEnabled()) {
-                    ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
-                    ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
-                    ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
-                }
+
+        if (ret.getSastEnabled()) {
+            ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
+            if (ret.getSastThresholdsEnabled()) {
+                ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
+                ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
+                ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
             }
-
-
-            if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
-                ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
-                if (ret.getOsaThresholdsEnabled()) {
-                    ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
-                    ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
-                    ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
-                }
-                if(ret.getDependencyScannerType().equals(DependencyScannerType.SCA)){
-                    scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
-                    scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
-                    scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
-                    scaConfig.setPassword(buildParameters.get(SCA_PASSWORD));
-                    scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
-                    scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-                    ret.setScaConfig(scaConfig);
-                }
-            }
-
         }
+
+
+        if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
+            ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
+            if (ret.getOsaThresholdsEnabled()) {
+                ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
+                ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
+                ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
+            }
+            if (ret.getDependencyScannerType().equals(DependencyScannerType.SCA)) {
+                scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
+                scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
+                scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
+                scaConfig.setPassword(EncryptUtil.isScrambled(buildParameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(buildParameters.get(SCA_PASSWORD)) : buildParameters.get(SCA_PASSWORD));
+                scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
+                scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+                ret.setScaConfig(scaConfig);
+            }
+        }
+
+
         return ret;
     }
 

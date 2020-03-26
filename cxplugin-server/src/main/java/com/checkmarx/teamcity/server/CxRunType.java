@@ -17,10 +17,12 @@ import com.checkmarx.teamcity.common.CxConstants;
 public class CxRunType extends RunType {
 
     private final PluginDescriptor pluginDescriptor;
+    private CxAdminConfig adminConfig;
 
 
-    public CxRunType(final RunTypeRegistry runTypeRegistry, final PluginDescriptor pluginDescriptor) {
+    public CxRunType(final RunTypeRegistry runTypeRegistry, final PluginDescriptor pluginDescriptor, CxAdminConfig adminConfig) {
         this.pluginDescriptor = pluginDescriptor;
+        this.adminConfig = adminConfig;
         runTypeRegistry.registerRunType(this);
     }
 
@@ -60,12 +62,14 @@ public class CxRunType extends RunType {
         parameters.put(CxParam.OSA_ARCHIVE_INCLUDE_PATTERNS, CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
         parameters.put(CxParam.IS_SYNCHRONOUS, CxConstants.TRUE);
         parameters.put(CxParam.SAST_ENABLED, CxConstants.TRUE);
-        parameters.put(CxParam.SCA_API_URL,"");
-        parameters.put(CxParam.SCA_USERNAME,"");
-        parameters.put(CxParam.SCA_PASSWORD,"");
-        parameters.put(CxParam.SCA_TENANT,"");
-        parameters.put(CxParam.SCA_WEB_APP_URL,"");
-        parameters.put(CxParam.SCA_ACCESS_CONTROL_URL,"");
+        parameters.put(CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS,adminConfig.getConfiguration(CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS));
+        parameters.put(CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,adminConfig.getConfiguration(CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
+        parameters.put(CxParam.SCA_API_URL,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_API_URL));
+        parameters.put(CxParam.SCA_USERNAME,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_USERNAME));
+        parameters.put(CxParam.SCA_PASSWORD,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_PASSWORD));
+        parameters.put(CxParam.SCA_TENANT,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_TENANT));
+        parameters.put(CxParam.SCA_WEB_APP_URL,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_WEB_APP_URL));
+        parameters.put(CxParam.SCA_ACCESS_CONTROL_URL,adminConfig.getConfiguration(CxParam.GLOBAL_SCA_ACCESS_CONTROL_URL));
 
 
         return parameters;

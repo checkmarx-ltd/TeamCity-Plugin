@@ -114,22 +114,8 @@ class TestConnectionController extends BaseController {
         TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setUsername(StringUtil.trim(ret.getUsername()));
-        ret.setPssd(resolvePasswordPlainText(ret.getPssd(), ret.isGlobal()));
+        ret.setPssd(CxOptions.decryptPassword(ret.getPssd(), ret.isGlobal()));
         return ret;
-    }
-
-    private String resolvePasswordPlainText(String pssd, boolean global) {
-
-        try {
-            if (!global) {
-                pssd = RSACipher.decryptWebRequestData(pssd);
-            }
-
-            return EncryptUtil.isScrambled(pssd) ? EncryptUtil.unscramble(pssd) : pssd;
-
-        } catch (Exception e) {
-            return pssd;
-        }
     }
 
     private boolean loginToServer(URL url, String username, String pssd) {

@@ -23,7 +23,6 @@ public abstract class CxParam {
     public static final String IS_INCREMENTAL = "cxIsIncremental";
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
-    public static final String SCA_ENABLED = "cxScaEnabled";
     public static final String DEPENDENCY_SCANNER_TYPE = "dependencyScannerType";
     public static final String SAST_ENABLED = "cxSastEnabled";
     public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
@@ -59,6 +58,12 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_MEDIUM_THRESHOLD = "cxGlobalOsaMediumThreshold";
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
     public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
+    public static final String GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS = "cxGlobalOsaArchiveIncludePatterns";
+    public static final String GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS="CxGlobalDependencyScanFilterPatterns";
+    public static final String GLOBAL_EXECUTE_DEPENDENCY_MANAGER = "cxGlobalExecuteDependencyManager";
+    public static final String GLOBAL_SCA_ENABLED = "cxGlobalScaEnabled";
+    public static final String GLOBAL_OSA_ENABLED = "cxGlobalOsaEnabled";
+    public static final String GLOBAL_DEPENDENCY_SCANNER_TYPE = "cxGlobalDependencyScanType";
     public static final String GLOBAL_SCA_API_URL = "cxGlobalSCAServerUrl";
     public static final String GLOBAL_SCA_ACCESS_CONTROL_URL = "cxGlobalSCAAccessControlServerURL";
     public static final String GLOBAL_SCA_WEB_APP_URL = "cxGlobalSCAWebAppURL";
@@ -66,7 +71,7 @@ public abstract class CxParam {
     public static final String GLOBAL_SCA_PASSWORD = "cxGlobalSCAPassword";
     public static final String GLOBAL_SCA_TENANT = "cxGlobalSCATenant";
 
-    public static final String GLOBAL_DEPENDENCY_SCAN_ENABLED = "globalDependencyScanEnabled";
+    public static final String GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS = "globalDependencyScanEnabled";
     public static final String GLOBAL_SCA_THRESHOLD_ENABLED = "cxGlobalSCAThresholdEnabled";
 
     //SCA Params
@@ -91,13 +96,17 @@ public abstract class CxParam {
     public static final String CONNECTION_FAILED_COMPATIBILITY = "Connection Failed.\n" +
             "Validate the provided login credentials and server URL are correct.\n" +
             "In addition, make sure the installed plugin version is compatible with the CxSAST version according to CxSAST release notes.";
+    public static final String SCA_CONNECTION_FAILED_COMPATIBILITY = "Connection Failed.\n" +
+            "Validate the provided login credentials and server URL are correct.";
 
     public static final String[] GLOBAL_CONFIGS = {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
             GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_HIGH_THRESHOLD,
             GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED, GLOBAL_OSA_HIGH_THRESHOLD,
-            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_SCA_API_URL,GLOBAL_SCA_ACCESS_CONTROL_URL,
-            GLOBAL_SCA_WEB_APP_URL,GLOBAL_SCA_USERNAME,GLOBAL_SCA_PASSWORD,GLOBAL_SCA_TENANT,GLOBAL_PROJECT_POLICY_VIOLATION
+            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION,
+            GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER,
+            GLOBAL_SCA_ENABLED, GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL,
+            GLOBAL_SCA_WEB_APP_URL, GLOBAL_SCA_USERNAME, GLOBAL_SCA_PASSWORD, GLOBAL_SCA_TENANT,
     };
 
 

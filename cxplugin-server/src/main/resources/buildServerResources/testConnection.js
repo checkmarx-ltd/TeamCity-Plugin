@@ -1,4 +1,4 @@
-Checkmarx = {
+window.Checkmarx = {
     extractCredentials: function () {
         return {
             serverUrl: $('cxServerUrl').value,
@@ -34,7 +34,7 @@ Checkmarx = {
                 scaUserName: $('scaUserName').value,
                 scaPassword: $('scaPass').value,
                 scaTenant: $('scaTenant').value,
-                global: true
+                global: false
             }
         },
     testConnection: function (credentials) {
@@ -178,7 +178,3 @@ validateSCAParameters: function (credentials) {
 
 
 };
-
-
-
-

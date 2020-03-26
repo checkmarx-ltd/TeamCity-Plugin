@@ -4,6 +4,211 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
+
+
+    <script type="text/javascript">
+    window.updateDependencyScanSectionVisibility = function() {
+        var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
+            overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
+            osaEnabled = jQuery('#enableOsa').prop('checked'),
+            scaEnabled = jQuery('#enableSca').prop('checked'),
+            isOverriding = depScanEnabled && overrideChecked;
+
+        jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
+        jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
+
+        jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
+        jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
+    }
+
+    console.log('updateDependencyScanSectionVisibility');
+    jQuery(updateDependencyScanSectionVisibility);
+    window.Checkmarx = {
+    extractCredentials: function () {
+        return {
+            serverUrl: $('cxServerUrl').value,
+            username: $('cxUsername').value,
+            pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
+        };
+    },
+
+    extractGlobalCredentials: function () {
+        return {
+            serverUrl: $('cxGlobalServerUrl').value,
+            username: $('cxGlobalUsername').value,
+            pssd: $('cxGlobalPassword').value,
+            global: true
+        }
+    },
+       extractGlobalSCAparameters: function () {
+        return {
+            serverUrl: $('cxGlobalSCAServerUrl').value,
+            accessControlServerUrl: $('cxGlobalSCAAccessControlServerURL').value,
+            webAppURL: $('cxGlobalSCAWebAppURL').value,
+            scaUserName: $('cxGlobalSCAUserName').value,
+            scaPassword: $('cxGlobalSCAPassword').value,
+            scaTenant: $('cxGlobalSCATenant').value,
+            global: true
+        }
+    },
+    extractSCAparameters: function () {
+            return {
+                serverUrl: $('scaApiUrl').value,
+                accessControlServerUrl: $('scaAccessControlUrl').value,
+                webAppURL: $('scaWebAppUrl').value,
+                scaUserName: $('scaUserName').value,
+                scaPassword: $('scaPass').value,
+                scaTenant: $('scaTenant').value,
+                global: false
+            }
+        },
+    testConnection: function (credentials) {
+        if (Checkmarx.validateCredentials(credentials)) {
+            var messageElm = jQuery('#testConnectionMsg');
+            var buttonElm = jQuery('#testConnection');
+
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
+                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+ testSCAConnection: function (credentials) {
+        if (Checkmarx.validateSCAParameters(credentials)) {
+            var messageElm = jQuery('#testSCAConnectionMsg');
+            var buttonElm = jQuery('#testConnectionSCA');
+
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testSCAConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+//                    if(!credentials.global) {
+//                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+//                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+//                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+
+
+    validateCredentials: function (credentials) {
+        var messageElm = jQuery('#testConnectionMsg');
+        if (!credentials.serverUrl) {
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.username) {
+            messageElm.text('Username must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.pssd) {
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        return true;
+
+    },
+
+validateSCAParameters: function (credentials) {
+        var messageElm = jQuery('#testSCAConnectionMsg');
+        if (!credentials.serverUrl) {
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+        if (!credentials.scaUserName) {
+            messageElm.text('User name must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+        if (!credentials.scaPassword) {
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+        if (!credentials.accessControlServerUrl) {
+            messageElm.text('Access control URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+        if (!credentials.scaTenant) {
+            messageElm.text('tenant must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+        return true;
+
+    },
+
+    populateDropdownList: function(data, selector, key, name) {
+        jQuery(selector).empty();
+        var l = data.length;
+         for (var i = 0; i < l; ++i) {
+            jQuery(selector).append('<option value="' + data[i][key] + '">' + data[i][name] + '</option>');
+        }
+}
+
+
+};
+
+
+    </script>
+
+
+
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
 
@@ -28,8 +233,6 @@
 ${'true'.equals(cxUseDefaultServer) ?
 optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword) :
 optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
-
-
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
@@ -87,28 +290,15 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <c:if test="${propertiesBean.properties[optionsBean.thresholdEnabled] != 'true' }">
     <c:set var="hideThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.osaEnabled] != 'true'}">
-    <c:set var="hideOsaSection" value="${optionsBean.noDisplay}"/>
-</c:if>
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] != 'true'}">
-    <c:set var="hideDependencyScannerTypeSection" value="${optionsBean.noDisplay}"/>
-</c:if>
-<c:if test="${propertiesBean.properties[optionsBean.dependencyScannerType] = 'true'}">
-    <c:set var="hideDependencyScanOptions" value="${optionsBean.noDisplay}"/>
-</c:if>
 
-<c:if test="${propertiesBean.properties[optionsBean.globalFilterPatterns] != 'true'}">
-    <c:set var="hidecxGlobalSCAPassword" value="${optionsBean.noDisplay}"/>
-</c:if>
-
-<script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
 <l:settingsGroup className="cx-title" title="Checkmarx Server">
     <tr>
-        <th><label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
+        <th>
+            <label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
             Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
             Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
         </th>
@@ -297,8 +487,6 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             </table>
         </td>
     </tr>
-
-
 </l:settingsGroup>
 
 <c:if test="${propertiesBean.properties[optionsBean.dependencyScanEnabled] != 'true'}">
@@ -315,30 +503,25 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
-            <c:set var="onclick">
-                jQuery('#editGlobalDependencyScanOption').toggle();
-                if(globalDependencyScanOption.style.display != 'none'){
-                    jQuery('#${optionsBean.overrideGlobalConfigurations}').click();
-                }
-            </c:set>
-            <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="${onclick}"/></td>
-    </tr>
-    <tbody id="editGlobalDependencyScanOption" ${hideEditGlobalDependencyScanSection}>
-    <tr>
-        <th><label for="${optionsBean.overrideGlobalConfigurations}">Override global dependency scan settings
-            <bs:helpIcon
-                    iconTitle="Override the Global Dependency Scan Configurations"/></label>
-        </th>
-        <td>
-            <c:set var="onclick">
-                jQuery('#globalDependencyScanOption').toggle();
-            </c:set>
-            <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="${onclick}"/></td>
+
+
+        <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="updateDependencyScanSectionVisibility()" /></td>
     </tr>
 
-    <tbody id="globalDependencyScanOption" ${hideGlobalDependencyScanSection}>
-    <tr>
-        <th><label for="${optionsBean.osaFilterPatterns}">OSA Include/Exclude Wildcard Patterns
+    <tr id="overrideGlobalDSSettings">
+        <th>
+            <label for="${optionsBean.overrideGlobalConfigurations}">Override global dependency scan settings
+            <bs:helpIcon iconTitle="Override the Global Dependency Scan Configurations"/>
+            </label>
+        </th>
+        <td>
+            <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="updateDependencyScanSectionVisibility()"/>
+        </td>
+    </tr>
+
+    <tr class="dependencyScanRow">
+        <th><label for="${optionsBean.osaFilterPatterns}">Include/Exclude Wildcard Patterns
+
             <bs:helpIcon
                     iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
         </label></th>
@@ -346,14 +529,16 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                                      cols="50" className="longField"/></td>
     </tr>
 
-    <tr>
-        <th><label for="${optionsBean.osaEnabled}">Use CxOSA dependency Scanner
+    <tr class="dependencyScanRow">
+        <th><label for="enableOsa">Use CxOSA dependency Scanner
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="OSA"/></td>
+        <td>
+            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="enableOsa"/>
+        </td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.osaArchiveIncludePatterns}">OSA Archive Extract Wildcard Patterns
+    <tr class="dependencyScanRow osaInput">
+        <th><label for="${optionsBean.osaArchiveIncludePatterns}">Archive Extract Patterns
             <bs:helpIcon
                     iconTitle="Comma separated list of archive wildcard patterns to include their extracted content for the scan. eg. *.zip, *.jar, *.ear.
                                         Supported archive types are: jar, war, ear, sca, gem, whl, egg, tar, tar.gz, tgz, zip, rar
@@ -361,60 +546,66 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </label></th>
         <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command
-            before Scan
+
+      <tr class="dependencyScanRow osaInput">
+        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+
             <bs:helpIcon
                     iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
         </label></th>
         <td><props:checkboxProperty name="${optionsBean.osaInstallBeforeScan}"/></td>
     </tr>
 
-    <tr>
-        <th><label for="${optionsBean.scaEnabled}">Use SCA dependency Scanner
+    <tr class="dependencyScanRow">
+        <th><label for="enableSca">Use CxSCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" disabled="false" value="SCA"/></td>
+
+        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
+                                       onclick="updateDependencyScanSectionVisibility()"/></td>
+
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaApiUrl}">SCA server URL
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaApiUrl}">CxSCA server URL
             <bs:helpIcon iconTitle="fill this with the SCA server URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaApiUrl}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaAccessControlUrl}">Access control server URL
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaAccessControlUrl}">CxSCA Access control server URL
             <bs:helpIcon iconTitle="fill this with the SCA Access Control URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaWebAppUrl}">SCA web app URL
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaWebAppUrl}">CxSCA web app URL
             <bs:helpIcon iconTitle="fill this with the SCA web app URL"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaWebAppUrl}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaUserName}">SCA userName
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaUserName}">CxSCA username
             <bs:helpIcon iconTitle="fill this with the SCA username"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaUserName}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaPass}">SCA password
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaPass}">CxSCA password
             <bs:helpIcon iconTitle="fill this with the SCA password"/>
         </label></th>
         <td><props:passwordProperty name="${optionsBean.scaPass}" className="longField"/></td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.scaTenant}">SCA Tenant
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaTenant}">CxSCA Tenant
             <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-    <tr>
-        <td>
-            <form>
+
+    <tr class="dependencyScanRow scaInput">
+         <td>
+             <form>
+
                 <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
                        onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
                 <span id="testSCAConnectionMsg"></span>
@@ -439,7 +630,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             <props:checkboxProperty name="${optionsBean.useDefaultScanControl}" onclick="${onclick}"/>
         </td>
     </tr>
-<%--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////--%>
+
     <tbody id="specificScanControlSection" ${hideSpecificScanControlSection}>
 
     <tr>
@@ -481,7 +672,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                         <props:checkboxProperty name="${optionsBean.thresholdEnabled}" onclick="${onclick}"/>
                     </td>
                 </tr>
-<%--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////--%>
+
                 <tbody id="thresholdSection" ${hideThresholdSection}>
                 <tr>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
@@ -506,10 +697,10 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     </td>
                 </tr>
                 </tbody>
-<%--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////--%>
-                <tbody id="osaThresholdSection" ${hideOsaSection}>
+
+                <tbody id="osaThresholdSection">
                 <tr>
-                    <th><label for="${optionsBean.osaThresholdEnabled}">Enable CxOSA Vulnerability Thresholds
+                    <th><label for="${optionsBean.osaThresholdEnabled}">Enable Dependency Scan Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
                         Leave blank for no thresholds."/></label>
                     </th>
@@ -550,7 +741,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 
     </tbody>
-<%--/////////////////////////////////////////////////////////////////////////////////////////////////////////////////--%>
+
     <tbody id="defaultScanControlSection" ${hideDefaultScanControlSection}>
 
     <tr>
@@ -605,9 +796,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 </tr>
                 </tbody>
 
-                <tbody id="globalOsaThresholdSection" ${hideOsaSection}>
+                <tbody id="globalOsaThresholdSection">
                 <tr>
-                    <th>Enable CxOSA Vulnerability Thresholds
+                    <th>Enable Dependency Scan Vulnerability Thresholds
                         <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
                         Leave blank for no thresholds."/></th>
                     <td>

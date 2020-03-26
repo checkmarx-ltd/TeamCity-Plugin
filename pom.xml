@@ -3,13 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.checkmarx.teamcity</groupId>
     <artifactId>cxplugin</artifactId>
-    <version>2019.4.1</version>
+    <version>2020.1.20</version>
     <packaging>pom</packaging>
 
     <properties>
         <teamcity-version>2018.2</teamcity-version>
 
-        <!-- properties for scanning this project with SonarCloud-->
+           <!-- properties for scanning this project with SonarCloud-->
+
         <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin1</sonar.projectKey>
         <sonar.moduleKey>
             ${artifactId}

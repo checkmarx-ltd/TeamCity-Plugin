@@ -8,6 +8,7 @@ import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,13 +115,9 @@ public class CxOptions {
     }
 
     @NotNull
-    public String getOsaEnabled() {
-        return OSA_ENABLED;
-    }
-
-    @NotNull
     public String getDependencyScannerType() {
-        return ("OSA".equals(DEPENDENCY_SCANNER_TYPE) || "SCA".equals(DEPENDENCY_SCANNER_TYPE))?DEPENDENCY_SCANNER_TYPE:"None" ;}
+        return DEPENDENCY_SCANNER_TYPE;
+    }
 
     @NotNull
     public String getSastEnabled() {
@@ -268,8 +265,6 @@ public class CxOptions {
     }
 
     @NotNull
-    public String getScaEnabled() { return SCA_ENABLED; }
-    @NotNull
     public String getScaApiUrl() { return SCA_API_URL; }
     @NotNull
     public String getScaAccessControlUrl() { return SCA_ACCESS_CONTROL_URL; }
@@ -311,9 +306,32 @@ public class CxOptions {
     public String getScaLocationPath() { return  SCA_LOCATION_PATH; }
 
     @NotNull
-    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEPENDENCY_SCAN_ENABLED; }
+    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS; }
 
-
+    @NotNull
+    public static String getGlobalOsaArchiveIncludePatterns() {
+        return GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS;
+    }
+    @NotNull
+    public static String getGlobalDependencyScanFilterPatterns() {
+        return GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS;
+    }
+    @NotNull
+    public static String getGlobalExecuteDependencyManager() {
+        return GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
+    }
+    @NotNull
+    public static String getGlobalScaEnabled() {
+        return GLOBAL_SCA_ENABLED;
+    }
+    @NotNull
+    public static String getGlobalOsaEnabled() {
+        return GLOBAL_OSA_ENABLED;
+    }
+    @NotNull
+    public static String getGlobaldependencyScannerType() {
+        return GLOBAL_DEPENDENCY_SCANNER_TYPE;
+    }
 
     public void testConnection(String serverUrl, String username, String pssd) {
 
@@ -355,5 +373,19 @@ public class CxOptions {
                 "teamList=" + teamList +
                 ", presetList=" + presetList +
                 '}';
+    }
+
+    public static String decryptPassword(String password, boolean global) {
+
+        try {
+            if (!global) {
+                password = RSACipher.decryptWebRequestData(password);
+            }
+
+            return EncryptUtil.isScrambled(password) ? EncryptUtil.unscramble(password) : password;
+
+        } catch (Exception e) {
+            return password;
+        }
     }
 }
