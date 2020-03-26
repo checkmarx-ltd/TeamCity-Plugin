@@ -377,7 +377,6 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 </l:settingsGroup>
 
-
 <l:settingsGroup className="cx-title" title="Checkmarx Scan CxSAST">
     <tr>
         <th><label for="${optionsBean.sastEnabled}">Enable CxSAST Scan</label>
@@ -490,6 +489,13 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 </l:settingsGroup>
 
+<c:if test="${propertiesBean.properties[optionsBean.dependencyScanEnabled] != 'true'}">
+    <c:set var="hideEditGlobalDependencyScanSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.overrideGlobalConfigurations] != 'true'}">
+    <c:set var="hideGlobalDependencyScanSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+
 <l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
     <tr>
         <th><label for="${optionsBean.dependencyScanEnabled}">Enable Dependency Scan
@@ -497,6 +503,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
+
 
         <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="updateDependencyScanSectionVisibility()" /></td>
     </tr>
@@ -514,6 +521,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
     <tr class="dependencyScanRow">
         <th><label for="${optionsBean.osaFilterPatterns}">Include/Exclude Wildcard Patterns
+
             <bs:helpIcon
                     iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
         </label></th>
@@ -538,8 +546,10 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </label></th>
         <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
     </tr>
+
       <tr class="dependencyScanRow osaInput">
         <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+
             <bs:helpIcon
                     iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
         </label></th>
@@ -550,8 +560,10 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <th><label for="enableSca">Use CxSCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
+
         <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
                                        onclick="updateDependencyScanSectionVisibility()"/></td>
+
     </tr>
     <tr class="dependencyScanRow scaInput">
         <th><label for="${optionsBean.scaApiUrl}">CxSCA server URL
@@ -589,16 +601,19 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
+
     <tr class="dependencyScanRow scaInput">
          <td>
              <form>
+
                 <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
-                onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
+                       onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
                 <span id="testSCAConnectionMsg"></span>
-               </form>
-          </td>
+            </form>
+        </td>
     </tr>
-</tbody>
+    </tbody>
+    </tbody>
 
 </l:settingsGroup>
 

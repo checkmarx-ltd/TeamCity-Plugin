@@ -294,7 +294,9 @@
               </tr>
               </tbody>
 
+
             </table>
+
 
                 <l:settingsGroup className="cx-title" title="Checkmarx Dependency Scan">
                     <tr>
