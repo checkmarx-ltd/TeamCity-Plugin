@@ -17,7 +17,7 @@ import static com.checkmarx.teamcity.common.CxParam.*;
 public class CxConfigHelper {
 
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
-             File reportDirectory) throws InvalidParameterException {
+                                                     File reportDirectory) throws InvalidParameterException {
 
         CxScanConfig ret = new CxScanConfig();
 
@@ -26,8 +26,6 @@ public class CxConfigHelper {
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
-
-
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
@@ -39,12 +37,11 @@ public class CxConfigHelper {
             ret.setPassword(EncryptUtil.unscramble(validateNotEmpty(buildParameters.get(PASSWORD), PASSWORD)));
         }
 
-
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
-        if(ret.getSastEnabled()){
+        if (ret.getSastEnabled()) {
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
                 ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
@@ -66,7 +63,6 @@ public class CxConfigHelper {
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
         ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
 
-
         String thresholdEnabled = THRESHOLD_ENABLED;
         String highThreshold = HIGH_THRESHOLD;
         String mediumThreshold = MEDIUM_THRESHOLD;
@@ -80,18 +76,18 @@ public class CxConfigHelper {
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
 
-        Map<String,String> parameters = buildParameters;
+        Map<String, String> parameters = buildParameters;
 
-        if(TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))){
-             thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
-             highThreshold = GLOBAL_HIGH_THRESHOLD;
-             mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
-             lowThreshold = GLOBAL_LOW_THRESHOLD;
+        if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
+            thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
+            highThreshold = GLOBAL_HIGH_THRESHOLD;
+            mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
+            lowThreshold = GLOBAL_LOW_THRESHOLD;
 
-             osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
-             osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
-             osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
-             osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
+            osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
+            osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
+            osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
+            osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
@@ -102,7 +98,7 @@ public class CxConfigHelper {
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
         if (ret.getSynchronous()) {
 
-            if(ret.getSastEnabled()){
+            if (ret.getSastEnabled()) {
                 ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
                 if (ret.getSastThresholdsEnabled()) {
                     ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
@@ -110,7 +106,6 @@ public class CxConfigHelper {
                     ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
                 }
             }
-
 
             if (ret.getOsaEnabled()) {
                 ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
@@ -122,6 +117,7 @@ public class CxConfigHelper {
             }
 
         }
+
         return ret;
     }
 
@@ -139,6 +135,7 @@ public class CxConfigHelper {
                 throw new InvalidParameterException("Parameter [" + paramName + "] must be positive integer. Actual value: " + param);
             }
         }
+
         return null;
     }
 
@@ -146,6 +143,8 @@ public class CxConfigHelper {
         if (param == null || param.length() == 0) {
             throw new InvalidParameterException("Parameter [" + paramName + "] must not be empty");
         }
+
         return param;
     }
+
 }
