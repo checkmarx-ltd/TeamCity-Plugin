@@ -13,5 +13,6 @@
       <logo>https://www.checkmarx.com/wp-content/themes/checkmarx/images/assets/cx-logo-alpha.svg</logo>
     </vendor>
   </info>
+  <requirements max-build="72059" />
   <deployment use-separate-classloader="true" />
 </teamcity-plugin>
