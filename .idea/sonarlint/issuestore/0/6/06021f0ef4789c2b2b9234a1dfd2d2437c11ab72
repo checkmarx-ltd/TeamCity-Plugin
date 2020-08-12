@@ -1,0 +1,14 @@
+
+Hsquid:S54114"*Use the primitive boolean expression here.(ƒ±§…8¶ Ÿ–.
+Usquid:S1135e"2Complete the task associated to this TODO comment.(Ê±ˆ«ÿÿÿÿÿ8· Ÿ–.
+Nsquid:S5411‹"*Use the primitive boolean expression here.(×‹í½úÿÿÿÿ8¶ Ÿ–.
+ksquid:S1192¥"LDefine a constant instead of duplicating this literal "Parameter [" 3 times.(ıÔû×8¶ Ÿ–.
+usquid:S1854f"RRemove this useless assignment to local variable "globalExecuteDependencyManager".(âñ™˜ûÿÿÿÿ8· Ÿ–.
+qsquid:UselessImportCheck
+"ARemove this unused import 'org.apache.commons.lang3.StringUtils'.(Øœ¼ºúÿÿÿÿ8· Ÿ–.
+usquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(Ûªúñşÿÿÿÿ8· Ÿ–.
+fsquid:S1481f"CRemove this unused "globalExecuteDependencyManager" local variable.(âñ™˜ûÿÿÿÿ8· Ÿ–.
+Isquid:S5411"*Use the primitive boolean expression here.(ÜŸ§›8¶ Ÿ–.
+]squid:S1118":Add a private constructor to hide the implicit public one.(îÏ¼ªüÿÿÿÿ8· Ÿ–.
+xsquid:UselessImportCheck	"MRemove this unused import 'jetbrains.buildServer.serverSide.crypt.RSACipher'.(ˆîÂœ8¶ Ÿ–.
+Hsquid:S5411"*Use the primitive boolean expression here.(ƒ±§…8¶ Ÿ–.

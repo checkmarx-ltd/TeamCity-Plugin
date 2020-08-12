@@ -1,0 +1,35 @@
+
+~squid:S14502"`Remove the "checkoutDirectory" field and declare it as a local variable in the relevant methods.(İ×Î8ç±Ÿ–.
+Xsquid:S1141p"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+Ysquid:S1141£"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+}squid:S1450."ZRemove the "sastPDFLink" field and declare it as a local variable in the relevant methods.(¨¶ıÿÿÿÿ8ç±Ÿ–.
+msquid:S1192ò"ODefine a constant instead of duplicating this literal "[No Threshold]" 6 times.(¼û–/8ç±Ÿ–.
+Isquid:S1075O"&Remove this hard-coded path-delimiter.(öÍùùùÿÿÿÿ8ç±Ÿ–.
+Isquid:S5411è"*Use the primitive boolean expression here.(¡¡½ 8ç±Ÿ–.
+Ysquid:S1141“"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+Isquid:S5411—"*Use the primitive boolean expression here.(Áœ›Œ8ç±Ÿ–.
+Hsquid:S5411T"*Use the primitive boolean expression here.(‘Ò·à8ç±Ÿ–.
+Isquid:S5411ş"*Use the primitive boolean expression here.(§Ï‹‡8ç±Ÿ–.
+qsquid:UselessImportCheck"ARemove this unused import 'org.apache.commons.lang3.StringUtils'.(Øœ¼ºúÿÿÿÿ8ç±Ÿ–.
+Tsquid:S10686"1Remove this unused "sastException" private field.(¿ÿıäúÿÿÿÿ8ç±Ÿ–.
+Isquid:S5411‡"*Use the primitive boolean expression here.(¨ø«Ò8ç±Ÿ–.
+nsquid:CommentedOutCodeLine&"<This block of commented-out lines of code should be removed.(òÊôÊşÿÿÿÿ8ç±Ÿ–.
+isquid:CommentedOutCodeLineW"<This block of commented-out lines of code should be removed.(ÓÒ—ù8ç±Ÿ–.
+Isquid:S5411ñ"*Use the primitive boolean expression here.(‹òÑÖ8ç±Ÿ–.
+Psquid:S1135W"2Complete the task associated to this TODO comment.(ÓÒ—ù8ç±Ÿ–.
+jsquid:CommentedOutCodeLineº"<This block of commented-out lines of code should be removed.(›èå‡8ç±Ÿ–.
+Vsquid:S2629á"7Use the built-in formatting to construct this argument.(ºĞ–µ8ç±Ÿ–.
+Xsquid:S1141^"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+Xsquid:S1141}"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+Xsquid:S1141Y"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+Nsquid:S00108Ú")Either remove or fill this block of code.(Æ¸Û‚øÿÿÿÿ8ç±Ÿ–.
+Ysquid:S1141²"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ç±Ÿ–.
+qsquid:S3776ß"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(“—Ñà8ç±Ÿ–.
+Hsquid:S5411|"*Use the primitive boolean expression here.(¡¡½ 8ç±Ÿ–.
+lsquid:UselessImportCheck"ARemove this unused import 'com.cx.restclient.osa.dto.OSAResults'.(­®É…8ç±Ÿ–.
+Isquid:S1075O"&Remove this hard-coded path-delimiter.(öÍùùùÿÿÿÿ8ç±Ÿ–.
+usquid:S3776B"RRefactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.(°¦ª™ùÿÿÿÿ8ç±Ÿ–.
+Nsquid:S10687"0Remove this unused "osaException" private field.(·°á•8ç±Ÿ–.
+ª%squid:RedundantThrowsDeclarationCheckˆ"lRemove the declaration of thrown exception 'java.io.IOException', as it cannot be thrown from method's body.(±Á´şûÿÿÿÿ8ç±Ÿ–.
+Isquid:S1075O"&Remove this hard-coded path-delimiter.(öÍùùùÿÿÿÿ8ç±Ÿ–.
+esquid:S2142Ä"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€8ç±Ÿ–.

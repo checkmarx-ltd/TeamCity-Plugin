@@ -1,0 +1,10 @@
+
+lsquid:S4144U"UUpdate this method so that its implementation is not identical to "debug" on line 55.(üæ‹Š
+˜squid:S1186"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(áïä
+˜squid:S1186'"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ÔÖ”Ê
+Isquid:S1948"-Make "buildLogger" transient or serializable.(˜‹Ğ–úÿÿÿÿ
+lsquid:S4144P"UUpdate this method so that its implementation is not identical to "debug" on line 50.(§‹†»
+˜squid:S1186!"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ÀŒöö
+˜squid:S1186"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ìö³”
+squid:S1186$"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(§ëİûÿÿÿÿ
+ksquid:S4144Z"UUpdate this method so that its implementation is not identical to "debug" on line 60.(Ûº¸

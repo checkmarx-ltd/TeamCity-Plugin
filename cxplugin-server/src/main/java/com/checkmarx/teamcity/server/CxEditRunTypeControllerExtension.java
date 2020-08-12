@@ -3,7 +3,9 @@ package com.checkmarx.teamcity.server;
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
 import jetbrains.buildServer.controllers.ActionErrors;
+import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.controllers.StatefulObject;
+import jetbrains.buildServer.controllers.admin.projects.BuildRunnerBean;
 import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
@@ -14,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
@@ -32,8 +36,19 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public void fillModel(@NotNull final HttpServletRequest request,
                           @NotNull final BuildTypeForm form,
                           @NotNull final Map model) {
-
-        final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
+        Map<String, String> properties = null;
+        final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
+        try {
+            Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
+            BasePropertiesBean basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
+            properties = basePropertiesBean.getProperties();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
 
         PluginDataMigration migration = new PluginDataMigration();
         migration.migrate(properties);
@@ -76,7 +91,19 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
     @NotNull
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
-        final Map<String, String> properties = form.getBuildRunnerBean().getPropertiesBean().getProperties();
+        Map<String, String> properties = null;
+        final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
+        try {
+            Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
+            BasePropertiesBean basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
+            properties = basePropertiesBean.getProperties();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
         String cxPass = properties.get(CxParam.PASSWORD);
 
         try {
