@@ -20,16 +20,17 @@
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.4.1" level="project" />
-    <orderEntry type="library" name="Maven: com.checkmarx:cx-client-common:9.20.SCA-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.28" level="project" />
+    <orderEntry type="library" name="Maven: com.checkmarx:cx-client-common:2020.2.25" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-log4j12:1.7.21" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.23" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient-win:4.5.10" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.5.2" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna-platform:4.5.2" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.10.1" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.10" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.10" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.10.2" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.2" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.64" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-utils:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-archiver:4.1.0" level="project" />
@@ -44,11 +45,18 @@
     <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.17" level="project" />
-    <orderEntry type="library" name="Maven: com.checkmarx:cx-ws-fs-agent:20.0.0" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-web:4.0.0-milestone2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-web-common:4.0.0-milestone2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:4.0.0-milestone2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-bridge-common:4.0.0-milestone2" level="project" />
+    <orderEntry type="library" name="Maven: com.checkmarx:cx-ws-fs-agent:20.0.5" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.46.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-web:3.8.5" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-web-common:3.8.5" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:3.8.5" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-bridge-common:3.8.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.6.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-interpolation:1.25" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
@@ -92,18 +100,20 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-vfs2:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.redline-rpm:redline:1.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20170516" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.2" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.18" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.26" level="project" />
     <orderEntry type="library" name="Maven: commons-validator:commons-validator:1.6" level="project" />
-    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
     <orderEntry type="library" name="Maven: commons-digester:commons-digester:1.8.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.4" level="project" />
     <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.11.3" level="project" />
     <orderEntry type="library" name="Maven: org.restlet.lib:org.simpleframework.simple-xml:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-container-default:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-classworlds:2.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xbean:xbean-reflect:3.7" level="project" />
     <orderEntry type="library" name="Maven: com.google.collections:google-collections:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.1.9.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.2.4.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.awaitility:awaitility:4.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest:2.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:1.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jaxb:jaxb-runtime:2.3.2" level="project" />
@@ -122,14 +132,12 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity.idea:obsolete-openapi:2018.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: jaxen:jaxen:1.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: jdom:jdom:1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: log4j:log4j:1.2.12" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.sf.trove4j:trove4j:3.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity.idea:trove4j:95.677" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: joda-time:joda-time:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.9" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity.xstream:xstream:1.4.10" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-log4j12:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: org.tukaani:xz:1.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: xerces:xercesImpl:2.9.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: xpp3:xpp3:1.1.4c" level="project" />

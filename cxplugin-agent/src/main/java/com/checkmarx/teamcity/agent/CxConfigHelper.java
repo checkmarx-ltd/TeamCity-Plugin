@@ -2,16 +2,12 @@ package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.InvalidParameterException;
+import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.dto.DependencyScannerType;
-import com.cx.restclient.sca.dto.SCAConfig;
+import com.cx.restclient.dto.ScannerType;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import jetbrains.buildServer.serverSide.crypt.RSACipher;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 import java.util.Map;
-
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 import static com.checkmarx.teamcity.common.CxParam.*;
 
@@ -25,7 +21,7 @@ public class CxConfigHelper {
              File reportDirectory) throws InvalidParameterException {
 
         CxScanConfig ret = new CxScanConfig();
-        SCAConfig scaConfig= new SCAConfig();
+        AstScaConfig scaConfig = new AstScaConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
         ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
@@ -49,7 +45,7 @@ public class CxConfigHelper {
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
-        if(ret.getSastEnabled()){
+        if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
                 ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
@@ -68,18 +64,18 @@ public class CxConfigHelper {
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
         {
-
+            ScannerType scannerType;
             if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
             {
-                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, buildParameters.get(DEPENDENCY_SCANNER_TYPE)));
+                scannerType = "SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE)) ?
+                        ScannerType.AST_SCA:ScannerType.OSA;
             } else {
-                ret.setDependencyScannerType(Enum.valueOf(DependencyScannerType.class, globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)));
+                scannerType = "SCA".equalsIgnoreCase(buildParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ?
+                        ScannerType.AST_SCA:ScannerType.OSA;
             }
+            ret.addScannerType(scannerType);
         }
-        else
-        {
-            ret.setDependencyScannerType(DependencyScannerType.NONE);
-        }
+
 
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
         ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
@@ -124,7 +120,7 @@ public class CxConfigHelper {
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
 
 
-        if (ret.getSastEnabled()) {
+        if (ret.isSastEnabled()) {
             ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
             if (ret.getSastThresholdsEnabled()) {
                 ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
@@ -134,21 +130,21 @@ public class CxConfigHelper {
         }
 
 
-        if (ret.getDependencyScannerType() != DependencyScannerType.NONE) {
+        if (ret.isAstScaEnabled() || ret.isOsaEnabled()) {
             ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
             if (ret.getOsaThresholdsEnabled()) {
                 ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
                 ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
                 ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
             }
-            if (ret.getDependencyScannerType().equals(DependencyScannerType.SCA)) {
+            if (ret.isAstScaEnabled()) {
                 scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
                 scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
                 scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
                 scaConfig.setPassword(EncryptUtil.isScrambled(buildParameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(buildParameters.get(SCA_PASSWORD)) : buildParameters.get(SCA_PASSWORD));
                 scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
                 scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-                ret.setScaConfig(scaConfig);
+                ret.setAstScaConfig(scaConfig);
             }
         }
 

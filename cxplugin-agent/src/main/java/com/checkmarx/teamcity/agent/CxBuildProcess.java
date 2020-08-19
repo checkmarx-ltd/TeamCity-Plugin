@@ -1,16 +1,13 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.common.CxPARAM;
-import com.cx.restclient.common.ShragaUtils;
 import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.dto.DependencyScanResults;
-import com.cx.restclient.dto.DependencyScannerType;
 import com.cx.restclient.dto.ScanResults;
+import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.scansummary.ScanSummary;
 import com.cx.restclient.exception.CxClientException;
-import com.cx.restclient.osa.dto.OSAResults;
 import com.cx.restclient.sast.dto.SASTResults;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
@@ -18,7 +15,6 @@ import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -49,7 +45,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     private File checkoutDirectory;
     private File buildDirectory;
-    CxShragaClient shraga = null;
+    private CxClientDelegator clientDelegator;
 
     private Exception sastException;
     private Exception osaException;
@@ -64,13 +60,12 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     @Override
     public BuildFinishedStatus call() throws Exception {
-
+        String appenderName = "cxAppender_" + agentRunningBuild.getBuildId();
         boolean sastCreated = false;
         boolean osaCreated = false;
 
         ScanResults ret = new ScanResults();
-        ret.setSastResults(new SASTResults());
-        ret.setDependencyScanResults(new DependencyScanResults());
+
         try {
 
             Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
@@ -81,18 +76,18 @@ public class CxBuildProcess extends CallableBuildProcess {
             pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
 
             printConfiguration();
-            if (!config.getSastEnabled() && config.getDependencyScannerType()== DependencyScannerType.NONE) {
+            if (!config.isSastEnabled() && !(config.isOsaEnabled() || config.isAstScaEnabled())) {
                 logger.error("Both SAST and OSA are disabled. exiting");
                 return null;
                 //TODO run.setResult(Result.FAILURE);
             }
             try {
-                shraga = new CxShragaClient(config, logger);
-                shraga.init();
+                clientDelegator = new CxClientDelegator(config, logger);
+                clientDelegator.init();
             } catch (Exception ex) {
-                if (ex.getMessage().contains("Server is unavailable")) {
+                if (ex.getMessage().contains("Server is unavailable") && config.isSastEnabled()) {
                     try {
-                        shraga.login();
+                        clientDelegator.getSastClient().login();
                     } catch (CxClientException e) {
                         throw new IOException(e);
                     }
@@ -101,35 +96,15 @@ public class CxBuildProcess extends CallableBuildProcess {
 
                 throw new RunBuildException("Failed to init CxClient: " + ex.getMessage(), ex);
             }
-
-            //Create OSA scan
-            if (config.getDependencyScannerType() != DependencyScannerType.NONE) {
-                //---------------------------
-                //we do this in order to redirect the logs from the filesystem agent component to the build console
-                String appenderName = "cxAppender_" + agentRunningBuild.getBuildId();
+            if(config.isOsaEnabled() || config.isAstScaEnabled()){
                 Logger.getRootLogger().addAppender(new CxAppender(agentRunningBuild.getBuildLogger(), appenderName));
-                //---------------------------
-                try {
-                    shraga.createDependencyScan();
-                    osaCreated = true;
-                } catch (CxClientException e) {
-                    ret.setOsaCreateException(e);
-                    logger.error(e.getMessage());
-                } finally {
-                    Logger.getRootLogger().removeAppender(appenderName);
-                }
-            }
+                ret = clientDelegator.initiateScan();
+                Logger.getRootLogger().removeAppender(appenderName);
 
-            //Create SAST scan
-            if (config.getSastEnabled()) {
-                try {
-                    shraga.createSASTScan();
-                    sastCreated = true;
-                } catch (IOException | CxClientException e) {
-                    ret.setSastCreateException(e);
-                    logger.error(e.getMessage());
-                }
             }
+            else
+                ret = clientDelegator.initiateScan();
+
 
             //Asynchronous MODE
             if (!config.getSynchronous()) {
@@ -142,38 +117,19 @@ public class CxBuildProcess extends CallableBuildProcess {
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             }
 
-            //Get SAST results
-            if (sastCreated) {
-                try {
-                    SASTResults sastResults = shraga.waitForSASTResults();
-                    ret.setSastResults(sastResults);
-                    publishXMLReport(sastResults);
-                    if (config.getGeneratePDFReport()) {
-                        publishPDFReport(sastResults);
-                    }
+            ret = clientDelegator.waitForScanResults();
 
-                } catch (CxClientException | IOException e) {
-                    ret.setSastWaitException(e);
-                    logger.error(e.getMessage());
-                }
+            if (config.getGeneratePDFReport()) {
+                publishPDFReport(ret.getSastResults());
             }
 
-            //Get OSA results
-            if (osaCreated) {
-                try {
-                    DependencyScanResults dependencyScanResults = shraga.waitForDependencyScanResults();
-                    ret.setDependencyScanResults(dependencyScanResults);
-                } catch (CxClientException e) {
-                    ret.setOsaWaitException(e);
-                    logger.error(e.getMessage());
-                }
-            }
+
 
             if (config.getEnablePolicyViolations()) {
-                shraga.printIsProjectViolated();
+                clientDelegator.printIsProjectViolated(ret);
             }
 
-            String summaryStr = shraga.generateHTMLSummary();
+            String summaryStr = clientDelegator.generateHTMLSummary(ret);
             File htmlFile = new File(buildDirectory, REPORT_HTML_NAME);
             try {
                 FileUtils.writeStringToFile(htmlFile, summaryStr);
@@ -184,7 +140,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
             //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
             //String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
-            ScanSummary scanSummary = new ScanSummary(config,ret);
+            ScanSummary scanSummary = new ScanSummary(config,ret.getSastResults(),ret.getOsaResults(),ret.getScaResults());
 
 
             if (scanSummary.hasErrors() || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
@@ -196,28 +152,29 @@ public class CxBuildProcess extends CallableBuildProcess {
         } catch (InterruptedException e) {
             logger.error("Interrupted exception: " + e.getMessage());
 
-            if (shraga != null && sastCreated) {
+            //TODO CHECK HOW TO CANCLE SCAN IN NEW COMMON
+           /* if (clientDelegator != null && sastCreated) {
                 logger.error("Canceling scan on the Checkmarx server...");
-                cancelScan(shraga);
-            }
+                cancelScan(clientDelegator);
+            }*/
             throw new RunBuildException(e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected exception: " + e.getMessage(), e);
             throw new RunBuildException(e);
         } finally {
-            if (shraga != null) {
-                shraga.close();
+            if (clientDelegator != null) {
+                clientDelegator.close();
             }
         }
 
     }
 
-    private void cancelScan(CxShragaClient shraga) {
+/*    private void cancelScan(CxShragaClient shraga) {
         try {
             shraga.cancelSASTScan();
         } catch (Exception ignored) {
         }
-    }
+    }*/
 
 
     private void printConfiguration() {
@@ -228,8 +185,8 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Project name: " + config.getProjectName());
         logger.info("Team ID: " + config.getTeamId());
         logger.info("Is synchronous scan: " + config.getSynchronous());
-        logger.info("CxSAST enabled: " + config.getSastEnabled());
-        if (config.getSastEnabled()) {
+        logger.info("CxSAST enabled: " + config.isSastEnabled());
+        if (config.isSastEnabled()) {
             logger.info("Preset ID: " + config.getPresetId());
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
@@ -245,16 +202,17 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
-        logger.info("Dependency scanner type: " + config.getDependencyScannerType().getDisplayName());
-        if (config.getDependencyScannerType() != DependencyScannerType.NONE) {
-            logger.info(config.getDependencyScannerType() +" dependency Scan filter patterns: " + config.getOsaFilterPattern());
-            logger.info(config.getDependencyScannerType() +" dependency Scan archive extract patterns: " + config.getOsaArchiveIncludePatterns());
-            logger.info(config.getDependencyScannerType() +" dependency Scan Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
-            logger.info(config.getDependencyScannerType() +" dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
+        if (config.isOsaEnabled() || config.isAstScaEnabled()) {
+            String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();
+            logger.info("Dependency scanner type: " + scannerType);
+            logger.info(scannerType+" dependency Scan filter patterns: " + config.getOsaFilterPattern());
+            logger.info(scannerType +" dependency Scan archive extract patterns: " + config.getOsaArchiveIncludePatterns());
+            logger.info(scannerType +" dependency Scan Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
+            logger.info(scannerType +" dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
             if (config.getOsaThresholdsEnabled()) {
-                logger.info(config.getDependencyScannerType() +" dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
-                logger.info(config.getDependencyScannerType() +" dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
-                logger.info(config.getDependencyScannerType() +" dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
+                logger.info(scannerType +" dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
+                logger.info(scannerType+" dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
+                logger.info(scannerType +" dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
             }
         }
         logger.info("------------------------------------------------------------------------");

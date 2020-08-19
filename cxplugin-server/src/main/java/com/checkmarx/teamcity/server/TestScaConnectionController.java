@@ -2,9 +2,9 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
-import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.ast.AstScaClient;
+import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.sca.dto.SCAConfig;
 import com.google.gson.Gson;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -50,16 +50,17 @@ public class TestScaConnectionController extends BaseController {
         config.setCxOrigin("TeamCity");
 
 
-        SCAConfig scaConfig = new SCAConfig();
+        AstScaConfig scaConfig = new AstScaConfig();
         scaConfig.setAccessControlUrl(credi.getAccessControlServerUrl());
         scaConfig.setApiUrl(credi.getServerUrl());
         scaConfig.setTenant(credi.getScaTenant());
         scaConfig.setUsername(credi.getScaUserName());
         scaConfig.setPassword(credi.getScaPassword());
         scaConfig.setWebAppUrl(credi.getWebAppURL());
-        config.setScaConfig(scaConfig);
+        config.setAstScaConfig(scaConfig);
+        AstScaClient scaClient = new AstScaClient(config,log);
         try {
-            CxShragaClient.testScaConnection(config, log);
+            scaClient.testScaConnection();
             res.setSuccess(true);
             res.setMessage(CxConstants.CONNECTION_SUCCESSFUL_MESSAGE);
             writeHttpServletResponse(httpServletResponse, res);

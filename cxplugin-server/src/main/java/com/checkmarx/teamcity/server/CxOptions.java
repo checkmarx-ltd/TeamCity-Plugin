@@ -1,19 +1,13 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.cx.restclient.CxShragaClient;
-import com.cx.restclient.SCAClient;
-import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -333,31 +327,7 @@ public class CxOptions {
         return GLOBAL_DEPENDENCY_SCANNER_TYPE;
     }
 
-    public void testConnection(String serverUrl, String username, String pssd) {
 
-        try {
-            if (EncryptUtil.isScrambled(pssd)) {
-                pssd = EncryptUtil.unscramble(pssd);
-            }
-            CxShragaClient shraga = new CxShragaClient(serverUrl.trim(), username, pssd,CxConstants.ORIGIN_TEAMCITY, false,log );
-            shraga.login();
-            presetList = shraga.getPresetList();
-            teamList = shraga.getTeamList();
-
-        }
-        catch (Exception ex) {
-            String result = ex.getMessage();
-            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
-        }
-    }
-
-    /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
-
-    public void testScaConnection() throws MalformedURLException {
-        CxScanConfig cxScanConfig= new CxScanConfig();
-        cxScanConfig.getScaConfig();
-        CxShragaClient.testScaConnection(cxScanConfig,log);
-    }
 
     @NotNull
     public String getNoDisplay() {

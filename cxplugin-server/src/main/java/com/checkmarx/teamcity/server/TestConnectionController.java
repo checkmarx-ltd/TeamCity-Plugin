@@ -2,7 +2,10 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
-import com.cx.restclient.CxShragaClient;
+import com.cx.restclient.CxClientDelegator;
+import com.cx.restclient.CxSASTClient;
+import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
@@ -16,14 +19,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
@@ -36,7 +37,7 @@ class TestConnectionController extends BaseController {
     private String result = "";
     private List<Preset> presets;
     private List<Team> teams;
-    private CxShragaClient shraga;
+    private CxClientDelegator clientDelegator;
 
     public TestConnectionController(@NotNull SBuildServer server,
                                     @NotNull WebControllerManager webControllerManager) {
@@ -64,8 +65,9 @@ class TestConnectionController extends BaseController {
         //create client and perform login
         try {
             if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPssd())) {
+                CxSASTClient sastClient = clientDelegator.getSastClient();
                 try {
-                    teams = shraga.getTeamList();
+                    teams = sastClient.getTeamList();
                 } catch (Exception e) {
                     log.error("Error occurred in test connection", e);
                     res.setMessage(CONNECTION_FAILED_COMPATIBILITY);
@@ -73,7 +75,7 @@ class TestConnectionController extends BaseController {
                     return null;
                 }
 
-                presets = shraga.getPresetList();
+                presets = sastClient.getPresetList();
 
                 if (presets == null || teams == null) {
                     throw new Exception("invalid preset teamPath");
@@ -116,10 +118,17 @@ class TestConnectionController extends BaseController {
         return ret;
     }
 
-    private boolean loginToServer(URL url, String username, String pssd) {
+    public boolean loginToServer(URL url, String username, String pssd) {
         try {
-            shraga = new CxShragaClient(url.toString().trim(), username, pssd, CxConstants.ORIGIN_TEAMCITY, false, log);
-            shraga.login();
+            CxScanConfig config = new CxScanConfig();
+            config.addScannerType(ScannerType.SAST);
+            config.setUsername(username);
+            config.setPassword(pssd);
+            config.setUrl(url.toString().trim());
+            config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
+            config.setDisableCertificateValidation(false);
+            clientDelegator = new CxClientDelegator(config, log);
+            clientDelegator.getSastClient().login();
 
             return true;
         } catch (Exception ex) {
