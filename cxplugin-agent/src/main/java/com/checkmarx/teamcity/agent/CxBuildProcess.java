@@ -146,7 +146,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             if (scanSummary.hasErrors() || ret.getSastWaitException() != null || ret.getSastCreateException() != null ||
                     ret.getOsaCreateException() != null || ret.getOsaWaitException() != null) {
                 printScanBuildFailure(scanSummary, ret, logger);
-                return BuildFinishedStatus.FINISHED_FAILED;
+                 return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_SUCCESS;
         } catch (InterruptedException e) {

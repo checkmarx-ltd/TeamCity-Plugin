@@ -364,7 +364,7 @@ public class CxOptions {
         config.setPassword(pssd);
         config.setUrl(serverUrl.trim());
         config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
-        config.setDisableCertificateValidation(false);
+        config.setDisableCertificateValidation(true);
         CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
         return clientDelegator;
     }
