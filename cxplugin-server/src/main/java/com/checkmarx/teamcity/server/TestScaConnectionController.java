@@ -48,8 +48,7 @@ public class TestScaConnectionController extends BaseController {
 
         CxScanConfig config = new CxScanConfig();
         config.setCxOrigin("TeamCity");
-
-
+        config.setDisableCertificateValidation(true);
         AstScaConfig scaConfig = new AstScaConfig();
         scaConfig.setAccessControlUrl(credi.getAccessControlServerUrl());
         scaConfig.setApiUrl(credi.getServerUrl());
@@ -57,6 +56,7 @@ public class TestScaConnectionController extends BaseController {
         scaConfig.setUsername(credi.getScaUserName());
         scaConfig.setPassword(credi.getScaPassword());
         scaConfig.setWebAppUrl(credi.getWebAppURL());
+        config.setDisableCertificateValidation(true);
         config.setAstScaConfig(scaConfig);
         AstScaClient scaClient = new AstScaClient(config,log);
         try {

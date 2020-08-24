@@ -118,7 +118,7 @@ class TestConnectionController extends BaseController {
         return ret;
     }
 
-    public boolean loginToServer(URL url, String username, String pssd) {
+    private boolean loginToServer(URL url, String username, String pssd) {
         try {
             CxScanConfig config = new CxScanConfig();
             config.addScannerType(ScannerType.SAST);
@@ -126,7 +126,7 @@ class TestConnectionController extends BaseController {
             config.setPassword(pssd);
             config.setUrl(url.toString().trim());
             config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
-            config.setDisableCertificateValidation(false);
+            config.setDisableCertificateValidation(true);
             clientDelegator = new CxClientDelegator(config, log);
             clientDelegator.getSastClient().login();
 

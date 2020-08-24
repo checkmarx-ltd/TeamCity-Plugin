@@ -1,13 +1,20 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.cx.restclient.CxClientDelegator;
+import com.cx.restclient.CxSASTClient;
+import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
+import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -328,6 +335,45 @@ public class CxOptions {
     }
 
 
+
+    public void testConnection(String serverUrl, String username, String pssd) {
+
+        try {
+
+
+            CxClientDelegator delegator = delegatorBuilder(pssd,username,serverUrl);
+            CxSASTClient sastClient = delegator.getSastClient();
+            sastClient.login();
+            presetList = sastClient.getPresetList();
+            teamList = sastClient.getTeamList();
+
+        }
+        catch (Exception ex) {
+            String result = ex.getMessage();
+            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
+        }
+    }
+
+    private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl) throws MalformedURLException {
+        if (EncryptUtil.isScrambled(pssd)) {
+            pssd = EncryptUtil.unscramble(pssd);
+        }
+        CxScanConfig config = new CxScanConfig();
+        config.addScannerType(ScannerType.SAST);
+        config.setUsername(username);
+        config.setPassword(pssd);
+        config.setUrl(serverUrl.trim());
+        config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
+        config.setDisableCertificateValidation(false);
+        CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
+        return clientDelegator;
+    }
+
+    /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
+
+    public void testScaConnection() throws MalformedURLException {
+
+    }
 
     @NotNull
     public String getNoDisplay() {
