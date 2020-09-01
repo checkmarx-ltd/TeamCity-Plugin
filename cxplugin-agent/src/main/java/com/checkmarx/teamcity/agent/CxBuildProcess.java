@@ -119,7 +119,9 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
 
             ret = clientDelegator.waitForScanResults();
-
+            if (ret.getSastResults() != null) {
+                publishXMLReport(ret.getSastResults());
+            }
             if (config.getGeneratePDFReport()) {
                 publishPDFReport(ret.getSastResults());
             }
