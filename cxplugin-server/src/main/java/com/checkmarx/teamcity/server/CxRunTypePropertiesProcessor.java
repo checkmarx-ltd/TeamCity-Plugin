@@ -1,12 +1,10 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxParam;
-import com.cx.restclient.dto.DependencyScannerType;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.StringUtil;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -68,7 +66,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
                     validateNumeric(CxParam.LOW_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                 }
 
-                boolean dependencyScanEnabled = DependencyScannerType.NONE.toString().equals(properties.get(CxParam.DEPENDENCY_SCANNER_TYPE));
+                boolean dependencyScanEnabled = "OSA".equals(properties.get(CxParam.DEPENDENCY_SCANNER_TYPE)) || "SCA".equals(properties.get(CxParam.DEPENDENCY_SCANNER_TYPE));
                 if (dependencyScanEnabled && TRUE.equals(properties.get(CxParam.OSA_THRESHOLD_ENABLED))) {
                     validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.OSA_MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);

@@ -1,9 +1,10 @@
 package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.cx.restclient.CxShragaClient;
-import com.cx.restclient.SCAClient;
+import com.cx.restclient.CxClientDelegator;
+import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
@@ -333,16 +334,18 @@ public class CxOptions {
         return GLOBAL_DEPENDENCY_SCANNER_TYPE;
     }
 
+
+
     public void testConnection(String serverUrl, String username, String pssd) {
 
         try {
-            if (EncryptUtil.isScrambled(pssd)) {
-                pssd = EncryptUtil.unscramble(pssd);
-            }
-            CxShragaClient shraga = new CxShragaClient(serverUrl.trim(), username, pssd,CxConstants.ORIGIN_TEAMCITY, false,log );
-            shraga.login();
-            presetList = shraga.getPresetList();
-            teamList = shraga.getTeamList();
+
+
+            CxClientDelegator delegator = delegatorBuilder(pssd,username,serverUrl);
+            CxSASTClient sastClient = delegator.getSastClient();
+            sastClient.login();
+            presetList = sastClient.getPresetList();
+            teamList = sastClient.getTeamList();
 
         }
         catch (Exception ex) {
@@ -351,12 +354,25 @@ public class CxOptions {
         }
     }
 
+    private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl) throws MalformedURLException {
+        if (EncryptUtil.isScrambled(pssd)) {
+            pssd = EncryptUtil.unscramble(pssd);
+        }
+        CxScanConfig config = new CxScanConfig();
+        config.addScannerType(ScannerType.SAST);
+        config.setUsername(username);
+        config.setPassword(pssd);
+        config.setUrl(serverUrl.trim());
+        config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
+        config.setDisableCertificateValidation(true);
+        CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
+        return clientDelegator;
+    }
+
     /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
 
     public void testScaConnection() throws MalformedURLException {
-        CxScanConfig cxScanConfig= new CxScanConfig();
-        cxScanConfig.getScaConfig();
-        CxShragaClient.testScaConnection(cxScanConfig,log);
+
     }
 
     @NotNull

@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
 
+import com.cx.restclient.dto.Results;
 import com.cx.restclient.dto.ScanResults;
 import com.cx.restclient.dto.scansummary.ScanSummary;
 
@@ -11,10 +12,11 @@ public abstract class CxPluginUtils {
         logger.error(" The Build Failed for the Following Reasons: ");
         logger.error("********************************************");
 
-        logError(ret.getSastCreateException(), logger);
-        logError(ret.getSastWaitException(), logger);
-        logError(ret.getOsaCreateException(), logger);
-        logError(ret.getOsaWaitException(), logger);
+
+
+        logError(ret.getSastResults(), logger);
+        logError(ret.getScaResults(), logger);
+        logError(ret.getOsaResults(), logger);
         //todo: check null
         if (scanSummary.hasErrors()) {
             //scanSummary.
@@ -28,10 +30,16 @@ public abstract class CxPluginUtils {
         logger.error("");
     }
 
-    private static void logError(Exception ex, org.slf4j.Logger log) {
-        if (ex != null) {
-            log.error(ex.getMessage());
-        }
+    private static void logError(Results results, org.slf4j.Logger log) {
+       if(results!=null){
+           if (results.getCreateException() != null ) {
+               log.error(results.getCreateException().getMessage());
+           }
+           if (results.getWaitException() != null ) {
+               log.error(results.getWaitException().getMessage());
+           }
+       }
+
     }
 }
 
