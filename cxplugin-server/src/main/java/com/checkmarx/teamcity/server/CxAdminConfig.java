@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -44,19 +45,18 @@ public class CxAdminConfig {
     }
 
     private void loadConfiguration(@NotNull final File configFile) throws IOException {
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(configFile);
+        //FileReader fileReader = null;
+        try(FileReader fileReader = new FileReader(configFile)) {
             this.properties.load(fileReader);
-
             for (String conf : CxParam.GLOBAL_CONFIGS) {
                 if (this.properties.get(conf) == null){
                     this.properties.put(conf, "");
                 }
             }
-
-        }  finally {
-            FileUtil.close(fileReader);
+        }
+        catch(FileNotFoundException fnfe)
+        {
+            fnfe.printStackTrace();
         }
     }
 

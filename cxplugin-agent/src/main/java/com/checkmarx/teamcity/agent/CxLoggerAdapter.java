@@ -24,19 +24,28 @@ public class CxLoggerAdapter extends MarkerIgnoringBase {
     }
 
     public void trace(String s) {
-
+        //Empty implementation - currently not in use .
     }
 
     public void trace(String s, Object o) {
+        //Empty implementation - currently not in use .
     }
 
     public void trace(String s, Object o, Object o1) {
+        //Empty implementation - currently not in use .
     }
 
     public void trace(String s, Object... objects) {
+        //Empty implementation - currently not in use .
     }
 
     public void trace(String s, Throwable throwable) {
+        //Empty implementation - currently not in use .
+    }
+
+    private void printHelper(String s, Object... objects) {
+        FormattingTuple ft = MessageFormatter.format(s, objects);
+        buildLogger.message(ft.getMessage());
     }
 
     public boolean isDebugEnabled() {
@@ -48,18 +57,15 @@ public class CxLoggerAdapter extends MarkerIgnoringBase {
     }
 
     public void debug(String s, Object o) {
-        FormattingTuple ft = MessageFormatter.format(s, o);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, o);
     }
 
     public void debug(String s, Object o, Object o1) {
-        FormattingTuple ft = MessageFormatter.format(s, o, o1);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, o, o1);
     }
 
     public void debug(String s, Object... objects) {
-        FormattingTuple ft = MessageFormatter.format(s, objects);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, objects);
     }
 
     public void debug(String s, Throwable throwable) {
@@ -77,19 +83,17 @@ public class CxLoggerAdapter extends MarkerIgnoringBase {
         buildLogger.message(s);
     }
 
+
     public void info(String s, Object o) {
-        FormattingTuple ft = MessageFormatter.format(s, o);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, o);
     }
 
     public void info(String s, Object o, Object o1) {
-        FormattingTuple ft = MessageFormatter.format(s, o, o1);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, o, o1);
     }
 
     public void info(String s, Object... objects) {
-        FormattingTuple ft = MessageFormatter.format(s, objects);
-        buildLogger.message(ft.getMessage());
+        printHelper(s, objects);
     }
 
     public void info(String s, Throwable throwable) {
