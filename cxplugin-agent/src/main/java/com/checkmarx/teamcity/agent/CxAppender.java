@@ -45,8 +45,7 @@ public class CxAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-        //  Release any resources allocated within the appender such as file
-        //     handles, network connections, etc.
+        //Empty implementation - currently not in use .
     }
 
     @Override

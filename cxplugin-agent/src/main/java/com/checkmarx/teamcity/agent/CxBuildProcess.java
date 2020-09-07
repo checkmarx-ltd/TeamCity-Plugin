@@ -33,7 +33,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     //    private static final String CX_REPORT_LOCATION = "/Checkmarx/Reports";
     private static final String REPORT_NAME = "CxSASTReport";
-    public static final String NO_THRESHOLD = "[No Threshold]";
+    private static final String NO_THRESHOLD = "[No Threshold]";
 
     private final BuildRunnerContext buildRunnerContext;
     private final AgentRunningBuild agentRunningBuild;

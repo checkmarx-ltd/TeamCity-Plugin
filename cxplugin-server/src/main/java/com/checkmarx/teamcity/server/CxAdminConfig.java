@@ -13,12 +13,14 @@ import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.FileUtil;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CxAdminConfig {
     private final ServerPaths serverPaths;
     private final Properties properties = new Properties();
-
+    public static final Logger log = LoggerFactory.getLogger(CxAdminConfig.class);
     public CxAdminConfig(@NotNull final ServerPaths serverPaths) throws IOException {
         this.serverPaths = serverPaths;
 
@@ -45,7 +47,6 @@ public class CxAdminConfig {
     }
 
     private void loadConfiguration(@NotNull final File configFile) throws IOException {
-        //FileReader fileReader = null;
         try(FileReader fileReader = new FileReader(configFile)) {
             this.properties.load(fileReader);
             for (String conf : CxParam.GLOBAL_CONFIGS) {
@@ -56,7 +57,7 @@ public class CxAdminConfig {
         }
         catch(FileNotFoundException fnfe)
         {
-            fnfe.printStackTrace();
+            log.error(fnfe.getMessage());
         }
     }
 

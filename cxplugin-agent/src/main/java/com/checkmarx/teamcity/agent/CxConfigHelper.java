@@ -17,8 +17,8 @@ import static com.checkmarx.teamcity.common.CxParam.*;
  */
 public class CxConfigHelper {
 
-    public static final String PARAMETER_PREFIX = "Parameter [";
-    public static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
+    private static final String PARAMETER_PREFIX = "Parameter [";
+    private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
 
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory) throws InvalidParameterException {
