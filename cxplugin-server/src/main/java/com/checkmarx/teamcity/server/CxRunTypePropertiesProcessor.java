@@ -100,14 +100,14 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
     private void validateNumeric(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
         String num = properties.get(parameterName);
-        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
+        if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
     }
 
     private void validateNumericLargerThanZero(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
         String num = properties.get(parameterName);
-        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
+        if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
     }

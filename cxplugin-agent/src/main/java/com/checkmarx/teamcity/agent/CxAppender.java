@@ -45,7 +45,7 @@ public class CxAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-
+        //Empty implementation - currently not in use .
     }
 
     @Override

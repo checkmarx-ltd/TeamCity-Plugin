@@ -393,7 +393,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td colspan="2">
             <table width="101%">
                 <tr>
-                    <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings</label></th>
+                    <th><label for="${optionsBean.useDefaultSastConfig}">Use Default Settings
+                        <bs:helpIcon iconTitle="Use default settings. if unchecked can edit the fields below"/>
+                    </label></th>
                     <td>
                         <c:set var="onclick">
                             jQuery('#sastConfigSection').toggle();
@@ -596,8 +598,8 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td><props:passwordProperty name="${optionsBean.scaPass}" className="longField"/></td>
     </tr>
     <tr class="dependencyScanRow scaInput">
-        <th><label for="${optionsBean.scaTenant}">CxSCA Tenant
-            <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
+        <th><label for="${optionsBean.scaTenant}">CxSCA Account
+            <bs:helpIcon iconTitle="fill this with the SCA Account"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
@@ -620,7 +622,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 <l:settingsGroup className="cx-title" title="Control Checkmarx Scan">
 
     <tr>
-        <th><label for="${optionsBean.useDefaultScanControl}">Use Default Settings</label></th>
+        <th><label for="${optionsBean.useDefaultScanControl}">Use Default Settings
+            <bs:helpIcon iconTitle="Use default settings. If unchecked can edit the fields below"/>
+        </label></th>
         <td>
             <c:set var="onclick">
                 jQuery('#specificScanControlSection').toggle();

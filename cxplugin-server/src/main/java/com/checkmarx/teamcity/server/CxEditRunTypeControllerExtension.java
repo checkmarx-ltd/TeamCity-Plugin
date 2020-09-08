@@ -73,7 +73,9 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
     }
 
-    public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {}
+    public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
+        //Empty implementation - currently not in use .
+    }
 
     @Nullable
     public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
@@ -83,7 +85,9 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public void updateBuildType(@NotNull final HttpServletRequest request,
                                 @NotNull final BuildTypeForm form,
                                 @NotNull final BuildTypeSettings buildTypeSettings,
-                                @NotNull final ActionErrors errors) {}
+                                @NotNull final ActionErrors errors) {
+        //Empty implementation - currently not in use .
+    }
 
     @NotNull
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {

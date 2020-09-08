@@ -82,7 +82,7 @@ public class CxAdminPageController extends BaseFormXmlController {
         ActionErrors ret = new ActionErrors();
 
         String cxGlobalServerUrl = request.getParameter(GLOBAL_SERVER_URL);
-        if (StringUtil.isEmptyOrSpaces(cxGlobalServerUrl)) {
+        if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(cxGlobalServerUrl)) {
             ret.addError(INVALID + GLOBAL_SERVER_URL, URL_NOT_EMPTY_MESSAGE);
         } else {
             try {
@@ -92,11 +92,11 @@ public class CxAdminPageController extends BaseFormXmlController {
             }
         }
 
-        if (StringUtil.isEmptyOrSpaces(request.getParameter(GLOBAL_USERNAME))) {
+        if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter(GLOBAL_USERNAME))) {
             ret.addError(INVALID + GLOBAL_USERNAME, USERNAME_NOT_EMPTY_MESSAGE);
         }
 
-        if (StringUtil.isEmptyOrSpaces(request.getParameter("encryptedCxGlobalPassword"))) {
+        if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter("encryptedCxGlobalPassword"))) {
             ret.addError(INVALID + GLOBAL_PASSWORD, PASSWORD_NOT_EMPTY_MESSAGE);
         }
 
@@ -123,14 +123,14 @@ public class CxAdminPageController extends BaseFormXmlController {
 
     private void validateNumeric(String parameterName, String errorMessage, HttpServletRequest request, ActionErrors errors) {
         String num = request.getParameter(parameterName);
-        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
+        if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
                 errors.addError(INVALID + parameterName, errorMessage);
         }
     }
 
     private void validateNumericLargerThanZero(String parameterName, String errorMessage, HttpServletRequest request, ActionErrors errors) {
         String num = request.getParameter(parameterName);
-        if (!StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
+        if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) <= 0))) {
             errors.addError(INVALID + parameterName, errorMessage);
         }
     }

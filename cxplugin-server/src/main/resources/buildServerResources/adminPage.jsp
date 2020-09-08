@@ -413,8 +413,8 @@
                             </tr>
 
                              <tr class="globalDependencyScanRow scaInput">
-                              <th><label for="cxGlobalSCATenant">CxSCA Tenant
-                                <bs:helpIcon iconTitle="fill this with the SCA Tenant"/>
+                              <th><label for="cxGlobalSCATenant">CxSCA Account
+                                <bs:helpIcon iconTitle="fill this with the SCA Account"/>
                                 <l:star/></label></th>
                               <td>
                                 <forms:textField name="cxGlobalSCATenant" value="${cxGlobalSCATenant}" className="longField"/>
