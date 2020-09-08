@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class CxAdminConfig {
     private final ServerPaths serverPaths;
     private final Properties properties = new Properties();
-    public static final Logger log = LoggerFactory.getLogger(CxAdminConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(CxAdminConfig.class);
     public CxAdminConfig(@NotNull final ServerPaths serverPaths) throws IOException {
         this.serverPaths = serverPaths;
 
