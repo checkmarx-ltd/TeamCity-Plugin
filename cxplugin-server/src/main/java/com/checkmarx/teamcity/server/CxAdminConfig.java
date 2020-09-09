@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,12 +13,14 @@ import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.FileUtil;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CxAdminConfig {
     private final ServerPaths serverPaths;
     private final Properties properties = new Properties();
-
+    private static final Logger log = LoggerFactory.getLogger(CxAdminConfig.class);
     public CxAdminConfig(@NotNull final ServerPaths serverPaths) throws IOException {
         this.serverPaths = serverPaths;
 
@@ -44,19 +47,17 @@ public class CxAdminConfig {
     }
 
     private void loadConfiguration(@NotNull final File configFile) throws IOException {
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(configFile);
+        try(FileReader fileReader = new FileReader(configFile)) {
             this.properties.load(fileReader);
-
             for (String conf : CxParam.GLOBAL_CONFIGS) {
                 if (this.properties.get(conf) == null){
                     this.properties.put(conf, "");
                 }
             }
-
-        }  finally {
-            FileUtil.close(fileReader);
+        }
+        catch(FileNotFoundException fnfe)
+        {
+            log.error(fnfe.getMessage());
         }
     }
 

@@ -17,8 +17,11 @@ import static com.checkmarx.teamcity.common.CxParam.*;
  */
 public class CxConfigHelper {
 
+    private static final String PARAMETER_PREFIX = "Parameter [";
+    private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
+
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
-             File reportDirectory) throws InvalidParameterException {
+                                                     File reportDirectory) throws InvalidParameterException {
 
         CxScanConfig ret = new CxScanConfig();
         AstScaConfig scaConfig = new AstScaConfig();
@@ -158,12 +161,13 @@ public class CxConfigHelper {
             try {
                 int i = Integer.parseInt(param);
                 if (i < 0) {
-                    throw new InvalidParameterException("Parameter [" + paramName + "] must be positive integer. Actual value: " + param);
+                    throw new InvalidParameterException(PARAMETER_PREFIX + paramName + PARAMETER_SUFFIX + param);
                 }
                 return i;
 
+
             } catch (NumberFormatException e) {
-                throw new InvalidParameterException("Parameter [" + paramName + "] must be positive integer. Actual value: " + param);
+                throw new InvalidParameterException(PARAMETER_PREFIX + paramName + PARAMETER_SUFFIX + param);
             }
         }
         return null;
@@ -171,7 +175,7 @@ public class CxConfigHelper {
 
     private static String validateNotEmpty(String param, String paramName) throws InvalidParameterException {
         if (param == null || param.length() == 0) {
-            throw new InvalidParameterException("Parameter [" + paramName + "] must not be empty");
+            throw new InvalidParameterException(PARAMETER_PREFIX + paramName + "] must not be empty");
         }
         return param;
     }
