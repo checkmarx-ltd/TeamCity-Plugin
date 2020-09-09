@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxParam;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
@@ -23,6 +24,7 @@ public class CxConfigHelper {
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory) throws InvalidParameterException {
 
+
         CxScanConfig ret = new CxScanConfig();
         AstScaConfig scaConfig = new AstScaConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
@@ -30,7 +32,6 @@ public class CxConfigHelper {
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
-
 
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
@@ -63,6 +64,10 @@ public class CxConfigHelper {
             ret.setScanComment(buildParameters.get(SCAN_COMMENT));
             ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
+        }
+
+        if(CxConstants.TRUE.equals(buildParameters.get(CxParam.OSA_ENABLED))){
+            ret.addScannerType(ScannerType.OSA);
         }
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
