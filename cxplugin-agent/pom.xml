@@ -5,7 +5,7 @@
     <parent>
         <artifactId>cxplugin</artifactId>
         <groupId>com.checkmarx.teamcity</groupId>
-        <version>2020.1.20.new</version>
+        <version>2020.1.21.new</version>
     </parent>
     <artifactId>cxplugin-agent</artifactId>
     <packaging>jar</packaging>

@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxParam;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.DependencyScannerType;
@@ -64,6 +65,10 @@ public class CxConfigHelper {
             ret.setScanComment(buildParameters.get(SCAN_COMMENT));
             ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
+        }
+
+        if(CxConstants.TRUE.equals(buildParameters.get(CxParam.OSA_ENABLED))){
+            ret.setDependencyScannerType(DependencyScannerType.OSA);
         }
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
