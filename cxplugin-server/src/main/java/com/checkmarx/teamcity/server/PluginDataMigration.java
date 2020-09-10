@@ -16,7 +16,7 @@ class PluginDataMigration {
             properties.put(CxParam.DEPENDENCY_SCANNER_TYPE, ScannerType.OSA.getDisplayName());
             properties.put(CxParam.DEPENDENCY_SCAN_ENABLED, CxConstants.TRUE);
             properties.put(CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS, CxConstants.TRUE);
-            properties.remove(CxParam.OSA_ENABLED);
+           // properties.remove(CxParam.OSA_ENABLED);
         }
     }
 }
