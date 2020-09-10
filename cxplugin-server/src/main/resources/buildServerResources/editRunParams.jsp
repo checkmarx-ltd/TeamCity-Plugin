@@ -532,11 +532,11 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 
     <tr class="dependencyScanRow">
-        <th><label for="enableOsa">Use CxOSA dependency Scanner
+        <th><label for="OsaEnabled">Use CxOSA dependency Scanner
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="enableOsa"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
         </td>
     </tr>
     <tr class="dependencyScanRow osaInput">

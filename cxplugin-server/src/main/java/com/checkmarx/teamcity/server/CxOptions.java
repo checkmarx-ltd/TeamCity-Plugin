@@ -111,6 +111,11 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getOsaEnabled() {
+        return OSA_ENABLED;
+    }
+
+    @NotNull
     public String getGeneratePDFReport() {
         return GENERATE_PDF_REPORT;
     }
