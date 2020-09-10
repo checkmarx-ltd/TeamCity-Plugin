@@ -67,9 +67,7 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        if(CxConstants.TRUE.equals(buildParameters.get(CxParam.OSA_ENABLED))){
-            ret.setDependencyScannerType(DependencyScannerType.OSA);
-        }
+
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
         {
@@ -84,6 +82,10 @@ public class CxConfigHelper {
         else
         {
             ret.setDependencyScannerType(DependencyScannerType.NONE);
+        }
+
+        if(CxConstants.TRUE.equals(buildParameters.get(CxParam.OSA_ENABLED))){
+            ret.setDependencyScannerType(DependencyScannerType.OSA);
         }
 
         ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
