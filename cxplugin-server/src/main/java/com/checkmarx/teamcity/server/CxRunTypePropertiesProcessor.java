@@ -1,6 +1,8 @@
 package com.checkmarx.teamcity.server;
 
+import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
+import com.cx.restclient.dto.ScannerType;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
@@ -20,6 +22,12 @@ import static com.checkmarx.teamcity.common.CxConstants.*;
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
+        if (CxConstants.TRUE.equals(properties.get(CxParam.OSA_ENABLED))) {
+            properties.put(CxParam.DEPENDENCY_SCANNER_TYPE, ScannerType.OSA.getDisplayName());
+            properties.put(CxParam.DEPENDENCY_SCAN_ENABLED, CxConstants.TRUE);
+            properties.put(CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS, CxConstants.TRUE);
+            properties.remove(CxParam.OSA_ENABLED);
+        }
         List<InvalidProperty> result = new Vector<>();
         if (!TRUE.equals(properties.get(CxParam.USE_DEFAULT_SERVER))) {
             final String cxServerUrl = properties.get(CxParam.SERVER_URL);
