@@ -7,6 +7,8 @@ import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.Map;
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
@@ -32,7 +34,8 @@ public class CxConfigHelper {
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
-
+        String isProxyVar = System.getProperty("cx.isproxy");
+        ret.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));

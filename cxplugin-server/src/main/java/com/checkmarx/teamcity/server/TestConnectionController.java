@@ -14,23 +14,29 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
 class TestConnectionController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(TestConnectionController.class);
+    private static final com.intellij.openapi.diagnostic.Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
 
     private Gson gson = new Gson();
 
@@ -69,7 +75,7 @@ class TestConnectionController extends BaseController {
                 try {
                     teams = sastClient.getTeamList();
                 } catch (Exception e) {
-                    log.error("Error occurred in test connection", e);
+                    LOG.error("Error occurred in test connection", e);
                     res.setMessage(CONNECTION_FAILED_COMPATIBILITY);
                     writeHttpServletResponse(httpServletResponse, res);
                     return null;
@@ -83,6 +89,7 @@ class TestConnectionController extends BaseController {
 
                 res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
                 writeHttpServletResponse(httpServletResponse, res);
+                LOG.info("Checkmarx test connection: Connection successful");
                 return null;
             } else {
                 result = result.contains("Failed to authenticate") ? "Failed to authenticate" : result;
@@ -91,16 +98,13 @@ class TestConnectionController extends BaseController {
                 res.setMessage(result);
                 writeHttpServletResponse(httpServletResponse, res);
                 return null;
-
             }
         } catch (Exception e) {
-            log.error("Error occurred in test connection", e);
+            LOG.error("Error occurred in test connection", e);
             res.setMessage(UNABLE_TO_CONNECT_MESSAGE);
             writeHttpServletResponse(httpServletResponse, res);
             return null;
         }
-
-
     }
 
     private void writeHttpServletResponse(HttpServletResponse httpServletResponse, TestConnectionResponse res) throws IOException {
@@ -127,14 +131,30 @@ class TestConnectionController extends BaseController {
             config.setUrl(url.toString().trim());
             config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
             config.setDisableCertificateValidation(true);
+            String isProxyVar = System.getProperty("cx.isproxy");
+            config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
             clientDelegator = new CxClientDelegator(config, log);
             clientDelegator.getSastClient().login();
 
             return true;
         } catch (Exception ex) {
+            LOG.error("Checkmarx test connection: " + ex.getMessage(), ex);
             result = ex.getMessage();
             return false;
         }
+    }
+
+    private void printProxyParams() {
+        LOG.info("##### JVM Http properties #####");
+        final Properties sysProps = System.getProperties();
+        final Set<String> keys = sysProps.stringPropertyNames();
+
+        for (final String key : keys) {
+            if (key.startsWith("http") || key.startsWith("java.net")) {
+                LOG.info(key + " : " + sysProps.getProperty(key));
+            }
+        }
+        LOG.info("###############################");
     }
 
 }

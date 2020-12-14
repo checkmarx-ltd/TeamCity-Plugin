@@ -10,6 +10,7 @@ import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,6 @@ public class CxOptions {
     public static final Logger log = LoggerFactory.getLogger(CxOptions.class);
     private List<Team> teamList = Collections.singletonList(new Team(NO_TEAM_PATH, CxConstants.NO_TEAM_MESSAGE));
     private List<Preset> presetList = Collections.singletonList(new Preset(NO_PRESET_ID, CxConstants.NO_PRESET_MESSAGE));
-
 
     @NotNull
     public String getUseDefaultServer() {
@@ -271,89 +271,121 @@ public class CxOptions {
     }
 
     @NotNull
-    public String getScaApiUrl() { return SCA_API_URL; }
-    @NotNull
-    public String getScaAccessControlUrl() { return SCA_ACCESS_CONTROL_URL; }
+    public String getScaApiUrl() {
+        return SCA_API_URL;
+    }
 
     @NotNull
-    public String getScaWebAppUrl() { return SCA_WEB_APP_URL; }
+    public String getScaAccessControlUrl() {
+        return SCA_ACCESS_CONTROL_URL;
+    }
 
     @NotNull
-    public String getScaUserName() { return SCA_USERNAME; }
+    public String getScaWebAppUrl() {
+        return SCA_WEB_APP_URL;
+    }
 
     @NotNull
-    public String getScaPass() { return SCA_PASSWORD; }
+    public String getScaUserName() {
+        return SCA_USERNAME;
+    }
 
     @NotNull
-    public String getScaTenant() { return SCA_TENANT; }
+    public String getScaPass() {
+        return SCA_PASSWORD;
+    }
 
     @NotNull
-    public String getOverrideGlobalConfigurations() {return OVERRIDE_GLOBAL_CONFIGURATIONS; }
+    public String getScaTenant() {
+        return SCA_TENANT;
+    }
 
     @NotNull
-    public String getScaHigh() { return SCA_HIGH; }
+    public String getOverrideGlobalConfigurations() {
+        return OVERRIDE_GLOBAL_CONFIGURATIONS;
+    }
 
     @NotNull
-    public String getScaMedium() { return SCA_MEDIUM; }
+    public String getScaHigh() {
+        return SCA_HIGH;
+    }
 
     @NotNull
-    public String getScaLow() { return SCA_LOW; }
+    public String getScaMedium() {
+        return SCA_MEDIUM;
+    }
 
     @NotNull
-    public String getScaFilesInclude() { return SCA_FILES_INCLUDE; }
+    public String getScaLow() {
+        return SCA_LOW;
+    }
 
     @NotNull
-    public String getScaFilesExclude() { return SCA_FILES_EXCLUDE; }
+    public String getScaFilesInclude() {
+        return SCA_FILES_INCLUDE;
+    }
 
     @NotNull
-    public String getScaFolderExclude() { return SCA_FOLDER_EXCLUDE; }
+    public String getScaFilesExclude() {
+        return SCA_FILES_EXCLUDE;
+    }
 
     @NotNull
-    public String getScaLocationPath() { return  SCA_LOCATION_PATH; }
+    public String getScaFolderExclude() {
+        return SCA_FOLDER_EXCLUDE;
+    }
 
     @NotNull
-    public String getGlobalDependencyScanEnabled() { return GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS; }
+    public String getScaLocationPath() {
+        return SCA_LOCATION_PATH;
+    }
+
+    @NotNull
+    public String getGlobalDependencyScanEnabled() {
+        return GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS;
+    }
 
     @NotNull
     public static String getGlobalOsaArchiveIncludePatterns() {
         return GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS;
     }
+
     @NotNull
     public static String getGlobalDependencyScanFilterPatterns() {
         return GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS;
     }
+
     @NotNull
     public static String getGlobalExecuteDependencyManager() {
         return GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
     }
+
     @NotNull
     public static String getGlobalScaEnabled() {
         return GLOBAL_SCA_ENABLED;
     }
+
     @NotNull
     public static String getGlobalOsaEnabled() {
         return GLOBAL_OSA_ENABLED;
     }
+
     @NotNull
     public static String getGlobaldependencyScannerType() {
         return GLOBAL_DEPENDENCY_SCANNER_TYPE;
     }
 
 
-
     public void testConnection(String serverUrl, String username, String pssd) {
 
         try {
-
-
-            CxClientDelegator delegator = delegatorBuilder(pssd,username,serverUrl);
+            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl);
             CxSASTClient sastClient = delegator.getSastClient();
             sastClient.login();
             presetList = sastClient.getPresetList();
             teamList = sastClient.getTeamList();
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             String result = ex.getMessage();
             Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
         }
@@ -370,6 +402,8 @@ public class CxOptions {
         config.setUrl(serverUrl.trim());
         config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         config.setDisableCertificateValidation(true);
+        String isProxyVar = System.getProperty("cx.isproxy");
+        config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
         CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
         return clientDelegator;
     }
@@ -386,7 +420,9 @@ public class CxOptions {
     }
 
     @NotNull
-    public String getDependencyScanEnabled() { return DEPENDENCY_SCAN_ENABLED; }
+    public String getDependencyScanEnabled() {
+        return DEPENDENCY_SCAN_ENABLED;
+    }
 
     @Override
     public String toString() {
