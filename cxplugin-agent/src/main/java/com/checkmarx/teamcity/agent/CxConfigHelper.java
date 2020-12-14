@@ -6,8 +6,11 @@ import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.Map;
+
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 import static com.checkmarx.teamcity.common.CxParam.*;
 
@@ -22,7 +25,6 @@ public class CxConfigHelper {
 
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory) throws InvalidParameterException {
-
         CxScanConfig ret = new CxScanConfig();
         AstScaConfig scaConfig = new AstScaConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
@@ -30,8 +32,8 @@ public class CxConfigHelper {
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
-
-
+        String isProxyVar = System.getProperty("cx.isproxy");
+        ret.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
@@ -48,7 +50,7 @@ public class CxConfigHelper {
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
-        if(ret.isSastEnabled()){
+        if (ret.isSastEnabled()) {
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
                 ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
@@ -65,16 +67,14 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
-        {
+        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED))) {
             ScannerType scannerType;
-            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
-            {
+            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS))) {
                 scannerType = "SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE)) ?
-                        ScannerType.AST_SCA:ScannerType.OSA;
+                        ScannerType.AST_SCA : ScannerType.OSA;
             } else {
                 scannerType = "SCA".equalsIgnoreCase(buildParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ?
-                        ScannerType.AST_SCA:ScannerType.OSA;
+                        ScannerType.AST_SCA : ScannerType.OSA;
             }
             ret.addScannerType(scannerType);
         }
@@ -97,21 +97,21 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
-    // TODO: 2/13/2020  add parameters that is common for two pages
-        String globalExecuteDependencyManager=GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
+        // TODO: 2/13/2020  add parameters that is common for two pages
+        String globalExecuteDependencyManager = GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
 
-        Map<String,String> parameters = buildParameters;
+        Map<String, String> parameters = buildParameters;
 
-        if(TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))){
-             thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
-             highThreshold = GLOBAL_HIGH_THRESHOLD;
-             mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
-             lowThreshold = GLOBAL_LOW_THRESHOLD;
+        if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
+            thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
+            highThreshold = GLOBAL_HIGH_THRESHOLD;
+            mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
+            lowThreshold = GLOBAL_LOW_THRESHOLD;
 
-             osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
-             osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
-             osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
-             osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
+            osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
+            osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
+            osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
+            osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
