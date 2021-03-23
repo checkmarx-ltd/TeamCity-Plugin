@@ -15,6 +15,7 @@ import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -71,6 +72,14 @@ public class CxBuildProcess extends CallableBuildProcess {
         ScanResults ret = new ScanResults();
 
         try {
+            Map<String, String> allParameters = buildRunnerContext.getBuildParameters().getAllParameters();
+            for (Map.Entry<String, String> entry : allParameters.entrySet()) {
+                if (entry.getKey().contains(".CX_")) {
+                    if (StringUtils.isNotEmpty(entry.getValue())) {
+                        System.setProperty(entry.getKey().substring(entry.getKey().indexOf(".") + 1), entry.getValue());
+                    }
+                }
+            }
 
             Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
             Map<String, String> sharedConfigParameters = agentRunningBuild.getSharedConfigParameters();
@@ -222,17 +231,26 @@ public class CxBuildProcess extends CallableBuildProcess {
     }
 
 
-    private void publishPDFReport(SASTResults sastResults) throws IOException {
-        publishArtifact(buildDirectory + CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
-        sastPDFLink = compileLinkToArtifact(sastResults.getPdfFileName());
-        sastResults.setSastPDFLink(sastPDFLink);
+    private void publishPDFReport(SASTResults sastResults) {
+        try {
+            publishArtifact(buildDirectory + CxPARAM.CX_REPORT_LOCATION + File.separator + sastResults.getPdfFileName());
+            sastPDFLink = compileLinkToArtifact(sastResults.getPdfFileName());
+            sastResults.setSastPDFLink(sastPDFLink);
+        } catch (Exception e) {
+            logger.error("Fail to publish PDF report");
+        }
     }
 
-    private void publishXMLReport(SASTResults sastResults) throws IOException {
-        String xmlFileName = REPORT_NAME + ".xml";
-        File xmlFile = new File(buildDirectory + CxPARAM.CX_REPORT_LOCATION, xmlFileName);
-        FileUtils.writeByteArrayToFile(xmlFile, sastResults.getRawXMLReport());
-        publishArtifact(xmlFile.getAbsolutePath());
+    private void publishXMLReport(SASTResults sastResults) {
+        try {
+            String xmlFileName = REPORT_NAME + ".xml";
+            File xmlFile = new File(buildDirectory + CxPARAM.CX_REPORT_LOCATION, xmlFileName);
+            FileUtils.writeByteArrayToFile(xmlFile, sastResults.getRawXMLReport());
+            publishArtifact(xmlFile.getAbsolutePath());
+        } catch (Exception e) {
+            boolean isExist = (sastResults != null && sastResults.getRawXMLReport() != null && sastResults.getRawXMLReport().length > 0);
+            logger.error("Fail to publish XML report, file: " + buildDirectory + CxPARAM.CX_REPORT_LOCATION + REPORT_NAME + ".xml, is xml file exist in SAST result: " + isExist);
+        }
     }
 
     private void publishArtifact(String filePath) {
@@ -245,7 +263,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         return "/repository/download/" + buildTypeId + "/" + buildId + ":id/" + CxConstants.RUNNER_DISPLAY_NAME + "/" + artifactName;
     }
 
-    private void checkExceptions(ScanResults ret){
+    private void checkExceptions(ScanResults ret) {
         //createExceptions
         sastCreateEx = ret.getSastResults() != null ? ret.getSastResults().getCreateException() : null;
         osaCreateEx = ret.getOsaResults() != null ? ret.getOsaResults().getCreateException() : null;
