@@ -18,7 +18,7 @@ public abstract class CxPluginUtils {
         logError(ret.getScaResults(), logger);
         logError(ret.getOsaResults(), logger);
         //todo: check null
-        if (scanSummary.hasErrors()) {
+        if (scanSummary != null && scanSummary.hasErrors()) {
             //scanSummary.
             //String[] lines = thDescription.split("\\n");
             //for (String s : lines) {

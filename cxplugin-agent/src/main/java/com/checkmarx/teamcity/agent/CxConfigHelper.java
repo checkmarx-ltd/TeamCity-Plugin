@@ -105,21 +105,21 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
-    // TODO: 2/13/2020  add parameters that is common for two pages
-        String globalExecuteDependencyManager=GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
+        // TODO: 2/13/2020  add parameters that is common for two pages
+        String globalExecuteDependencyManager = GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
 
-        Map<String,String> parameters = buildParameters;
+        Map<String, String> parameters = buildParameters;
 
-        if(TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))){
-             thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
-             highThreshold = GLOBAL_HIGH_THRESHOLD;
-             mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
-             lowThreshold = GLOBAL_LOW_THRESHOLD;
+        if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
+            thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
+            highThreshold = GLOBAL_HIGH_THRESHOLD;
+            mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
+            lowThreshold = GLOBAL_LOW_THRESHOLD;
 
-             osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
-             osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
-             osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
-             osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
+            osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
+            osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
+            osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
+            osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
