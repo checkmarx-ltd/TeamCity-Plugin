@@ -49,12 +49,7 @@ public class CxBuildProcess extends CallableBuildProcess {
     private File buildDirectory;
     private CxClientDelegator clientDelegator;
 
-    private Exception sastCreateEx;
-    private Exception sastWaitEx;
-    private Exception osaCreateEx;
-    private Exception osaWaitEx;
-    private Exception scaCreateEx;
-    private Exception scaWaitEx;
+
 
     public CxBuildProcess(AgentRunningBuild agentRunningBuild, BuildRunnerContext buildRunnerContext, ArtifactsWatcher artifactsWatcher) {
         this.agentRunningBuild = agentRunningBuild;
@@ -66,8 +61,6 @@ public class CxBuildProcess extends CallableBuildProcess {
     @Override
     public BuildFinishedStatus call() throws Exception {
         String appenderName = "cxAppender_" + agentRunningBuild.getBuildId();
-        boolean sastCreated = false;
-        boolean osaCreated = false;
 
         ScanResults ret = new ScanResults();
 
@@ -119,16 +112,20 @@ public class CxBuildProcess extends CallableBuildProcess {
             //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
-                checkExceptions(ret);
-                if (sastCreateEx != null || osaCreateEx != null || scaCreateEx != null) {
+                if (ret.getException() != null || ret.getGeneralException() != null) {
                     printScanBuildFailure(null, ret, logger);
                     return BuildFinishedStatus.FINISHED_FAILED;
                 }
 
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             }
-
+            
             ret = clientDelegator.waitForScanResults();
+            if (config.getSynchronous() && config.isSastEnabled() && ((ret.getSastResults() != null
+					&& ret.getSastResults().getException() != null
+					&& ret.getSastResults().getScanId() > 0))) {
+                cancelScan(clientDelegator);
+            }
             if (ret.getSastResults() != null) {
                 publishXMLReport(ret.getSastResults());
             }
@@ -153,22 +150,16 @@ public class CxBuildProcess extends CallableBuildProcess {
             //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
             //String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
             ScanSummary scanSummary = new ScanSummary(config, ret.getSastResults(), ret.getOsaResults(), ret.getScaResults());
-            checkExceptions(ret);
-            if (scanSummary.hasErrors() || sastWaitEx != null || sastCreateEx != null ||
-                    osaCreateEx != null || osaWaitEx != null ||
-                    scaCreateEx != null || scaWaitEx != null) {
+            if (scanSummary.hasErrors() || ret.getGeneralException() != null ||
+                    (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
+                    (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
+                    (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
                 printScanBuildFailure(scanSummary, ret, logger);
                 return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_SUCCESS;
         } catch (InterruptedException e) {
             logger.error("Interrupted exception: " + e.getMessage());
-
-            //TODO CHECK HOW TO CANCLE SCAN IN NEW COMMON
-           /* if (clientDelegator != null && sastCreated) {
-                logger.error("Canceling scan on the Checkmarx server...");
-                cancelScan(clientDelegator);
-            }*/
             throw new RunBuildException(e.getMessage());
         } catch (Exception e) {
             logger.error("Unexpected exception: " + e.getMessage(), e);
@@ -181,12 +172,12 @@ public class CxBuildProcess extends CallableBuildProcess {
 
     }
 
-/*    private void cancelScan(CxShragaClient shraga) {
+    private void cancelScan(CxClientDelegator delegator) {
         try {
-            shraga.cancelSASTScan();
+            delegator.getSastClient().cancelSASTScan();
         } catch (Exception ignored) {
         }
-    }*/
+    }
 
 
     private void printConfiguration() {
@@ -214,18 +205,22 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
-        if (config.isOsaEnabled() || config.isAstScaEnabled()) {
-            String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();
-            logger.info("Dependency scanner type: " + scannerType);
-            logger.info(scannerType + " dependency Scan filter patterns: " + config.getOsaFilterPattern());
-            logger.info(scannerType + " dependency Scan archive extract patterns: " + config.getOsaArchiveIncludePatterns());
-            logger.info(scannerType + " dependency Scan Execute dependency managers 'install packages' command before Scan: " + config.getOsaRunInstall());
-            logger.info(scannerType + " dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
-            if (config.getOsaThresholdsEnabled()) {
-                logger.info(scannerType + " dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? NO_THRESHOLD : config.getOsaHighThreshold()));
-                logger.info(scannerType + " dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? NO_THRESHOLD : config.getOsaMediumThreshold()));
-                logger.info(scannerType + " dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? NO_THRESHOLD : config.getOsaLowThreshold()));
-            }
+        logger.info("Dependency Scan enabled : " + (config.isOsaEnabled() || config.isAstScaEnabled()));        
+        if(config.isOsaEnabled() || config.isAstScaEnabled()) {
+        	String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();
+        	logger.info("Dependency Scan type : " + scannerType);
+        	logger.info("Dependency scan configuration:");
+        	logger.info(" Include/Exclude Filter patterns: " + config.getOsaFilterPattern());	        
+        	logger.info(" Dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
+	        if (config.getOsaThresholdsEnabled()) {
+	        	logger.info(" Dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
+	        	logger.info(" Dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
+	        	logger.info(" Dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
+	        }
+	        if (config.isOsaEnabled()) {	            
+	        	logger.info(" CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
+	        	logger.info(" Execute dependency managers 'install packages' command before CxOSA Scan: " + config.getOsaRunInstall());            
+	        }	        
         }
         logger.info("------------------------------------------------------------------------");
     }
@@ -263,16 +258,5 @@ public class CxBuildProcess extends CallableBuildProcess {
         return "/repository/download/" + buildTypeId + "/" + buildId + ":id/" + CxConstants.RUNNER_DISPLAY_NAME + "/" + artifactName;
     }
 
-    private void checkExceptions(ScanResults ret) {
-        //createExceptions
-        sastCreateEx = ret.getSastResults() != null ? ret.getSastResults().getCreateException() : null;
-        osaCreateEx = ret.getOsaResults() != null ? ret.getOsaResults().getCreateException() : null;
-        scaCreateEx = ret.getScaResults() != null ? ret.getScaResults().getCreateException() : null;
-        //Wait Exceptions
-        sastWaitEx = ret.getSastResults() != null ? ret.getSastResults().getWaitException() : null;
-        osaWaitEx = ret.getOsaResults() != null ? ret.getOsaResults().getWaitException() : null;
-        scaWaitEx = ret.getScaResults() != null ? ret.getScaResults().getWaitException() : null;
-
-    }
 
 }

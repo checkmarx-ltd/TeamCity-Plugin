@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>2020.3.8</version>
+    <version>2021.2.1</version>
   </parent>
   <artifactId>cxplugin-common</artifactId>
   <packaging>jar</packaging>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>2020.3.77</version>
+      <version>2021.2.159</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>

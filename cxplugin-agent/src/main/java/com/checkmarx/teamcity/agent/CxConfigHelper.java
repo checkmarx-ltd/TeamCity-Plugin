@@ -1,7 +1,6 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.CxParam;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
@@ -28,7 +27,6 @@ public class CxConfigHelper {
 
 
         CxScanConfig ret = new CxScanConfig();
-        AstScaConfig scaConfig = new AstScaConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
         ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
         ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
@@ -50,7 +48,8 @@ public class CxConfigHelper {
 
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
-        ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
+        // Parameter name is TEAM_ID, But actual value is TEAM_NAME
+        ret.setTeamPath((validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID)));
 
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
@@ -69,28 +68,40 @@ public class CxConfigHelper {
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
-        if(CxConstants.TRUE.equals(buildParameters.get(CxParam.OSA_ENABLED))){
-            ret.addScannerType(ScannerType.OSA);
-        }
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
         {
             ScannerType scannerType;
             if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
             {
-                scannerType = "SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE)) ?
-                        ScannerType.AST_SCA:ScannerType.OSA;
+            	ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
+                if("SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE))) {
+                	scannerType = ScannerType.AST_SCA;
+                	ret.setAstScaConfig(getScaConfig(buildParameters, false));
+                }
+                else {
+                	scannerType = ScannerType.OSA;
+                	ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
+                    ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
+                }
+                
             } else {
-                scannerType = "SCA".equalsIgnoreCase(buildParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ?
-                        ScannerType.AST_SCA:ScannerType.OSA;
+            	ret.setOsaFilterPattern(globalParameters.get(GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS));
+            	if("SCA".equalsIgnoreCase(globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ) {
+            		scannerType = ScannerType.AST_SCA;
+            		ret.setAstScaConfig(getScaConfig(globalParameters, true));
+            	} 
+            	else {
+            		scannerType = ScannerType.OSA;
+            		ret.setOsaArchiveIncludePatterns(buildParameters.get(GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
+                    ret.setOsaRunInstall(TRUE.equals(buildParameters.get(GLOBAL_EXECUTE_DEPENDENCY_MANAGER)));
+            	}
             }
-            ret.addScannerType(scannerType);
+            if (scannerType != null) {
+                ret.addScannerType(scannerType);
+            }
         }
 
-
-        ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
-        ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
-        ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
 
 
         String thresholdEnabled = THRESHOLD_ENABLED;
@@ -105,9 +116,6 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
-        // TODO: 2/13/2020  add parameters that is common for two pages
-        String globalExecuteDependencyManager = GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
-
         Map<String, String> parameters = buildParameters;
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
@@ -140,7 +148,6 @@ public class CxConfigHelper {
             }
         }
 
-
         if (ret.isAstScaEnabled() || ret.isOsaEnabled()) {
             ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
             if (ret.getOsaThresholdsEnabled()) {
@@ -148,20 +155,31 @@ public class CxConfigHelper {
                 ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
                 ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));
             }
-            if (ret.isAstScaEnabled()) {
-                scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
-                scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
-                scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
-                scaConfig.setPassword(EncryptUtil.isScrambled(buildParameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(buildParameters.get(SCA_PASSWORD)) : buildParameters.get(SCA_PASSWORD));
-                scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
-                scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-                ret.setAstScaConfig(scaConfig);
-            }
         }
-
-
         return ret;
     }
+    private static AstScaConfig getScaConfig(Map<String, String> parameters, boolean fromGlobal) {
+		AstScaConfig scaConfig = new AstScaConfig();
+		
+		if(fromGlobal) {
+			scaConfig.setAccessControlUrl(parameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
+            scaConfig.setWebAppUrl(parameters.get(GLOBAL_SCA_WEB_APP_URL));
+            scaConfig.setApiUrl(parameters.get(GLOBAL_SCA_API_URL));
+            scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(GLOBAL_SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(GLOBAL_SCA_PASSWORD)) : parameters.get(GLOBAL_SCA_PASSWORD));
+            scaConfig.setUsername(parameters.get(GLOBAL_SCA_USERNAME));
+            scaConfig.setTenant(parameters.get(GLOBAL_SCA_TENANT));
+
+		}else {
+			scaConfig.setAccessControlUrl(parameters.get(SCA_ACCESS_CONTROL_URL));
+            scaConfig.setWebAppUrl(parameters.get(SCA_WEB_APP_URL));
+            scaConfig.setApiUrl(parameters.get(SCA_API_URL));
+            scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(SCA_PASSWORD)) : parameters.get(SCA_PASSWORD));
+            scaConfig.setUsername(parameters.get(SCA_USERNAME));
+            scaConfig.setTenant(parameters.get(SCA_TENANT));	
+		}
+		return scaConfig;
+    }
+    
 
     private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
 

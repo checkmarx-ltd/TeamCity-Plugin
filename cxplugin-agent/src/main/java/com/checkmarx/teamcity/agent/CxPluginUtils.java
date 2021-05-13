@@ -32,11 +32,8 @@ public abstract class CxPluginUtils {
 
     private static void logError(Results results, org.slf4j.Logger log) {
        if(results!=null){
-           if (results.getCreateException() != null ) {
-               log.error(results.getCreateException().getMessage());
-           }
-           if (results.getWaitException() != null ) {
-               log.error(results.getWaitException().getMessage());
+           if (results.getException() != null ) {
+               log.error(results.getException().getMessage());
            }
        }
 

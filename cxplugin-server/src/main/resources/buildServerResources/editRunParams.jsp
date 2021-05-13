@@ -10,7 +10,7 @@
     window.updateDependencyScanSectionVisibility = function() {
         var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
             overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
-            osaEnabled = jQuery('#enableOsa').prop('checked'),
+            osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
             isOverriding = depScanEnabled && overrideChecked;
 
@@ -369,7 +369,7 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
         <td>
             <props:selectProperty name="${optionsBean.teamId}" className="longField">
                 <c:forEach items="${optionsBean.teamList}" var="item">
-                    <props:option value="${item.id}">${item.fullName}</props:option>
+                    <props:option value="${item.fullName}">${item.fullName}</props:option>
                 </c:forEach>
             </props:selectProperty>
             <span class="error" id="error_${optionsBean.teamId}"></span>
