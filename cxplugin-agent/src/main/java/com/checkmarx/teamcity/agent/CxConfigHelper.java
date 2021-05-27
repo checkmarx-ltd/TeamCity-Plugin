@@ -5,10 +5,15 @@ import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
+import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
+
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 import static com.checkmarx.teamcity.common.CxParam.*;
@@ -179,12 +184,29 @@ public class CxConfigHelper {
             scaConfig.setUsername(parameters.get(SCA_USERNAME));
             scaConfig.setTenant(parameters.get(SCA_TENANT));
             scaConfig.setIncludeSources(TRUE.equals(parameters.get(IS_INCLUDE_SOURCES)));
+            String scaEnvVars = parameters.get(SCA_ENV_VARIABLE);
+
+            if(StringUtils.isNotEmpty(scaEnvVars))
+            {
+            	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
+            }
+            String filePath = parameters.get(SCA_CONFIGFILE);
+            String[] strArrayFile=filePath.split(",");
+            List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
+            scaConfig.setConfigFilePaths(trimmedConfigPaths);
 		}
 		return scaConfig;
     }
     
 
-    private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
+    private static List<String> getTrimmedConfigPaths(String[] strArrayFile) {
+    	List<String> paths = new ArrayList<String>();
+    	for (int i = 0; i < strArrayFile.length; i++) {
+    		paths.add(strArrayFile[i].trim());
+		}
+		return paths;
+	}
+	private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
 
         if (param != null && param.length() > 0) {
             try {
