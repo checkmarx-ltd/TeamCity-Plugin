@@ -70,6 +70,13 @@ public abstract class CxParam {
     public static final String GLOBAL_SCA_USERNAME = "cxGlobalSCAUserName";
     public static final String GLOBAL_SCA_PASSWORD = "cxGlobalSCAPassword";
     public static final String GLOBAL_SCA_TENANT = "cxGlobalSCATenant";
+    
+    public static final String GLOBAL_SCA_CONFIGFILE = "cxGlobalScaConfigFile";
+    public static final String GLOBAL_SCA_ENV_VARIABLE = "cxGlobalScaEnvVariable";
+    public static final String GLOBAL_IS_EXPLOITABLE_PATH = "cxGlobalIsExploitablePath";
+    public static final String GLOBAL_SAST_SERVER_URL = "cxGlobalSastServerUrl";
+    public static final String GLOBAL_SAST_SERVER_USERNAME = "cxGlobalSastUsername";
+    public static final String GLOBAL_SAST_SERVER_PASSWORD = "cxGlobalSastPassword";
 
     public static final String GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS = "globalDependencyScanEnabled";
     public static final String GLOBAL_SCA_THRESHOLD_ENABLED = "cxGlobalSCAThresholdEnabled";
@@ -81,7 +88,14 @@ public abstract class CxParam {
     public static final String SCA_USERNAME = "scaUserName";
     public static final String SCA_PASSWORD = "scaPass";
     public static final String SCA_TENANT = "scaTenant";
-
+    public static final String SCA_CONFIGFILE = "scaConfigFile";
+    public static final String SCA_ENV_VARIABLE = "scaEnvVariable";
+    public static final String IS_INCLUDE_SOURCES = "isIncludeSources";
+    public static final String IS_EXPLOITABLE_PATH = "isExploitablePath";
+    public static final String SCA_SAST_PROJECT_FULLPATH = "scaSASTProjectFullPath";
+    public static final String SCA_SAST_PROJECT_ID = "scaSASTProjectID";
+    public static final String USE_SAST_DEFAULT_SERVER = "useSASTDefaultServer";
+    
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";
     public static final String SCA_LOW = "ScaLow";
@@ -106,7 +120,8 @@ public abstract class CxParam {
             GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION,
             GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER,
             GLOBAL_SCA_ENABLED, GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL,
-            GLOBAL_SCA_WEB_APP_URL, GLOBAL_SCA_USERNAME, GLOBAL_SCA_PASSWORD, GLOBAL_SCA_TENANT,
+            GLOBAL_SCA_WEB_APP_URL, GLOBAL_SCA_USERNAME, GLOBAL_SCA_PASSWORD, GLOBAL_SCA_TENANT, GLOBAL_SCA_CONFIGFILE, GLOBAL_SCA_ENV_VARIABLE, GLOBAL_IS_EXPLOITABLE_PATH
+            , GLOBAL_SAST_SERVER_URL, GLOBAL_SAST_SERVER_USERNAME, GLOBAL_SAST_SERVER_PASSWORD
     };
 
 

@@ -13,12 +13,14 @@
             osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
             isOverriding = depScanEnabled && overrideChecked;
-
+        	isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
+        
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
 
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
+        jQuery('.expPath')[scaEnabled && isEnableExpPath ? 'show' : 'hide']();
     }
 
     console.log('updateDependencyScanSectionVisibility');
@@ -236,6 +238,9 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.useSASTDefaultServer] == 'true'}">
+    <c:set var="hideScaSASTServerOverrideSection" value="${optionsBean.noDisplay}"/>
 </c:if>
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultSastConfig] == 'true'}">
@@ -614,6 +619,117 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             </form>
         </td>
     </tr>
+    <!-- SCA FEATURES -->
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaConfigFile}">Package Manager's Config File(s) Path
+
+            <bs:helpIcon
+                    iconTitle="This parameter is to provide configuration files of the package managers used in the project. For ex. Settings.xml for maven, Nuget.config for Nuget, .npmrc for npm etc.</br>
+This option is relevant for projects that use private artifactory. Use CxSCA agent to perfom the scan. CxSCA agent will try to perform dependency resolution using the package manager's configuration files provided.</br>
+Multiple comma character separated file path can be provided.  </br>
+<p>
+Example: c:\user\.m2\settings.xml, c:\user\npm\.npmrc"/>
+        </label></th>
+        <td><props:multilineProperty name="${optionsBean.scaConfigFile}" linkTitle="" expanded="true" rows="5"
+                                     cols="50" className="longField"/></td>
+    </tr>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaEnvVariable}">Private Registry Environment Variable
+
+            <bs:helpIcon
+                    iconTitle="This option is relevant only if Package Manager's config files are provided.
+In many cases, package manager's configuration files reference environment variables, often to provide credentials without storing them in a file. Pass all such variables using this option.
+<p>
+Example: param1:value1,param2:value2"/>
+        </label></th>
+        <td><props:multilineProperty name="${optionsBean.scaEnvVariable}" linkTitle="" expanded="true" rows="5"
+                                     cols="50" className="longField"/></td>
+    </tr>
+    
+     <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.isIncludeSources}">Include Sources
+            <bs:helpIcon iconTitle="When this flag is enabled, it will include entire source code in the zip file to be scanned."/>
+        </label></th>
+        <td> <props:checkboxProperty name="${optionsBean.isIncludeSources}"/>
+        </td>
+    </tr>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
+            <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
+In this section, provide details like CxSAST server url, credentials.
+At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST. 
+<p>
+Example of Project Full Path: CxServer/team1/projectname."/>
+        </label></th>
+        <td> 
+       
+        <props:checkboxProperty name="${optionsBean.isExploitablePath}" id="enableExpPath" onclick="updateDependencyScanSectionVisibility()"/>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath">
+        <th>
+            <label for="${optionsBean.useSASTDefaultServer}">Use Default Credentials<br>
+            Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
+            Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
+        </th>
+        <td>
+            <c:set var="onclick">
+                $('scaSASTServerOverrideSection').toggle();
+            </c:set>
+            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="${onclick}"/>
+        </td>
+    </tr>
+    <tbody id="scaSASTServerOverrideSection" ${hideScaSASTServerOverrideSection}>
+    <tr>
+        <th><label for="${optionsBean.serverUrl}">Server URL<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.serverUrl}" className="longField"/>
+            <span class="error" id="error_${optionsBean.serverUrl}"></span>
+        </td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.username}">Username<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.username}" className="longField"/>
+            <span class="error" id="error_${optionsBean.username}"></span>
+        </td>
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.password}">Password<l:star/></label></th>
+        <td>
+            <props:passwordProperty name="${optionsBean.password}" className="longField"/>
+            <span class="error" id="error_${optionsBean.password}"></span>
+        </td>
+    </tr>
+    <td>
+        <form>
+            <input id="testConnection" type="button" name="TestConnection" value="Connect to Server"
+                   onclick="Checkmarx.testConnection(Checkmarx.extractCredentials())"/>
+            <span id="testConnectionMsg"></span>
+        </form>
+    </td>
+    </tbody>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTProjectFullPath}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTProjectFullPath}"></span>
+        </td>
+    </tr>
+    
+    <tr  class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTProjectID}"></span>
+        </td>
+    </tr>
+   
+    <!-- END SCA FEATURES -->
+    
     </tbody>
     </tbody>
 

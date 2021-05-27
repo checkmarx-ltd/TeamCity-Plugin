@@ -149,7 +149,32 @@ public class CxOptions {
     public String getIsSynchronous() {
         return IS_SYNCHRONOUS;
     }
-
+    
+    @NotNull
+    public String getIsIncludeSources() {
+        return IS_INCLUDE_SOURCES;
+    }
+    
+    @NotNull
+    public String getIsExploitablePath() {
+        return IS_EXPLOITABLE_PATH;
+    }
+    
+    @NotNull
+    public String getScaSASTProjectFullPath() {
+        return SCA_SAST_PROJECT_FULLPATH;
+    }
+    
+    @NotNull
+    public String getScaSASTProjectID() {
+        return SCA_SAST_PROJECT_ID;
+    }
+    
+    @NotNull
+    public String getUseSASTDefaultServer() {
+        return USE_SAST_DEFAULT_SERVER;
+    }
+    
     @NotNull
     public String getThresholdEnabled() {
         return THRESHOLD_ENABLED;
@@ -298,6 +323,16 @@ public class CxOptions {
     @NotNull
     public String getScaTenant() {
         return SCA_TENANT;
+    }
+    
+    @NotNull
+    public String getScaConfigFile() {
+        return SCA_CONFIGFILE;
+    }
+    
+    @NotNull
+    public String getScaEnvVariable() {
+    	return SCA_ENV_VARIABLE;
     }
 
     @NotNull

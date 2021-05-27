@@ -49,7 +49,7 @@ public class CxConfigHelper {
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         // Parameter name is TEAM_ID, But actual value is TEAM_NAME
-        ret.setTeamPath((validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID)));
+        ret.setTeamPath(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
@@ -168,6 +168,8 @@ public class CxConfigHelper {
             scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(GLOBAL_SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(GLOBAL_SCA_PASSWORD)) : parameters.get(GLOBAL_SCA_PASSWORD));
             scaConfig.setUsername(parameters.get(GLOBAL_SCA_USERNAME));
             scaConfig.setTenant(parameters.get(GLOBAL_SCA_TENANT));
+            // As we dont have include source option at global level, the flag can be set to false
+            scaConfig.setIncludeSources(false);
 
 		}else {
 			scaConfig.setAccessControlUrl(parameters.get(SCA_ACCESS_CONTROL_URL));
@@ -175,7 +177,8 @@ public class CxConfigHelper {
             scaConfig.setApiUrl(parameters.get(SCA_API_URL));
             scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(SCA_PASSWORD)) : parameters.get(SCA_PASSWORD));
             scaConfig.setUsername(parameters.get(SCA_USERNAME));
-            scaConfig.setTenant(parameters.get(SCA_TENANT));	
+            scaConfig.setTenant(parameters.get(SCA_TENANT));
+            scaConfig.setIncludeSources(TRUE.equals(parameters.get(IS_INCLUDE_SOURCES)));
 		}
 		return scaConfig;
     }
