@@ -6,8 +6,7 @@ import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
-
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -43,11 +42,11 @@ public class CxConfigHelper {
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
             ret.setUsername(validateNotEmpty(globalParameters.get(GLOBAL_USERNAME), GLOBAL_USERNAME));
-            ret.setPassword(EncryptUtil.unscramble(validateNotEmpty(globalParameters.get(GLOBAL_PASSWORD), GLOBAL_PASSWORD)));
+            ret.setPassword(decrypt(validateNotEmpty(globalParameters.get(GLOBAL_PASSWORD), GLOBAL_PASSWORD)));
         } else {
             ret.setUrl(validateNotEmpty(buildParameters.get(SERVER_URL), SERVER_URL));
             ret.setUsername(validateNotEmpty(buildParameters.get(USERNAME), USERNAME));
-            ret.setPassword(EncryptUtil.unscramble(validateNotEmpty(buildParameters.get(PASSWORD), PASSWORD)));
+            ret.setPassword(decrypt(validateNotEmpty(buildParameters.get(PASSWORD), PASSWORD)));
         }
 
 
@@ -170,17 +169,43 @@ public class CxConfigHelper {
 			scaConfig.setAccessControlUrl(parameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(parameters.get(GLOBAL_SCA_WEB_APP_URL));
             scaConfig.setApiUrl(parameters.get(GLOBAL_SCA_API_URL));
-            scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(GLOBAL_SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(GLOBAL_SCA_PASSWORD)) : parameters.get(GLOBAL_SCA_PASSWORD));
+            scaConfig.setPassword(decrypt(parameters.get(GLOBAL_SCA_PASSWORD)));
             scaConfig.setUsername(parameters.get(GLOBAL_SCA_USERNAME));
             scaConfig.setTenant(parameters.get(GLOBAL_SCA_TENANT));
             // As we dont have include source option at global level, the flag can be set to false
             scaConfig.setIncludeSources(false);
+            String scaEnvVars = parameters.get(GLOBAL_SCA_ENV_VARIABLE);
+
+            if(StringUtils.isNotEmpty(scaEnvVars))
+            {
+            	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
+            }
+            String configFilePaths = parameters.get(GLOBAL_SCA_CONFIGFILE);
+			if (StringUtils.isNotEmpty(configFilePaths)) {
+				String[] strArrayFile = configFilePaths.split(",");
+				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
+				scaConfig.setConfigFilePaths(trimmedConfigPaths);
+			}
+			
+			//set the exp path params
+
+			String isExpPath = parameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
+			if (TRUE.equals(isExpPath)) {
+				String scaSASTServerUrl = parameters.get(GLOBAL_SAST_SERVER_URL);
+				String scaSASTServerUserName = parameters.get(GLOBAL_SAST_SERVER_USERNAME);
+				String scaSASTServerPassword = parameters.get(GLOBAL_SAST_SERVER_PASSWORD);
+
+				scaConfig.setSastServerUrl(scaSASTServerUrl);
+				scaConfig.setSastUsername(scaSASTServerUserName);
+				scaConfig.setSastPassword(scaSASTServerPassword);
+
+			}
 
 		}else {
 			scaConfig.setAccessControlUrl(parameters.get(SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(parameters.get(SCA_WEB_APP_URL));
             scaConfig.setApiUrl(parameters.get(SCA_API_URL));
-            scaConfig.setPassword(EncryptUtil.isScrambled(parameters.get(SCA_PASSWORD)) ? EncryptUtil.unscramble(parameters.get(SCA_PASSWORD)) : parameters.get(SCA_PASSWORD));
+            scaConfig.setPassword(decrypt(parameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(parameters.get(SCA_USERNAME));
             scaConfig.setTenant(parameters.get(SCA_TENANT));
             scaConfig.setIncludeSources(TRUE.equals(parameters.get(IS_INCLUDE_SOURCES)));
@@ -190,10 +215,41 @@ public class CxConfigHelper {
             {
             	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
             }
-            String filePath = parameters.get(SCA_CONFIGFILE);
-            String[] strArrayFile=filePath.split(",");
-            List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
-            scaConfig.setConfigFilePaths(trimmedConfigPaths);
+            String configFilePaths = parameters.get(SCA_CONFIGFILE);
+			if (StringUtils.isNotEmpty(configFilePaths)) {
+				String[] strArrayFile = configFilePaths.split(",");
+				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
+				scaConfig.setConfigFilePaths(trimmedConfigPaths);
+			}
+			
+			//set the exp path params
+
+			String isExpPath = parameters.get(IS_EXPLOITABLE_PATH);
+			if (TRUE.equals(isExpPath)) {
+				String sastProjectName = parameters.get(SCA_SAST_PROJECT_FULLPATH);
+				String sastProjectId = parameters.get(SCA_SAST_PROJECT_ID);
+				scaConfig.setSastProjectName(sastProjectName);
+				scaConfig.setSastProjectId(sastProjectId);
+				if (!TRUE.equals(parameters.get(USE_SAST_DEFAULT_SERVER))) {
+					String scaSASTServerUrl = parameters.get(SCA_SAST_SERVER_URL);
+					String scaSASTServerUserName = parameters.get(SCA_SAST_SERVER_USERNAME);
+					String scaSASTServerPassword = parameters.get(SCA_SAST_SERVER_PASSWORD);
+
+					scaConfig.setSastServerUrl(scaSASTServerUrl);
+					scaConfig.setSastUsername(scaSASTServerUserName);
+					scaConfig.setSastPassword(scaSASTServerPassword);
+				} else {
+					String scaSASTServerUrl = parameters.get(GLOBAL_SAST_SERVER_URL);
+					String scaSASTServerUserName = parameters.get(GLOBAL_SAST_SERVER_USERNAME);
+					String scaSASTServerPassword = parameters.get(GLOBAL_SAST_SERVER_PASSWORD);
+
+					scaConfig.setSastServerUrl(scaSASTServerUrl);
+					scaConfig.setSastUsername(scaSASTServerUserName);
+					scaConfig.setSastPassword(scaSASTServerPassword);
+				}
+				
+
+			}
 		}
 		return scaConfig;
     }

@@ -95,6 +95,9 @@ public abstract class CxParam {
     public static final String SCA_SAST_PROJECT_FULLPATH = "scaSASTProjectFullPath";
     public static final String SCA_SAST_PROJECT_ID = "scaSASTProjectID";
     public static final String USE_SAST_DEFAULT_SERVER = "useSASTDefaultServer";
+    public static final String SCA_SAST_SERVER_URL = "scaSASTServerUrl";
+    public static final String SCA_SAST_SERVER_USERNAME = "scaSASTUserName";
+    public static final String SCA_SAST_SERVER_PASSWORD = "scaSASTPassword";
     
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";

@@ -8,7 +8,7 @@ import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -160,6 +160,20 @@ public class CxOptions {
         return IS_EXPLOITABLE_PATH;
     }
     
+    @NotNull
+    public String getScaSASTUserName() {
+        return SCA_SAST_SERVER_USERNAME;
+    }
+    
+    @NotNull
+    public String getScaSASTServerUrl() {
+        return SCA_SAST_SERVER_URL;
+    }
+    
+    @NotNull
+    public String getScaSASTPassword() {
+        return SCA_SAST_SERVER_PASSWORD;
+    }
     @NotNull
     public String getScaSASTProjectFullPath() {
         return SCA_SAST_PROJECT_FULLPATH;
@@ -427,9 +441,7 @@ public class CxOptions {
     }
 
     private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl) throws MalformedURLException {
-        if (EncryptUtil.isScrambled(pssd)) {
-            pssd = EncryptUtil.unscramble(pssd);
-        }
+            pssd = decrypt(pssd);
         CxScanConfig config = new CxScanConfig();
         config.addScannerType(ScannerType.SAST);
         config.setUsername(username);
@@ -441,6 +453,21 @@ public class CxOptions {
         config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
         CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
         return clientDelegator;
+    }
+    
+    public void testSASTConnection(String serverUrl, String username, String pssd) {
+
+        try {
+            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl);
+            CxSASTClient sastClient = delegator.getSastClient();
+            sastClient.login();
+            presetList = sastClient.getPresetList();
+            teamList = sastClient.getTeamList();
+
+        } catch (Exception ex) {
+            String result = ex.getMessage();
+            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
+        }
     }
 
     /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
@@ -474,7 +501,7 @@ public class CxOptions {
                 pssd = RSACipher.decryptWebRequestData(pssd);
             }
 
-            return EncryptUtil.isScrambled(pssd) ? EncryptUtil.unscramble(pssd) : pssd;
+            return decrypt(pssd);
 
         } catch (Exception e) {
             return pssd;

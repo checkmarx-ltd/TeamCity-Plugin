@@ -10,22 +10,43 @@
     window.updateDependencyScanSectionVisibility = function() {
         var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
             overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
+            overrideSASTChecked = jQuery('#useSASTDefaultServer').prop('checked'),
             osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
+            isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
             isOverriding = depScanEnabled && overrideChecked;
-        	isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
-        
+        	
+        	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
+        jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
 
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        jQuery('.expPath')[scaEnabled && isEnableExpPath ? 'show' : 'hide']();
+        
+        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
     }
 
     console.log('updateDependencyScanSectionVisibility');
     jQuery(updateDependencyScanSectionVisibility);
     window.Checkmarx = {
+    		extractSASTCredentials: function () {
+        return {
+            sastServerUrl: $('scaSASTServerUrl').value,
+            sastUsername: $('scaSASTUserName').value,
+            sastPssd: $('prop:encrypted:scaSASTPassword').value ? $('prop:encrypted:scaSASTPassword').value : $('scaSASTPassword').value
+        };
+    },
+    
+    extractGlobalSASTCredentials: function () {
+        return {
+        	sastServerUrl: $('cxGlobalSastServerUrl').value,
+        	sastUsername: $('cxGlobalSastUsername').value,
+        	sastPssd: $('cxGlobalSastPassword').value,
+            global: true
+        }
+    },
     extractCredentials: function () {
         return {
             serverUrl: $('cxServerUrl').value,
@@ -33,7 +54,7 @@
             pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
         };
     },
-
+    
     extractGlobalCredentials: function () {
         return {
             serverUrl: $('cxGlobalServerUrl').value,
@@ -68,7 +89,7 @@
         if (Checkmarx.validateCredentials(credentials)) {
             var messageElm = jQuery('#testConnectionMsg');
             var buttonElm = jQuery('#testConnection');
-
+			console.log('testConnection');
             messageElm.removeAttr("style");
             messageElm.text('');
             buttonElm.attr("disabled", true);
@@ -101,6 +122,44 @@
             });
         }
     },
+    testScaSASTConnection: function (credentials) {
+        if (Checkmarx.validateSASTCredentials(credentials)) {
+            var messageElm = jQuery('#testScaSASTConnectionMsg');
+            var buttonElm = jQuery('#testScaSASTConnection');
+			console.log('testScaSASTConnection');
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
+                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+    
  testSCAConnection: function (credentials) {
         if (Checkmarx.validateSCAParameters(credentials)) {
             var messageElm = jQuery('#testSCAConnectionMsg');
@@ -155,6 +214,30 @@
         }
 
         if (!credentials.pssd) {
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        return true;
+
+    },
+    
+    validateSASTCredentials: function (credentials) {
+        var messageElm = jQuery('#testScaSASTConnectionMsg');
+        if (!credentials.sastServerUrl) {
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastUsername) {
+            messageElm.text('Username must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastPssd) {
             messageElm.text('Password must not be empty');
             messageElm.css('color','red');
             return false;
@@ -236,11 +319,12 @@ ${'true'.equals(cxUseDefaultServer) ?
 optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword) :
 optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
+${'true'.equals(useSASTDefaultServer) ?
+optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
+optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
+
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
-</c:if>
-<c:if test="${propertiesBean.properties[optionsBean.useSASTDefaultServer] == 'true'}">
-    <c:set var="hideScaSASTServerOverrideSection" value="${optionsBean.noDisplay}"/>
 </c:if>
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultSastConfig] == 'true'}">
@@ -675,44 +759,40 @@ Example of Project Full Path: CxServer/team1/projectname."/>
             Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
         </th>
         <td>
-            <c:set var="onclick">
-                $('scaSASTServerOverrideSection').toggle();
-            </c:set>
-            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="${onclick}"/>
+            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
-    <tbody id="scaSASTServerOverrideSection" ${hideScaSASTServerOverrideSection}>
-    <tr>
-        <th><label for="${optionsBean.serverUrl}">Server URL<l:star/></label></th>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTServerUrl}">Server URL<l:star/></label></th>
         <td>
-            <props:textProperty name="${optionsBean.serverUrl}" className="longField"/>
-            <span class="error" id="error_${optionsBean.serverUrl}"></span>
+            <props:textProperty name="${optionsBean.scaSASTServerUrl}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTServerUrl}"></span>
         </td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.username}">Username<l:star/></label></th>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTUserName}">Username<l:star/></label></th>
         <td>
-            <props:textProperty name="${optionsBean.username}" className="longField"/>
-            <span class="error" id="error_${optionsBean.username}"></span>
+            <props:textProperty name="${optionsBean.scaSASTUserName}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTUserName}"></span>
         </td>
     </tr>
-    <tr>
-        <th><label for="${optionsBean.password}">Password<l:star/></label></th>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTPassword}">Password<l:star/></label></th>
         <td>
-            <props:passwordProperty name="${optionsBean.password}" className="longField"/>
-            <span class="error" id="error_${optionsBean.password}"></span>
+            <props:passwordProperty name="${optionsBean.scaSASTPassword}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTPassword}"></span>
         </td>
     </tr>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
     <td>
         <form>
-            <input id="testConnection" type="button" name="TestConnection" value="Connect to Server"
-                   onclick="Checkmarx.testConnection(Checkmarx.extractCredentials())"/>
-            <span id="testConnectionMsg"></span>
+            <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
+                   onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
+            <span id="testScaSASTConnectionMsg"></span>
         </form>
     </td>
-    </tbody>
-    
-    <tr class="dependencyScanRow scaInput">
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath">
         <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
         <td>
             <props:textProperty name="${optionsBean.scaSASTProjectFullPath}" className="longField"/>
@@ -720,7 +800,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
         </td>
     </tr>
     
-    <tr  class="dependencyScanRow scaInput">
+    <tr  class="dependencyScanRow scaInput expPath">
         <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
         <td>
             <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>

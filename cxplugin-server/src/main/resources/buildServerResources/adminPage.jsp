@@ -503,8 +503,8 @@ Example of Project Full Path: CxServer/team1/projectname"/></label>
           <td>
             <form>
               <input id="testScaSastConnection" type="button" name="TestScaSastConnection" value="Connect to Server"
-                     onclick="Checkmarx.testConnection(Checkmarx.extractGlobalCredentials())"/>
-              <span id="testConnectionMsg"></span>
+                     onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractGlobalSASTCredentials())"/>
+              <span id="testScaSASTConnectionMsg"></span>
             </form>
           </td>
 

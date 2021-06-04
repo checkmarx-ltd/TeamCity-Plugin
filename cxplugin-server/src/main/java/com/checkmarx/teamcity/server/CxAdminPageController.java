@@ -4,7 +4,7 @@ package com.checkmarx.teamcity.server;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jdom.Element;
@@ -67,14 +67,7 @@ public class CxAdminPageController extends BaseFormXmlController {
 
     private String ensurePasswordEncryption(HttpServletRequest request, String requestParamName) {
         String password = RSACipher.decryptWebRequestData(request.getParameter(requestParamName));
-        if(!EncryptUtil.isScrambled(password)) {
-            try {
-                password = EncryptUtil.scramble(password);
-            } catch (RuntimeException e) {
-                password = "";
-            }
-        }
-        return password;
+        return encrypt(password);
     }
 
     private ActionErrors validateForm(final HttpServletRequest request) {
