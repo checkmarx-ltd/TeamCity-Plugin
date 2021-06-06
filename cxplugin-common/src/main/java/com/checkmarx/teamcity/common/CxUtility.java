@@ -1,6 +1,8 @@
 package com.checkmarx.teamcity.common;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
 
 public class CxUtility {
@@ -28,6 +30,7 @@ public class CxUtility {
 	 */
 	public static String decrypt(String password) {
         String encStr;
+        if(StringUtils.isNotEmpty(password)) {
         if (EncryptUtil.isScrambled(password)) {
             try {
                 encStr = EncryptUtil.unscramble(password);
@@ -38,5 +41,8 @@ public class CxUtility {
         } else {
             return password;
         }
+        }
+        else
+        	return "";
     }
 }
