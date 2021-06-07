@@ -118,6 +118,21 @@
                   $("invalid_cxGlobalSCATenant").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
                   SettingsForm.highlightErrorField($("cxGlobalSCATenant"));
         },
+        
+        onInvalid_cxGlobalSastServerUrlError: function (elem) {
+            $("invalid_cxGlobalSastServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastServerUrl"));
+          },
+          onInvalid_cxGlobalSastUsernameError: function (elem) {
+            $("invalid_cxGlobalSastUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastUsername"));
+          },
+          onInvalid_cxGlobalSastPasswordError: function (elem) {
+            $("invalid_cxGlobalSastPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastPassword"));
+          },
+
+          
         onSuccessfulSave: function () {
           SettingsForm.enable();
         },

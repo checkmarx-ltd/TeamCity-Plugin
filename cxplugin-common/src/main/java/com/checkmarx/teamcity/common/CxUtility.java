@@ -12,15 +12,14 @@ public class CxUtility {
 	 * @param password
 	 * @return
 	 */
-	public static String encrypt(String password) {
+	public static String encrypt(String password) throws RuntimeException{
+		String encPassword = "";
     	if(!EncryptUtil.isScrambled(password)) {
-            try {
-                password = EncryptUtil.scramble(password);
-            } catch (RuntimeException e) {
-                password = "";
-            }
+    		encPassword = EncryptUtil.scramble(password);
+        } else {
+        	encPassword = password;
         }
-        return password;
+        return encPassword;
     }
 	
 	/**
@@ -28,21 +27,15 @@ public class CxUtility {
 	 * @param password
 	 * @return
 	 */
-	public static String decrypt(String password) {
-        String encStr;
-        if(StringUtils.isNotEmpty(password)) {
-        if (EncryptUtil.isScrambled(password)) {
-            try {
-                encStr = EncryptUtil.unscramble(password);
-            } catch (RuntimeException e) {
-                encStr = "";
-            }
-            return encStr;
-        } else {
-            return password;
-        }
-        }
-        else
-        	return "";
-    }
+	public static String decrypt(String password) throws RuntimeException {
+		String encStr = "";
+		if (StringUtils.isNotEmpty(password)) {
+			if (EncryptUtil.isScrambled(password)) {
+				encStr = EncryptUtil.unscramble(password);
+			} else {
+				encStr =  password;
+			}
+		}
+		return encStr;
+	}
 }

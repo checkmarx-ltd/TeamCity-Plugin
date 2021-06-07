@@ -3,11 +3,10 @@ package com.checkmarx.teamcity.agent;
 
 import com.cx.restclient.dto.Results;
 import com.cx.restclient.dto.ScanResults;
-import com.cx.restclient.dto.scansummary.ScanSummary;
 
 public abstract class CxPluginUtils {
     //ScanSummary obj instead of String
-    public static void printScanBuildFailure(ScanSummary scanSummary, ScanResults ret, CxLoggerAdapter logger) {
+    public static void printScanBuildFailure(String scanSummary, ScanResults ret, CxLoggerAdapter logger) {
         logger.error("********************************************");
         logger.error(" The Build Failed for the Following Reasons: ");
         logger.error("********************************************");
@@ -18,11 +17,11 @@ public abstract class CxPluginUtils {
         logError(ret.getScaResults(), logger);
         logError(ret.getOsaResults(), logger);
         //todo: check null
-        if (scanSummary != null && scanSummary.hasErrors()) {
+        if (scanSummary != null) {
             //scanSummary.
             //String[] lines = thDescription.split("\\n");
             //for (String s : lines) {
-                logger.error(scanSummary.toString());
+                logger.error(scanSummary);
             //}
         }
 

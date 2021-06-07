@@ -38,6 +38,11 @@ public abstract class CxConstants {
     public static final String URL_NOT_VALID_MESSAGE = "Server URL is not valid";
     public static final String USERNAME_NOT_EMPTY_MESSAGE = "Username must not be empty";
     public static final String PASSWORD_NOT_EMPTY_MESSAGE = "Password must not be empty";
+    public static final String SAST_URL_NOT_EMPTY_MESSAGE = "Server URL for exploitable path feature must not be empty";
+    public static final String SAST_URL_NOT_VALID_MESSAGE = "Server URL for exploitable path feature is not valid";
+    public static final String SAST_USERNAME_NOT_EMPTY_MESSAGE = "Username for exploitable path feature must not be empty";
+    public static final String SAST_PASSWORD_NOT_EMPTY_MESSAGE = "Password for exploitable path feature must not be empty";
+    public static final String PROJECT_FULLPATH_PROJECT_ID_NOT_EMPTY_MESSAGE = "Must provide value for either 'Project Full Path' or 'Project Id'.";
     public static final String PROJECT_NAME_NOT_EMPTY_MESSAGE = "Project name must not be empty";
     public static final String PROJECT_NAME_ILLEGAL_CHARS_MESSAGE = "Project name should not contain the following characters: / ? < > : * |";
     public static final String PROJECT_NAME_MAX_CHARS_MESSAGE = "Project name length must not exceed 200 characters";

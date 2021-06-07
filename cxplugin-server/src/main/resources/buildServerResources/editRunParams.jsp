@@ -754,9 +754,9 @@ Example of Project Full Path: CxServer/team1/projectname."/>
     </tr>
     <tr class="dependencyScanRow scaInput expPath">
         <th>
-            <label for="${optionsBean.useSASTDefaultServer}">Use Default Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
-            Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
+            <label for="${optionsBean.useSASTDefaultServer}">Use Global Credentials<br>
+            Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
+            Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
         </th>
         <td>
             <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
