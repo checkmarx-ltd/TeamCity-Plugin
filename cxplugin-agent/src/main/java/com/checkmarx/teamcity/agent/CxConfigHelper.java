@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
+import static com.checkmarx.teamcity.common.CxConstants.FALSE;
+import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
+import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
+import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
 import static com.checkmarx.teamcity.common.CxParam.*;
 
 
@@ -26,7 +30,7 @@ public class CxConfigHelper {
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
 
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
-                                                     File reportDirectory) throws InvalidParameterException {
+                                                     File reportDirectory,  Map<String,String> otherParameters) throws InvalidParameterException {
 
 
         CxScanConfig ret = new CxScanConfig();
@@ -68,6 +72,13 @@ public class CxConfigHelper {
 
             ret.setScanComment(buildParameters.get(SCAN_COMMENT));
             ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
+            
+            String periodicFullScan = (buildParameters.get(PERIODIC_FULL_SCAN) == null)? FALSE: buildParameters.get(PERIODIC_FULL_SCAN);
+            int fullScanAfterNumberOfBuilds = -1;
+            if(TRUE.equalsIgnoreCase(periodicFullScan))
+            	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
+            
+            ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 
@@ -285,6 +296,37 @@ public class CxConfigHelper {
             throw new InvalidParameterException(PARAMETER_PREFIX + paramName + "] must not be empty");
         }
         return param;
+    }
+    
+    private static boolean isThisBuildIncremental(String buildNumber, String isIncremental, String isPeriodicFullScan, int fullScanAfter ) {
+
+        boolean askedForIncremental = TRUE.equalsIgnoreCase(isIncremental);
+        if (!askedForIncremental) {
+            return false;
+        }
+
+        boolean askedForPeriodicFullScans = TRUE.equalsIgnoreCase(isPeriodicFullScan);
+        if (!askedForPeriodicFullScans) {
+            return true;
+        }
+
+        // if user entered invalid value for full scan cycle - all scans will be incremental
+        if (fullScanAfter < FULL_SCAN_CYCLE_MIN || fullScanAfter > FULL_SCAN_CYCLE_MAX) {
+            return true;
+        }
+
+        int currentBuildNumer = -1;
+        try {		
+        	currentBuildNumer = Integer.parseInt(buildNumber);
+        }catch(Exception wrongNumber) {
+        	return true;
+        }
+        // If user asked to perform full scan after every 9 incremental scans -
+        // it means that every 10th scan should be full,
+        // that is the ordinal numbers of full scans will be "1", "11", "21" and so on...
+        boolean shouldBeFullScan = currentBuildNumer % (fullScanAfter + 1) == 1;
+
+        return !shouldBeFullScan;
     }
 
 }

@@ -20,11 +20,13 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.checkmarx.teamcity.agent.CxPluginUtils.printScanBuildFailure;
 import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
+import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
 
 /**
  * Created by: Dorg.
@@ -78,7 +80,10 @@ public class CxBuildProcess extends CallableBuildProcess {
             Map<String, String> sharedConfigParameters = agentRunningBuild.getSharedConfigParameters();
             checkoutDirectory = agentRunningBuild.getCheckoutDirectory();
             buildDirectory = new File(agentRunningBuild.getBuildTempDirectory() + "/" + agentRunningBuild.getProjectName() + "/" + agentRunningBuild.getBuildTypeName() + "/" + agentRunningBuild.getBuildNumber());
-            config = CxConfigHelper.resolveConfigurations(runnerParameters, sharedConfigParameters, checkoutDirectory, buildDirectory);
+            Map<String,String> otherParameters = new HashMap<>();
+            otherParameters.put(CX_BUILD_NUMBER, agentRunningBuild.getBuildNumber());
+            
+            config = CxConfigHelper.resolveConfigurations(runnerParameters, sharedConfigParameters, checkoutDirectory, buildDirectory, otherParameters);
             pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
 
             printConfiguration();
@@ -216,7 +221,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
             logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());
-            logger.info("Scan comment: " + config.getScanComment());
+            logger.info("Scan comment: " + config.getScanComment());            
             logger.info("Is incremental scan: " + config.getIncremental());
             logger.info("Generate PDF report: " + config.getGeneratePDFReport());
             logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());

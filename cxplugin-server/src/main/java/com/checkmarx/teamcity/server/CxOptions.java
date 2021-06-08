@@ -109,6 +109,16 @@ public class CxOptions {
     public String getIsIncremental() {
         return IS_INCREMENTAL;
     }
+    
+    @NotNull
+    public String getIsPeriodicFullScan() {
+        return PERIODIC_FULL_SCAN;
+    }
+    
+    @NotNull
+    public String getPeriodicFullScanAfter() {
+        return PERIODIC_FULL_SCAN_AFTER;
+    }
 
     @NotNull
     public String getOsaEnabled() {

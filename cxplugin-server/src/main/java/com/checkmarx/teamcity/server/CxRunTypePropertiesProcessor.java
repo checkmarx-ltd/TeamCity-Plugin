@@ -54,7 +54,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
         validateExpPathProjectDetails(properties, result);
         validateProjectName(properties.get(CxParam.PROJECT_NAME), result);
-
+        validIncrementalSettings(properties, result);
 
         if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PRESET_ID))) {
             result.add(new InvalidProperty(CxParam.PRESET_ID, PRESET_NOT_EMPTY_MESSAGE));
@@ -89,6 +89,13 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
         return result;
     }
+
+	private void validIncrementalSettings(Map<String, String> properties, List<InvalidProperty> result) {
+		if (TRUE.equals(properties.get(CxParam.IS_INCREMENTAL)) && TRUE.equals(properties.get(CxParam.PERIODIC_FULL_SCAN))) {
+			if(!validateRange(properties.get(CxParam.PERIODIC_FULL_SCAN_AFTER), FULL_SCAN_CYCLE_MIN, FULL_SCAN_CYCLE_MAX))
+	            result.add(new InvalidProperty(CxParam.PERIODIC_FULL_SCAN_AFTER, WRONG_PERIODIC_FULL_SCAN_INTERVAL));
+		}
+	}
 
 	private void validateExpPathProjectDetails(Map<String, String> properties, List<InvalidProperty> result) {
 		if (TRUE.equals(properties.get(CxParam.DEPENDENCY_SCAN_ENABLED))) {
@@ -139,4 +146,28 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
     }
+    
+    private boolean validateNumber(String num ) {
+    	boolean valid = true;    	
+    	try {
+    		if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
+    			valid = false;
+    		}
+    	}catch(Exception wrongNumber) {
+    		valid = false;
+    	}
+    	return valid;
+    }
+    
+    private boolean validateRange(String num, int min, int max) {
+    	boolean withinRange = false;
+		if (validateNumber(num)) {
+
+			int tobechecked = Integer.parseInt(num);
+			if (tobechecked >= min && tobechecked <= max)
+				withinRange = true;
+		}
+    	return withinRange;	
+    }
+    
 }
