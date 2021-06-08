@@ -108,6 +108,41 @@ public class CxBuildProcess extends CallableBuildProcess {
             if (config.isOsaEnabled() || config.isAstScaEnabled()) {
                 Logger.getRootLogger().removeAppender(appenderName);
             }
+            
+            ret = config.getSynchronous() ? clientDelegator.waitForScanResults() : clientDelegator.getLatestScanResults();
+            
+            if (config.getEnablePolicyViolations()) {
+                clientDelegator.printIsProjectViolated(ret);
+            }
+
+
+            //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
+            ScanSummary scanSummary = new ScanSummary(config, ret.getSastResults(), ret.getOsaResults(), ret.getScaResults());
+            if (scanSummary.hasErrors() || ret.getGeneralException() != null ||
+                    (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
+                    (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
+                    (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
+            	
+					StringBuilder scanFailedAtServer = new StringBuilder();
+					if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady() ))
+						scanFailedAtServer.append("CxSAST scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+					if (config.isOsaEnabled() && (ret.getOsaResults() == null || !ret.getOsaResults().isOsaResultsReady() ))
+						scanFailedAtServer.append("CxSAST OSA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+					if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady())) 
+						scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+									
+					if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty())
+						scanFailedAtServer.append(scanSummary.toString());
+					else if (scanSummary.hasErrors())
+						scanFailedAtServer.append("\n").append(scanSummary.toString());				 
+					            	
+					printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);
+					
+					//handle hard failures. In case of threshold or policy failure, we still need to generate report before returning.
+					//Hence, cannot return yet
+					if(!scanSummary.hasErrors()) 
+						return BuildFinishedStatus.FINISHED_FAILED;
+            	}
             //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
@@ -119,7 +154,6 @@ public class CxBuildProcess extends CallableBuildProcess {
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             }
             
-            ret = clientDelegator.waitForScanResults();
             if (config.getSynchronous() && config.isSastEnabled() && ((ret.getSastResults() != null
 					&& ret.getSastResults().getException() != null
 					&& ret.getSastResults().getScanId() > 0))) {
@@ -132,11 +166,6 @@ public class CxBuildProcess extends CallableBuildProcess {
                 publishPDFReport(ret.getSastResults());
             }
 
-
-            if (config.getEnablePolicyViolations()) {
-                clientDelegator.printIsProjectViolated(ret);
-            }
-
             String summaryStr = clientDelegator.generateHTMLSummary(ret);
             File htmlFile = new File(buildDirectory, REPORT_HTML_NAME);
             try {
@@ -145,30 +174,10 @@ public class CxBuildProcess extends CallableBuildProcess {
                 logger.error("Failed to generate full html report: " + e.getMessage());
             }
             publishArtifact(htmlFile.getAbsolutePath());
-
-            //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
-            //String buildFailureResult = ShragaUtils.getBuildFailureResult(config, ret.getSastResults(), ret.getOsaResults());
-            ScanSummary scanSummary = new ScanSummary(config, ret.getSastResults(), ret.getOsaResults(), ret.getScaResults());
-            if (scanSummary.hasErrors() || ret.getGeneralException() != null ||
-                    (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
-                    (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
-                    (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
-            	StringBuilder scanFailedAtServer = new StringBuilder();
-            	if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady() ))
-            		scanFailedAtServer.append("CxSAST scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-                if (config.isOsaEnabled() && (ret.getOsaResults() == null || !ret.getOsaResults().isOsaResultsReady() ))
-                	scanFailedAtServer.append("CxSAST OSA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-                if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady())) 
-                	scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-            					
-				if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty())
-					scanFailedAtServer.append(scanSummary.toString());
-				else if (scanSummary.hasErrors())
-					scanFailedAtServer.append("\n").append(scanSummary.toString());	
-                printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);
-                return BuildFinishedStatus.FINISHED_FAILED;
+            if(scanSummary.hasErrors()) {
+            	return BuildFinishedStatus.FINISHED_FAILED;
             }
-            
+            ///////////////
             
             return BuildFinishedStatus.FINISHED_SUCCESS;
         } catch (InterruptedException e) {
