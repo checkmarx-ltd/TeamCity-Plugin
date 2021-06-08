@@ -115,13 +115,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-        String sastProjectFullPath = properties.get(CxParam.SCA_SAST_PROJECT_FULLPATH);
-        String sastProjectId = properties.get(CxParam.SCA_SAST_PROJECT_ID);
-        if((StringUtils.isEmpty(sastProjectFullPath)) && 
-        		(StringUtils.isEmpty(sastProjectId) )) {
-        	properties.put(CxParam.SCA_SAST_PROJECT_ID, sastProjectId);
-        	properties.put(CxParam.SCA_SAST_PROJECT_FULLPATH, sastProjectFullPath);
-        }
         return new ActionErrors();
     }
 }

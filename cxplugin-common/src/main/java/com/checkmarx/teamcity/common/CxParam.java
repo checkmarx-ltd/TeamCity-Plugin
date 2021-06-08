@@ -21,6 +21,8 @@ public abstract class CxParam {
     public static final String SCAN_TIMEOUT_IN_MINUTES = "cxScanTimeoutInMinutes";
     public static final String SCAN_COMMENT = "cxScanComment";
     public static final String IS_INCREMENTAL = "cxIsIncremental";
+    public static final String PERIODIC_FULL_SCAN = "cxIsPeriodicFullScan";
+    public static final String PERIODIC_FULL_SCAN_AFTER = "cxPeriodicFullScanAfter";
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
     public static final String DEPENDENCY_SCANNER_TYPE = "dependencyScannerType";

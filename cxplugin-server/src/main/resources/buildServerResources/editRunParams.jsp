@@ -382,6 +382,12 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
 </c:if>
+<c:if test="${propertiesBean.properties[optionsBean.isIncremental] != 'true'}">
+    <c:set var="hideIncrementalSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.isPeriodicFullScan] != 'true'}">
+    <c:set var="hidePeriodicScanSection" value="${optionsBean.noDisplay}"/>
+</c:if>
 
 
 <l:settingsGroup className="cx-title" title="Checkmarx Server">
@@ -565,9 +571,37 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                 <tr>
                     <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
                         <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
-                    <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
+                    <td>
+                    	<c:set var="onclick">
+                            $('incrementalSection').toggle();
+                            BS.VisibilityHandlers.updateVisibility('sastConfigSection')
+                        </c:set>
+                    	<props:checkboxProperty name="${optionsBean.isIncremental}" onclick="${onclick}" />
+                    </td>
                 </tr>
-
+                <tbody id="incrementalSection" ${hideIncrementalSection}>
+                <tr>
+                    <th><label for="${optionsBean.isPeriodicFullScan}">Schedule periodic full scans
+                    </label></th>
+                    <td>
+                    	<c:set var="onclick">
+                            $('periodicScanSection').toggle();
+                            BS.VisibilityHandlers.updateVisibility('scanControlSection')
+                        </c:set>
+                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="${onclick}"/>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody id="periodicScanSection" ${hidePeriodicScanSection}>
+                <tr>
+                    <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans
+                    </label></th>
+                    <td>
+                    	 <props:textProperty name="${optionsBean.periodicFullScanAfter}" className="longField"/>
+                    	 <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
+                    </td>
+                </tr>
+                </tbody>
                 <tr>
                     <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
                         <bs:helpIcon
