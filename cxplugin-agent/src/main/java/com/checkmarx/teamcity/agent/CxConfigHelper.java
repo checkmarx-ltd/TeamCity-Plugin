@@ -1,15 +1,20 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import com.checkmarx.teamcity.common.CxUtility;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
+
+import jetbrains.buildServer.agent.AgentRunningBuild;
+
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +35,20 @@ public class CxConfigHelper {
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
 
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
-                                                     File reportDirectory,  Map<String,String> otherParameters) throws InvalidParameterException {
+                                                     File reportDirectory,  Map<String,String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
 
 
         CxScanConfig ret = new CxScanConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
         ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
-        ret.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
+        
+        String originUrl = CxUtility.getCxOriginUrl(agentRunningBuild);
+        ret.setCxOriginUrl(originUrl);
+        String cxOrigin = CxUtility.getCxOrigin(agentRunningBuild);
+        ret.setCxOrigin(cxOrigin);
+        logger.info("CxOrigin : "+ cxOrigin);
+        logger.info("CxOrigin URL : "+ originUrl);
+        
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
         String isProxyVar = System.getProperty("cx.isproxy");

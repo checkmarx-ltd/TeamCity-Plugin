@@ -83,7 +83,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             Map<String,String> otherParameters = new HashMap<>();
             otherParameters.put(CX_BUILD_NUMBER, agentRunningBuild.getBuildNumber());
             
-            config = CxConfigHelper.resolveConfigurations(runnerParameters, sharedConfigParameters, checkoutDirectory, buildDirectory, otherParameters);
+            config = CxConfigHelper.resolveConfigurations(runnerParameters, sharedConfigParameters, checkoutDirectory, buildDirectory, otherParameters, agentRunningBuild, logger);
             pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
 
             printConfiguration();
