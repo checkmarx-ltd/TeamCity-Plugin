@@ -216,6 +216,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Team ID: " + config.getTeamId());
         logger.info("Is synchronous scan: " + config.getSynchronous());
         logger.info("CxSAST enabled: " + config.isSastEnabled());
+        logger.info("Proxy Enabled: " + config.isProxy());
         if (config.isSastEnabled()) {
             logger.info("Preset ID: " + config.getPresetId());
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());

@@ -150,9 +150,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     private boolean validateNumber(String num ) {
     	boolean valid = true;    	
     	try {
-    		if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
-    			valid = false;
-    		}
+    			Integer.parseInt(num);    		
     	}catch(Exception wrongNumber) {
     		valid = false;
     	}
