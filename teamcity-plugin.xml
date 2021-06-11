@@ -4,7 +4,7 @@
     <name>cxplugin</name>
     <display-name>Checkmarx</display-name>
     <version>@Version@</version>
-    <description>Add a Checkmarx Scan (CxSAST, CxOSA) inside your build process</description>
+    <description>Add a Checkmarx Scan (CxSAST, CxOSA, CxSCA) inside your build process</description>
     <download-url>https://www.checkmarx.com/plugins/</download-url>
     <email>support@checkmarx.com</email>
     <vendor>

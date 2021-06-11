@@ -118,6 +118,21 @@
                   $("invalid_cxGlobalSCATenant").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
                   SettingsForm.highlightErrorField($("cxGlobalSCATenant"));
         },
+        
+        onInvalid_cxGlobalSastServerUrlError: function (elem) {
+            $("invalid_cxGlobalSastServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastServerUrl"));
+          },
+          onInvalid_cxGlobalSastUsernameError: function (elem) {
+            $("invalid_cxGlobalSastUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastUsername"));
+          },
+          onInvalid_cxGlobalSastPasswordError: function (elem) {
+            $("invalid_cxGlobalSastPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalSastPassword"));
+          },
+
+          
         onSuccessfulSave: function () {
           SettingsForm.enable();
         },
@@ -142,6 +157,10 @@
 <c:if test="${cxGlobalThresholdEnabled != 'true'}">
   <c:set var="hideThresholdSection" value="style='display:none'"/>
 </c:if>
+<c:if test="${cxGlobalIsExploitablePath != 'true'}">
+  <c:set var="hideExpPathSection" value="style='display:none'"/>
+</c:if>
+
 <c:if test="${cxGlobalOsaThresholdEnabled != 'true'}">
   <c:set var="hideOsaThresholdSection" value="style='display:none'"/>
 </c:if>
@@ -431,7 +450,83 @@
                                     </td>
 
                                   </tr>
-                            </tbody>
+                                   </tbody>
+         <!-- SCA FEATURES  -->
+     <tr class="globalDependencyScanRow scaInput">
+             <th><label for="cxGlobalScaConfigFile">Package Manager's Config File(s) Path
+                 <bs:helpIcon iconTitle="This parameter is to provide configuration files of the package managers used in the project. For ex. Settings.xml for maven, Nuget.config for Nuget, .npmrc for npm etc.
+				This option is relevant for projects that use private artifactory. Use CxSCA agent to perfom the scan. CxSCA agent will try to perform dependency resolution using the package manager's configuration files provided.
+			Multiple comma character separated file path can be provided.  
+		
+			Example: c:\user\.m2\settings.xml, c:\user\npm\.npmrc"/>
+                 </label></th>
+              <td>
+                 <textarea rows="5" cols="50" name="cxGlobalScaConfigFile" wrap="off">${cxGlobalScaConfigFile}</textarea>
+              </td>
+      </tr>
+    <tr class="globalDependencyScanRow scaInput">
+             <th><label for="cxGlobalScaEnvVariable">Private Registry Environment Variable
+                 <bs:helpIcon iconTitle="This option is relevant only if Package Manager's config files are provided.
+	In many cases, package manager's configuration files reference environment variables, often to provide credentials without storing them in a file. Pass all such variables using this option.
+	<p>
+	Example: param1:value1,param2:value2"/>
+                 </label></th>
+              <td>
+                 <textarea rows="5" cols="50" name="cxGlobalScaEnvVariable" wrap="off">${cxGlobalScaEnvVariable}</textarea>
+              </td>
+      </tr>
+      
+      <tr class="globalDependencyScanRow scaInput">
+                <th><label for="cxGlobalIsExploitablePath">Enable Exploitable Path
+                  <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. In this section, provide details like CxSAST server url, credentials. At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST.
+Example of Project Full Path: CxServer/team1/projectname"/></label>
+                </th>
+                <td><forms:checkbox name="cxGlobalIsExploitablePath" value="${cxGlobalIsExploitablePath}"
+                                    checked="${cxGlobalIsExploitablePath}"
+                                    onclick="$('expPathSection').toggle()"/></td>
+              </tr>
+
+              <tbody id="expPathSection" ${hideExpPathSection}>
+
+              <tr>
+          <th><label for="cxGlobalSastServerUrl">Server URL<l:star/></label></th>
+          <td>
+            <forms:textField name="cxGlobalSastServerUrl" value="${cxGlobalSastServerUrl}" className="longField"/>
+            <span class="error" id="invalid_cxGlobalSastServerUrl"></span>
+          </td>
+        </tr>
+
+        <tr>
+          <th><label for="cxGlobalSastUsername">Username<l:star/></label></th>
+          <td>
+            <forms:textField name="cxGlobalSastUsername" value="${cxGlobalSastUsername}" className="longField"/>
+            <span class="error" id="invalid_cxGlobalSastUsername"></span>
+
+          </td>
+
+        </tr>
+
+        <tr>
+          <th><label for="cxGlobalSastPassword">Password<l:star/></label></th>
+          <td>
+            <input type="password" id="cxGlobalSastPassword" name="cxGlobalSastPassword" value="${cxGlobalSastPassword}" class="longField"/>
+            <span class="error" id="invalid_cxGlobalSastPassword"></span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <form>
+              <input id="testScaSastConnection" type="button" name="TestScaSastConnection" value="Connect to Server"
+                     onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractGlobalSASTCredentials())"/>
+              <span id="testScaSASTConnectionMsg"></span>
+            </form>
+          </td>
+
+        </tr>
+              </tbody>
+      <!-- END OF SCA FEATURES -->
+                           
 
 
                   <tr class="globalDependencyScanRow">

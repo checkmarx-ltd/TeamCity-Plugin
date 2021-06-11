@@ -16,7 +16,10 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static com.checkmarx.teamcity.common.CxConstants.*;
+import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
@@ -49,8 +52,9 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
             }
         }
 
+        validateExpPathProjectDetails(properties, result);
         validateProjectName(properties.get(CxParam.PROJECT_NAME), result);
-
+        validIncrementalSettings(properties, result);
 
         if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PRESET_ID))) {
             result.add(new InvalidProperty(CxParam.PRESET_ID, PRESET_NOT_EMPTY_MESSAGE));
@@ -86,7 +90,30 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         return result;
     }
 
-    private void validateProjectName(String projectName, List<InvalidProperty> result) {
+	private void validIncrementalSettings(Map<String, String> properties, List<InvalidProperty> result) {
+		if (TRUE.equals(properties.get(CxParam.IS_INCREMENTAL)) && TRUE.equals(properties.get(CxParam.PERIODIC_FULL_SCAN))) {
+			if(!validateRange(properties.get(CxParam.PERIODIC_FULL_SCAN_AFTER), FULL_SCAN_CYCLE_MIN, FULL_SCAN_CYCLE_MAX))
+	            result.add(new InvalidProperty(CxParam.PERIODIC_FULL_SCAN_AFTER, WRONG_PERIODIC_FULL_SCAN_INTERVAL));
+		}
+	}
+
+	private void validateExpPathProjectDetails(Map<String, String> properties, List<InvalidProperty> result) {
+		if (TRUE.equals(properties.get(CxParam.DEPENDENCY_SCAN_ENABLED))) {
+			if (TRUE.equals(properties.get(CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS))) {
+				if ("SCA".equalsIgnoreCase(properties.get(DEPENDENCY_SCANNER_TYPE))) {
+					if (TRUE.equals(properties.get(CxParam.IS_EXPLOITABLE_PATH))) {
+						if ((PropertiesUtil.isEmptyOrNull(properties.get(CxParam.SCA_SAST_PROJECT_FULLPATH))) && 
+								(PropertiesUtil.isEmptyOrNull(properties.get(CxParam.SCA_SAST_PROJECT_ID))) ) {
+			                result.add(new InvalidProperty(CxParam.SCA_SAST_PROJECT_FULLPATH, PROJECT_FULLPATH_PROJECT_ID_NOT_EMPTY_MESSAGE));
+			            }
+					}
+
+				}
+			}
+		}
+	}
+
+	private void validateProjectName(String projectName, List<InvalidProperty> result) {
         if (PropertiesUtil.isEmptyOrNull(projectName)) {
             result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_NOT_EMPTY_MESSAGE));
             return;
@@ -119,4 +146,26 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
     }
+    
+    private boolean validateNumber(String num ) {
+    	boolean valid = true;    	
+    	try {
+    			Integer.parseInt(num);    		
+    	}catch(Exception wrongNumber) {
+    		valid = false;
+    	}
+    	return valid;
+    }
+    
+    private boolean validateRange(String num, int min, int max) {
+    	boolean withinRange = false;
+		if (validateNumber(num)) {
+
+			int tobechecked = Integer.parseInt(num);
+			if (tobechecked >= min && tobechecked <= max)
+				withinRange = true;
+		}
+    	return withinRange;	
+    }
+    
 }

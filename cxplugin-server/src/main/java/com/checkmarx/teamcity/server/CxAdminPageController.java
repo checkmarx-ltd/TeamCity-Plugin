@@ -4,7 +4,7 @@ package com.checkmarx.teamcity.server;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jdom.Element;
@@ -55,6 +55,9 @@ public class CxAdminPageController extends BaseFormXmlController {
 
         String scaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSCAPassword");
         cxAdminConfig.setConfiguration(GLOBAL_SCA_PASSWORD, scaPassword);
+        
+        String sastPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSastPassword");
+        cxAdminConfig.setConfiguration(GLOBAL_SAST_SERVER_PASSWORD, sastPassword);
 
         try {
             cxAdminConfig.persistConfiguration();
@@ -67,14 +70,7 @@ public class CxAdminPageController extends BaseFormXmlController {
 
     private String ensurePasswordEncryption(HttpServletRequest request, String requestParamName) {
         String password = RSACipher.decryptWebRequestData(request.getParameter(requestParamName));
-        if(!EncryptUtil.isScrambled(password)) {
-            try {
-                password = EncryptUtil.scramble(password);
-            } catch (RuntimeException e) {
-                password = "";
-            }
-        }
-        return password;
+        return encrypt(password);
     }
 
     private ActionErrors validateForm(final HttpServletRequest request) {
@@ -102,6 +98,27 @@ public class CxAdminPageController extends BaseFormXmlController {
 
         validateNumericLargerThanZero(GLOBAL_SCAN_TIMEOUT_IN_MINUTES, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, request, ret);
 
+        if(TRUE.equals(request.getParameter(GLOBAL_IS_EXPLOITABLE_PATH))){
+        	
+        	String cxGlobalSastServerUrl = request.getParameter(GLOBAL_SAST_SERVER_URL);
+            if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(cxGlobalSastServerUrl)) {
+                ret.addError(INVALID + GLOBAL_SAST_SERVER_URL, SAST_URL_NOT_EMPTY_MESSAGE);
+            } else {
+                try {
+                    new URL(cxGlobalSastServerUrl);
+                } catch (MalformedURLException e) {
+                    ret.addError(INVALID + GLOBAL_SAST_SERVER_URL, SAST_URL_NOT_VALID_MESSAGE);
+                }
+            }
+
+            if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter(GLOBAL_SAST_SERVER_USERNAME))) {
+                ret.addError(INVALID + GLOBAL_SAST_SERVER_USERNAME, SAST_USERNAME_NOT_EMPTY_MESSAGE);
+            }
+        	
+        	if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter("encryptedCxGlobalSastPassword"))) {
+                ret.addError(INVALID + GLOBAL_SAST_SERVER_PASSWORD, SAST_PASSWORD_NOT_EMPTY_MESSAGE);
+            }
+        }
 
         if(TRUE.equals(request.getParameter(GLOBAL_IS_SYNCHRONOUS))) {
 

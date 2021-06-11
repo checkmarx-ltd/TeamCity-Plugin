@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>2020.3.8</version>
+    <version>2021.2.1</version>
   </parent>
   <artifactId>cxplugin-common</artifactId>
   <packaging>jar</packaging>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>2020.3.77</version>
+      <version>2021.2.161</version>
       <exclusions>
         <exclusion>
           <groupId>stax</groupId>
@@ -76,8 +76,39 @@
           <artifactId>vertx-core</artifactId>
           <groupId>io.vertx</groupId>
         </exclusion>
+        <exclusion>
+           <groupId>io.vertx</groupId>
+           <artifactId>vertx-web</artifactId>
+        </exclusion>
+        <exclusion>
+           <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+          <groupId>io.vertx</groupId>
+          <artifactId>vertx-web</artifactId>
+          <version>4.1.0</version>
+          <exclusions>
+	          <exclusion>
+	            <groupId>io.netty</groupId>
+	            <artifactId>netty-codec-http2</artifactId>
+	          </exclusion>
+          </exclusions>
+         </dependency>
+         <dependency>
+             <groupId>io.netty</groupId>
+             <artifactId>netty-codec-http2</artifactId>
+             <version>4.1.65.Final</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-codec-http -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+		    <version>4.1.65.Final</version>
+		</dependency>
+        
   </dependencies>
   <build>
   </build>

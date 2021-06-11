@@ -8,7 +8,7 @@ import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +109,16 @@ public class CxOptions {
     public String getIsIncremental() {
         return IS_INCREMENTAL;
     }
+    
+    @NotNull
+    public String getIsPeriodicFullScan() {
+        return PERIODIC_FULL_SCAN;
+    }
+    
+    @NotNull
+    public String getPeriodicFullScanAfter() {
+        return PERIODIC_FULL_SCAN_AFTER;
+    }
 
     @NotNull
     public String getOsaEnabled() {
@@ -149,7 +159,46 @@ public class CxOptions {
     public String getIsSynchronous() {
         return IS_SYNCHRONOUS;
     }
-
+    
+    @NotNull
+    public String getIsIncludeSources() {
+        return IS_INCLUDE_SOURCES;
+    }
+    
+    @NotNull
+    public String getIsExploitablePath() {
+        return IS_EXPLOITABLE_PATH;
+    }
+    
+    @NotNull
+    public String getScaSASTUserName() {
+        return SCA_SAST_SERVER_USERNAME;
+    }
+    
+    @NotNull
+    public String getScaSASTServerUrl() {
+        return SCA_SAST_SERVER_URL;
+    }
+    
+    @NotNull
+    public String getScaSASTPassword() {
+        return SCA_SAST_SERVER_PASSWORD;
+    }
+    @NotNull
+    public String getScaSASTProjectFullPath() {
+        return SCA_SAST_PROJECT_FULLPATH;
+    }
+    
+    @NotNull
+    public String getScaSASTProjectID() {
+        return SCA_SAST_PROJECT_ID;
+    }
+    
+    @NotNull
+    public String getUseSASTDefaultServer() {
+        return USE_SAST_DEFAULT_SERVER;
+    }
+    
     @NotNull
     public String getThresholdEnabled() {
         return THRESHOLD_ENABLED;
@@ -200,6 +249,15 @@ public class CxOptions {
         return GLOBAL_USERNAME;
     }
 
+    @NotNull
+    public String getGlobalSastServerUrl() {
+        return GLOBAL_SAST_SERVER_URL;
+    }
+
+    @NotNull
+    public String getGlobalSastUsername() {
+        return GLOBAL_SAST_SERVER_USERNAME;
+    }
     @NotNull
     public String getGlobalExcludeFolders() {
         return GLOBAL_EXCLUDE_FOLDERS;
@@ -299,6 +357,16 @@ public class CxOptions {
     public String getScaTenant() {
         return SCA_TENANT;
     }
+    
+    @NotNull
+    public String getScaConfigFile() {
+        return SCA_CONFIGFILE;
+    }
+    
+    @NotNull
+    public String getScaEnvVariable() {
+    	return SCA_ENV_VARIABLE;
+    }
 
     @NotNull
     public String getOverrideGlobalConfigurations() {
@@ -392,9 +460,7 @@ public class CxOptions {
     }
 
     private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl) throws MalformedURLException {
-        if (EncryptUtil.isScrambled(pssd)) {
-            pssd = EncryptUtil.unscramble(pssd);
-        }
+            pssd = decrypt(pssd);
         CxScanConfig config = new CxScanConfig();
         config.addScannerType(ScannerType.SAST);
         config.setUsername(username);
@@ -406,6 +472,21 @@ public class CxOptions {
         config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
         CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
         return clientDelegator;
+    }
+    
+    public void testSASTConnection(String serverUrl, String username, String pssd) {
+
+        try {
+            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl);
+            CxSASTClient sastClient = delegator.getSastClient();
+            sastClient.login();
+            presetList = sastClient.getPresetList();
+            teamList = sastClient.getTeamList();
+
+        } catch (Exception ex) {
+            String result = ex.getMessage();
+            Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
+        }
     }
 
     /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
@@ -439,7 +520,7 @@ public class CxOptions {
                 pssd = RSACipher.decryptWebRequestData(pssd);
             }
 
-            return EncryptUtil.isScrambled(pssd) ? EncryptUtil.unscramble(pssd) : pssd;
+            return decrypt(pssd);
 
         } catch (Exception e) {
             return pssd;

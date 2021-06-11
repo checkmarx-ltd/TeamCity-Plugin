@@ -10,7 +10,7 @@ import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,8 +103,8 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String cxPass = properties.get(CxParam.PASSWORD);
 
         try {
-            if(cxPass != null && !EncryptUtil.isScrambled(cxPass)) {
-                cxPass = EncryptUtil.scramble(cxPass);
+            if(cxPass != null) {
+                cxPass = encrypt(cxPass);
             }
         } catch (RuntimeException e) {
             cxPass = "";
@@ -115,7 +115,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-
         return new ActionErrors();
     }
 }
