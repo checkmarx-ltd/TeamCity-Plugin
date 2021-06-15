@@ -67,8 +67,7 @@ public class CxConfigHelper {
 
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
-        // Parameter name is TEAM_ID, But actual value is TEAM_NAME
-        ret.setTeamPath(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
+        ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
