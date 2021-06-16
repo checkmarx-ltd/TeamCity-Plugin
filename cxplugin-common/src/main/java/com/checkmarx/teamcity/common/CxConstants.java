@@ -27,6 +27,10 @@ public abstract class CxConstants {
                     "!**/*.stml,    !**/*.ttml,      !**/*.txn,      !**/*.xhtm,     !**/*.xhtml,   !**/*.class, !**/node_modules/**/*, !**/*.iml\n";
 
     public static final String DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS = "*.zip, *.tgz, *.war, *.ear";
+    
+    public static final String DEFAULT_SCA_API_URL = "https://api-sca.checkmarx.net";
+    public static final String DEFAULT_SCA_ACCESS_CONTROL_URL = "https://platform.checkmarx.net";
+    public static final String DEFAULT_SCA_WEB_APP_URL = "https://sca.checkmarx.net";
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection successful";
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
