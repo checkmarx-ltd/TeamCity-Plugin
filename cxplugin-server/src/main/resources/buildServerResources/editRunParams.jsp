@@ -80,7 +80,7 @@
                 accessControlServerUrl: $('scaAccessControlUrl').value,
                 webAppURL: $('scaWebAppUrl').value,
                 scaUserName: $('scaUserName').value,
-                scaPassword: $('scaPass').value,
+                scaPassword: $('prop:encrypted:scaPass').value ? $('prop:encrypted:scaPass').value : $('scaPass').value,
                 scaTenant: $('scaTenant').value,
                 global: false
             }
