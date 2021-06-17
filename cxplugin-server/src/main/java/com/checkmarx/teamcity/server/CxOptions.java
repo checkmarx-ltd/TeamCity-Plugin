@@ -517,7 +517,11 @@ public class CxOptions {
 
         try {
             if (!global) {
-                pssd = RSACipher.decryptWebRequestData(pssd);
+            	try {
+            		pssd = RSACipher.decryptWebRequestData(pssd);
+            	}catch(Exception notAbleToDescrypt) {
+            		//try with other decryption
+            	}
             }
 
             return decrypt(pssd);

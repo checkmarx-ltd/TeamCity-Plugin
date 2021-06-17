@@ -110,6 +110,29 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
             cxPass = "";
         }
         properties.put(CxParam.PASSWORD, cxPass);
+        
+        String scaPass = properties.get(CxParam.SCA_PASSWORD);
+
+        try {
+            if(scaPass != null) {
+            	scaPass = encrypt(scaPass);
+            }
+        } catch (RuntimeException e) {
+        	scaPass = "";
+        }
+        properties.put(CxParam.SCA_PASSWORD, scaPass);
+        
+        String scaSastPass = properties.get(CxParam.SCA_SAST_SERVER_PASSWORD);
+
+        try {
+            if(scaSastPass != null) {
+            	scaSastPass = encrypt(scaSastPass);
+            }
+        } catch (RuntimeException e) {
+        	scaSastPass = "";
+        }
+        properties.put(CxParam.SCA_SAST_SERVER_PASSWORD, scaSastPass);
+        
         //the jsp page dosent pass false value, so we need to check if it isnt true, null in this case, set it as false
         //this way we can distinguish in the build process between an old job (sast enabled == null) and a job where user specified not to run sast (sast_enabled == false)
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
