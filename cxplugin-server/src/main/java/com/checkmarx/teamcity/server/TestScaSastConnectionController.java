@@ -33,9 +33,9 @@ import java.util.Set;
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
 
-class TestConnectionController extends BaseController {
+class TestScaSastConnectionController extends BaseController {
 
-    public static final Logger log = LoggerFactory.getLogger(TestConnectionController.class);
+    public static final Logger log = LoggerFactory.getLogger(TestScaSastConnectionController.class);
     private static final com.intellij.openapi.diagnostic.Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
 
     private Gson gson = new Gson();
@@ -45,10 +45,10 @@ class TestConnectionController extends BaseController {
     private List<Team> teams;
     private CxClientDelegator clientDelegator;
 
-    public TestConnectionController(@NotNull SBuildServer server,
+    public TestScaSastConnectionController(@NotNull SBuildServer server,
                                     @NotNull WebControllerManager webControllerManager) {
         super(server);
-        webControllerManager.registerController("/checkmarx/testConnection/", this);
+        webControllerManager.registerController("/checkmarx/testScaSastConnection/", this);
     }
 
     @Nullable
@@ -61,16 +61,16 @@ class TestConnectionController extends BaseController {
             return null;
         }
 
-        TestConnectionResponse res = new TestConnectionResponse();
+        TestScaSastConnectionResponse res = new TestScaSastConnectionResponse();
         res.setPresetList(Collections.singletonList(new Preset(CxParam.NO_PRESET_ID, NO_PRESET_MESSAGE)));
         res.setTeamPathList(Collections.singletonList(new Team(CxParam.GENERATE_PDF_REPORT, NO_TEAM_MESSAGE)));
 
 
-        TestConnectionRequest credi = extractRequestBody(httpServletRequest);
+        TestScaSastConnectionRequest credi = extractRequestBody(httpServletRequest);
 
         //create client and perform login
         try {
-            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPssd())) {
+            if (loginToServer(new URL(credi.getSastServerUrl()), credi.getSastUsername(), credi.getSastPssd())) {
                 CxSASTClient sastClient = clientDelegator.getSastClient();
                 try {
                     teams = sastClient.getTeamList();
@@ -87,7 +87,7 @@ class TestConnectionController extends BaseController {
                     throw new Exception("invalid preset teamPath");
                 }
 
-                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
+                res = new TestScaSastConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
                 writeHttpServletResponse(httpServletResponse, res);
                 LOG.info("Checkmarx test connection: Connection successful");
                 return null;
@@ -107,18 +107,18 @@ class TestConnectionController extends BaseController {
         }
     }
 
-    private void writeHttpServletResponse(HttpServletResponse httpServletResponse, TestConnectionResponse res) throws IOException {
+    private void writeHttpServletResponse(HttpServletResponse httpServletResponse, TestScaSastConnectionResponse res) throws IOException {
         httpServletResponse.getWriter().write(gson.toJson(res));
         httpServletResponse.setContentType("application/json");
         httpServletResponse.setStatus(200);
     }
 
-    private TestConnectionRequest extractRequestBody(HttpServletRequest request) throws IOException {
+    private TestScaSastConnectionRequest extractRequestBody(HttpServletRequest request) throws IOException {
         String jsonString = IOUtils.toString(request.getReader());
-        TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
-        ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
-        ret.setUsername(StringUtil.trim(ret.getUsername()));
-        ret.setPssd(CxOptions.decryptPasswordPlainText(ret.getPssd(), ret.isGlobal()));
+        TestScaSastConnectionRequest ret = gson.fromJson(jsonString, TestScaSastConnectionRequest.class);
+        ret.setSastServerUrl(StringUtil.trim(ret.getSastServerUrl()));
+        ret.setSastUsername(StringUtil.trim(ret.getSastUsername()));
+        ret.setSastPssd(CxOptions.decryptPasswordPlainText(ret.getSastPssd(), ret.isGlobal()));
         return ret;
     }
 

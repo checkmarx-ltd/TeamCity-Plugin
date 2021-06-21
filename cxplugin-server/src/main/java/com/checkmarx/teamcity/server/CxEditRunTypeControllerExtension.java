@@ -10,7 +10,7 @@ import jetbrains.buildServer.controllers.admin.projects.BuildTypeForm;
 import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExtension;
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
+import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,19 +103,41 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String cxPass = properties.get(CxParam.PASSWORD);
 
         try {
-            if(cxPass != null && !EncryptUtil.isScrambled(cxPass)) {
-                cxPass = EncryptUtil.scramble(cxPass);
+            if(cxPass != null) {
+                cxPass = encrypt(cxPass);
             }
         } catch (RuntimeException e) {
             cxPass = "";
         }
         properties.put(CxParam.PASSWORD, cxPass);
+        
+        String scaPass = properties.get(CxParam.SCA_PASSWORD);
+
+        try {
+            if(scaPass != null) {
+            	scaPass = encrypt(scaPass);
+            }
+        } catch (RuntimeException e) {
+        	scaPass = "";
+        }
+        properties.put(CxParam.SCA_PASSWORD, scaPass);
+        
+        String scaSastPass = properties.get(CxParam.SCA_SAST_SERVER_PASSWORD);
+
+        try {
+            if(scaSastPass != null) {
+            	scaSastPass = encrypt(scaSastPass);
+            }
+        } catch (RuntimeException e) {
+        	scaSastPass = "";
+        }
+        properties.put(CxParam.SCA_SAST_SERVER_PASSWORD, scaSastPass);
+        
         //the jsp page dosent pass false value, so we need to check if it isnt true, null in this case, set it as false
         //this way we can distinguish in the build process between an old job (sast enabled == null) and a job where user specified not to run sast (sast_enabled == false)
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-
         return new ActionErrors();
     }
 }

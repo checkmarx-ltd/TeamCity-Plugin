@@ -42,6 +42,9 @@ public class CxAdminConfig {
         this.properties.put(CxParam.GLOBAL_IS_SYNCHRONOUS, CxConstants.TRUE);
         this.properties.put(CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, CxConstants.DEFAULT_FILTER_PATTERN);
         this.properties.put(CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS, CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
+        this.properties.put(CxParam.GLOBAL_SCA_API_URL, CxConstants.DEFAULT_SCA_API_URL);
+        this.properties.put(CxParam.GLOBAL_SCA_ACCESS_CONTROL_URL, CxConstants.DEFAULT_SCA_ACCESS_CONTROL_URL);
+        this.properties.put(CxParam.GLOBAL_SCA_WEB_APP_URL, CxConstants.DEFAULT_SCA_WEB_APP_URL);
         configFile.getParentFile().mkdirs();
         PropertiesUtil.storeProperties(this.properties, configFile, "");
     }

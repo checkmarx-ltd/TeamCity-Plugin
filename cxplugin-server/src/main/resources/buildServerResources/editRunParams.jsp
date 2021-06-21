@@ -10,20 +10,43 @@
     window.updateDependencyScanSectionVisibility = function() {
         var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
             overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
-            osaEnabled = jQuery('#enableOsa').prop('checked'),
+            overrideSASTChecked = jQuery('#useSASTDefaultServer').prop('checked'),
+            osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
+            isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
             isOverriding = depScanEnabled && overrideChecked;
-
+        	
+        	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
+        jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
 
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
+        
+        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
     }
 
     console.log('updateDependencyScanSectionVisibility');
     jQuery(updateDependencyScanSectionVisibility);
     window.Checkmarx = {
+    		extractSASTCredentials: function () {
+        return {
+            sastServerUrl: $('scaSASTServerUrl').value,
+            sastUsername: $('scaSASTUserName').value,
+            sastPssd: $('prop:encrypted:scaSASTPassword').value ? $('prop:encrypted:scaSASTPassword').value : $('scaSASTPassword').value
+        };
+    },
+    
+    extractGlobalSASTCredentials: function () {
+        return {
+        	sastServerUrl: $('cxGlobalSastServerUrl').value,
+        	sastUsername: $('cxGlobalSastUsername').value,
+        	sastPssd: $('cxGlobalSastPassword').value,
+            global: true
+        }
+    },
     extractCredentials: function () {
         return {
             serverUrl: $('cxServerUrl').value,
@@ -31,7 +54,7 @@
             pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
         };
     },
-
+    
     extractGlobalCredentials: function () {
         return {
             serverUrl: $('cxGlobalServerUrl').value,
@@ -57,7 +80,7 @@
                 accessControlServerUrl: $('scaAccessControlUrl').value,
                 webAppURL: $('scaWebAppUrl').value,
                 scaUserName: $('scaUserName').value,
-                scaPassword: $('scaPass').value,
+                scaPassword: $('prop:encrypted:scaPass').value ? $('prop:encrypted:scaPass').value : $('scaPass').value,
                 scaTenant: $('scaTenant').value,
                 global: false
             }
@@ -66,7 +89,7 @@
         if (Checkmarx.validateCredentials(credentials)) {
             var messageElm = jQuery('#testConnectionMsg');
             var buttonElm = jQuery('#testConnection');
-
+			console.log('testConnection');
             messageElm.removeAttr("style");
             messageElm.text('');
             buttonElm.attr("disabled", true);
@@ -99,6 +122,44 @@
             });
         }
     },
+    testScaSASTConnection: function (credentials) {
+        if (Checkmarx.validateSASTCredentials(credentials)) {
+            var messageElm = jQuery('#testScaSASTConnectionMsg');
+            var buttonElm = jQuery('#testScaSASTConnection');
+			console.log('testScaSASTConnection');
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
+                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+    
  testSCAConnection: function (credentials) {
         if (Checkmarx.validateSCAParameters(credentials)) {
             var messageElm = jQuery('#testSCAConnectionMsg');
@@ -153,6 +214,30 @@
         }
 
         if (!credentials.pssd) {
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        return true;
+
+    },
+    
+    validateSASTCredentials: function (credentials) {
+        var messageElm = jQuery('#testScaSASTConnectionMsg');
+        if (!credentials.sastServerUrl) {
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastUsername) {
+            messageElm.text('Username must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastPssd) {
             messageElm.text('Password must not be empty');
             messageElm.css('color','red');
             return false;
@@ -234,6 +319,10 @@ ${'true'.equals(cxUseDefaultServer) ?
 optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword) :
 optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 
+${'true'.equals(useSASTDefaultServer) ?
+optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
+optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
+
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
 </c:if>
@@ -292,6 +381,12 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 </c:if>
 <c:if test="${propertiesBean.properties[optionsBean.osaThresholdEnabled] != 'true'}">
     <c:set var="hideOsaThresholdSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.isIncremental] != 'true'}">
+    <c:set var="hideIncrementalSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.isPeriodicFullScan] != 'true'}">
+    <c:set var="hidePeriodicScanSection" value="${optionsBean.noDisplay}"/>
 </c:if>
 
 
@@ -476,9 +571,37 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
                 <tr>
                     <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
                         <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
-                    <td><props:checkboxProperty name="${optionsBean.isIncremental}"/></td>
+                    <td>
+                    	<c:set var="onclick">
+                            $('incrementalSection').toggle();
+                            BS.VisibilityHandlers.updateVisibility('sastConfigSection')
+                        </c:set>
+                    	<props:checkboxProperty name="${optionsBean.isIncremental}" onclick="${onclick}" />
+                    </td>
                 </tr>
-
+                <tbody id="incrementalSection" ${hideIncrementalSection}>
+                <tr>
+                    <th><label for="${optionsBean.isPeriodicFullScan}">Schedule periodic full scans
+                    </label></th>
+                    <td>
+                    	<c:set var="onclick">
+                            $('periodicScanSection').toggle();
+                            BS.VisibilityHandlers.updateVisibility('scanControlSection')
+                        </c:set>
+                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="${onclick}"/>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody id="periodicScanSection" ${hidePeriodicScanSection}>
+                <tr>
+                    <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans
+                    </label></th>
+                    <td>
+                    	 <props:textProperty name="${optionsBean.periodicFullScanAfter}" className="longField"/>
+                    	 <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
+                    </td>
+                </tr>
+                </tbody>
                 <tr>
                     <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
                         <bs:helpIcon
@@ -532,11 +655,11 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
     </tr>
 
     <tr class="dependencyScanRow">
-        <th><label for="enableOsa">Use CxOSA dependency Scanner
+        <th><label for="OsaEnabled">Use CxOSA dependency Scanner
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="enableOsa"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
         </td>
     </tr>
     <tr class="dependencyScanRow osaInput">
@@ -614,6 +737,113 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
             </form>
         </td>
     </tr>
+    <!-- SCA FEATURES -->
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaConfigFile}">Package Manager's Config File(s) Path
+
+            <bs:helpIcon
+                    iconTitle="This parameter is to provide configuration files of the package managers used in the project. For ex. Settings.xml for maven, Nuget.config for Nuget, .npmrc for npm etc.</br>
+This option is relevant for projects that use private artifactory. Use CxSCA agent to perfom the scan. CxSCA agent will try to perform dependency resolution using the package manager's configuration files provided.</br>
+Multiple comma character separated file path can be provided.  </br>
+<p>
+Example: c:\user\.m2\settings.xml, c:\user\npm\.npmrc"/>
+        </label></th>
+        <td><props:multilineProperty name="${optionsBean.scaConfigFile}" linkTitle="" expanded="true" rows="5"
+                                     cols="50" className="longField"/></td>
+    </tr>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.scaEnvVariable}">Private Registry Environment Variable
+
+            <bs:helpIcon
+                    iconTitle="This option is relevant only if Package Manager's config files are provided.
+In many cases, package manager's configuration files reference environment variables, often to provide credentials without storing them in a file. Pass all such variables using this option.
+<p>
+Example: param1:value1,param2:value2"/>
+        </label></th>
+        <td><props:multilineProperty name="${optionsBean.scaEnvVariable}" linkTitle="" expanded="true" rows="5"
+                                     cols="50" className="longField"/></td>
+    </tr>
+    
+     <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.isIncludeSources}">Include Sources
+            <bs:helpIcon iconTitle="When this flag is enabled, it will include entire source code in the zip file to be scanned."/>
+        </label></th>
+        <td> <props:checkboxProperty name="${optionsBean.isIncludeSources}"/>
+        </td>
+    </tr>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
+            <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
+In this section, provide details like CxSAST server url, credentials.
+At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST. 
+<p>
+Example of Project Full Path: CxServer/team1/projectname."/>
+        </label></th>
+        <td> 
+       
+        <props:checkboxProperty name="${optionsBean.isExploitablePath}" id="enableExpPath" onclick="updateDependencyScanSectionVisibility()"/>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath">
+        <th>
+            <label for="${optionsBean.useSASTDefaultServer}">Use Global Credentials<br>
+            Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
+            Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
+        </th>
+        <td>
+            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTServerUrl}">Server URL<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTServerUrl}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTServerUrl}"></span>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTUserName}">Username<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTUserName}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTUserName}"></span>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+        <th><label for="${optionsBean.scaSASTPassword}">Password<l:star/></label></th>
+        <td>
+            <props:passwordProperty name="${optionsBean.scaSASTPassword}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTPassword}"></span>
+        </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
+    <td>
+        <form>
+            <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
+                   onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
+            <span id="testScaSASTConnectionMsg"></span>
+        </form>
+    </td>
+    </tr>
+    <tr class="dependencyScanRow scaInput expPath">
+        <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTProjectFullPath}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTProjectFullPath}"></span>
+        </td>
+    </tr>
+    
+    <tr  class="dependencyScanRow scaInput expPath">
+        <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
+        <td>
+            <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>
+            <span class="error" id="error_${optionsBean.scaSASTProjectID}"></span>
+        </td>
+    </tr>
+   
+    <!-- END SCA FEATURES -->
+    
     </tbody>
     </tbody>
 

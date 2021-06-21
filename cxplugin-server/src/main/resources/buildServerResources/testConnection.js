@@ -7,6 +7,15 @@ window.Checkmarx = {
         };
     },
 
+    extractGlobalSASTCredentials: function () {
+        return {
+        	sastServerUrl: $('cxGlobalSastServerUrl').value,
+        	sastUsername: $('cxGlobalSastUsername').value,
+        	sastPssd: $('cxGlobalSastPassword').value,
+            global: true
+        }
+    },
+    
     extractGlobalCredentials: function () {
         return {
             serverUrl: $('cxGlobalServerUrl').value,
@@ -32,7 +41,7 @@ window.Checkmarx = {
                 accessControlServerUrl: $('scaAccessControlUrl').value,
                 webAppURL: $('scaWebAppUrl').value,
                 scaUserName: $('scaUserName').value,
-                scaPassword: $('scaPass').value,
+                scaPassword: $('prop:encrypted:scaPass').value ? $('prop:encrypted:scaPass').value : $('scaPass').value,
                 scaTenant: $('scaTenant').value,
                 global: false
             }
@@ -41,7 +50,7 @@ window.Checkmarx = {
         if (Checkmarx.validateCredentials(credentials)) {
             var messageElm = jQuery('#testConnectionMsg');
             var buttonElm = jQuery('#testConnection');
-
+            console.log('testConnection');
             messageElm.removeAttr("style");
             messageElm.text('');
             buttonElm.attr("disabled", true);
@@ -49,6 +58,43 @@ window.Checkmarx = {
             jQuery.ajax({
                 type: 'POST',
                 url: window['base_uri'] + '/checkmarx/testConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
+                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+    testScaSASTConnection: function (credentials) {
+        if (Checkmarx.validateSASTCredentials(credentials)) {
+            var messageElm = jQuery('#testScaSASTConnectionMsg');
+            var buttonElm = jQuery('#testScaSastConnection');
+			console.log('testScaSASTConnection');
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
                 contentType: 'application/json',
                 dataType: 'json',
                 data: JSON.stringify(credentials),
@@ -128,6 +174,30 @@ window.Checkmarx = {
         }
 
         if (!credentials.pssd) {
+            messageElm.text('Password must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        return true;
+
+    },
+    
+    validateSASTCredentials: function (credentials) {
+        var messageElm = jQuery('#testScaSASTConnectionMsg');
+        if (!credentials.sastServerUrl) {
+            messageElm.text('URL must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastUsername) {
+            messageElm.text('Username must not be empty');
+            messageElm.css('color','red');
+            return false;
+        }
+
+        if (!credentials.sastPssd) {
             messageElm.text('Password must not be empty');
             messageElm.css('color','red');
             return false;
