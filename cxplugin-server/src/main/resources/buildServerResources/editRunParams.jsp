@@ -28,6 +28,18 @@
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
     }
 
+    window.updatePeriodicScanSectionVisibility = function() {
+        var incrementalScanEnabled = jQuery('#isIncremental').prop('checked'),
+            schedulePeriodicScanEnabled = jQuery('#isPeriodicFullScan').prop('checked'),
+            
+        	periodindFullScanAfter = incrementalScanEnabled && schedulePeriodicScanEnabled;
+        
+        jQuery('.isPeriodicFullScanEnabled')[incrementalScanEnabled ? 'show' : 'hide']();
+
+        jQuery('.periodindFullScanAfterVisibility')[periodindFullScanAfter ? 'show' : 'hide']();
+        
+    }
+    
     console.log('updateDependencyScanSectionVisibility');
     jQuery(updateDependencyScanSectionVisibility);
     window.Checkmarx = {
@@ -572,28 +584,21 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
                         <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
                     <td>
-                    	<c:set var="onclick">
-                            $('incrementalSection').toggle();
-                            BS.VisibilityHandlers.updateVisibility('sastConfigSection')
-                        </c:set>
-                    	<props:checkboxProperty name="${optionsBean.isIncremental}" onclick="${onclick}" />
+                    	
+                    	<props:checkboxProperty name="${optionsBean.isIncremental}" onclick="updatePeriodicScanSectionVisibility()" />
                     </td>
                 </tr>
-                <tbody id="incrementalSection" ${hideIncrementalSection}>
-                <tr>
+                
+                <tr class="isPeriodicFullScanEnabled">
                     <th><label for="${optionsBean.isPeriodicFullScan}">Schedule periodic full scans
                     </label></th>
                     <td>
-                    	<c:set var="onclick">
-                            $('periodicScanSection').toggle();
-                            BS.VisibilityHandlers.updateVisibility('scanControlSection')
-                        </c:set>
-                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="${onclick}"/>
+                    	
+                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="updatePeriodicScanSectionVisibility()"/>
                     </td>
                 </tr>
-                </tbody>
-                <tbody id="periodicScanSection" ${hidePeriodicScanSection}>
-                <tr>
+               
+                <tr class="periodindFullScanAfterVisibility">
                     <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans
                     </label></th>
                     <td>
@@ -601,7 +606,6 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     	 <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
                     </td>
                 </tr>
-                </tbody>
                 <tr>
                     <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
                         <bs:helpIcon
