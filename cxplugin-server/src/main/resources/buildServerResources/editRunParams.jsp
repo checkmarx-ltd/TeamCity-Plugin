@@ -27,21 +27,18 @@
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
     }
-
+    console.log('updateDependencyScanSectionVisibility');
+    jQuery(updateDependencyScanSectionVisibility);
     window.updatePeriodicScanSectionVisibility = function() {
         var incrementalScanEnabled = jQuery('#isIncremental').prop('checked'),
             schedulePeriodicScanEnabled = jQuery('#isPeriodicFullScan').prop('checked'),
-            
         	periodindFullScanAfter = incrementalScanEnabled && schedulePeriodicScanEnabled;
-        
         jQuery('.isPeriodicFullScanEnabled')[incrementalScanEnabled ? 'show' : 'hide']();
 
         jQuery('.periodindFullScanAfterVisibility')[periodindFullScanAfter ? 'show' : 'hide']();
         
     }
-    
-    console.log('updateDependencyScanSectionVisibility');
-    jQuery(updateDependencyScanSectionVisibility);
+    jQuery(updatePeriodicScanSectionVisibility);
     window.Checkmarx = {
     		extractSASTCredentials: function () {
         return {
