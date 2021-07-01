@@ -45,7 +45,7 @@ public abstract class CxParam {
     public static final String NO_TEAM_PATH = "noTeamPath";
     public static final int NO_PRESET_ID = -1;
     public static final int PROJECT_DEFAULT_CONFIG_ID = 0;
-    public static final String PROJECT_DEFAULT = "Project Default";
+    public static final String PROJECT_DEFAULT = "Project Default (Only for CxSAST 9.3.0+)";
 
     public static final String GLOBAL_SERVER_URL = "cxGlobalServerUrl";
     public static final String GLOBAL_USERNAME = "cxGlobalUsername";

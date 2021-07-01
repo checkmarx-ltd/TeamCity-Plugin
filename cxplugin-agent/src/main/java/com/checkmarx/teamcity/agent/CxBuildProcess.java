@@ -219,6 +219,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         logger.info("Proxy Enabled: " + config.isProxy());
         if (config.isSastEnabled()) {
             logger.info("Preset ID: " + config.getPresetId());
+            logger.info("Engine Configuration ID : " + config.getEngineConfigurationId());
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
             logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());

@@ -29,6 +29,22 @@
 
     console.log('updateDependencyScanSectionVisibility');
     jQuery(updateDependencyScanSectionVisibility);
+
+    window.updatePeriodicScanSectionVisibility = function() {
+        var incrementalScanEnabled = jQuery('#cxIsIncremental').prop('checked'),
+            isPeriodicFullScanEnabled = jQuery('#cxIsPeriodicFullScan').prop('checked'),
+            periodindFullScanAfter = incrementalScanEnabled && isPeriodicFullScanEnabled;
+
+        jQuery('#cxIsPeriodicFullScan')[incrementalScanEnabled ? 'show' : 'hide']();
+        jQuery('#incrementalSection')[incrementalScanEnabled ? 'show' : 'hide']();
+        jQuery('#cxPeriodicFullScanAfter')[periodindFullScanAfter ? 'show' : 'hide']();
+        jQuery('#periodicScanSection')[periodindFullScanAfter ? 'show' : 'hide']();
+
+    }
+
+    console.log('updatePeriodicScanSectionVisibility');
+    jQuery(updatePeriodicScanSectionVisibility);
+
     window.Checkmarx = {
     		extractSASTCredentials: function () {
         return {
@@ -299,7 +315,7 @@ validateSCAParameters: function (credentials) {
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
 
 <style>
-    #cxPresetId, #cxTeamId,#cxEngineConfigId {
+    #cxPresetId, #cxTeamId {
         width: 535px;
     }
 
@@ -471,18 +487,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <span class="error" id="error_${optionsBean.teamId}"></span>
         </td>`
     </tr>
-    <tr>
-        <th><label for="${optionsBean.engineConfigId}">Source character encoding (Configuration)<l:star/>
-            <bs:helpIcon iconTitle="Source character encoding for the project"/></label></th>
-        <td>
-            <props:selectProperty name="${optionsBean.engineConfigId}" className="longField">
-                <c:forEach items="${optionsBean.engineConfigList}" var="item">
-                    <props:option value="${item.id}" >${item.name}</props:option>
-                </c:forEach>
-            </props:selectProperty>
-            <span class="error" id="error_${optionsBean.engineConfigId}"></span>
-        </td>
-    </tr>
+
 </l:settingsGroup>
 
 <l:settingsGroup className="cx-title" title="Checkmarx Scan CxSAST">
@@ -585,11 +590,9 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
                         <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
                     <td>
-                    	<c:set var="onclick">
-                            $('incrementalSection').toggle();
-                            BS.VisibilityHandlers.updateVisibility('sastConfigSection')
-                        </c:set>
-                    	<props:checkboxProperty name="${optionsBean.isIncremental}" onclick="${onclick}" />
+
+
+                    <props:checkboxProperty name="${optionsBean.isIncremental}" onclick="updatePeriodicScanSectionVisibility()" />
                     </td>
                 </tr>
                 <tbody id="incrementalSection" ${hideIncrementalSection}>
@@ -597,18 +600,15 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <th><label for="${optionsBean.isPeriodicFullScan}">Schedule periodic full scans
                     </label></th>
                     <td>
-                    	<c:set var="onclick">
-                            $('periodicScanSection').toggle();
-                            BS.VisibilityHandlers.updateVisibility('scanControlSection')
-                        </c:set>
-                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="${onclick}"/>
+
+                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="updatePeriodicScanSectionVisibility()" />
                     </td>
                 </tr>
                 </tbody>
                 <tbody id="periodicScanSection" ${hidePeriodicScanSection}>
                 <tr>
-                    <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans
-                    </label></th>
+                    <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans (1-99)
+                        <bs:helpIcon iconTitle="Number of incremental scans between full scans."/></label></th>
                     <td>
                     	 <props:textProperty name="${optionsBean.periodicFullScanAfter}" className="longField"/>
                     	 <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
@@ -622,7 +622,21 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     </th>
                     <td><props:checkboxProperty name="${optionsBean.generatePDFReport}"/></td>
                 </tr>
+                <tr>
+                    <th><label for="${optionsBean.engineConfigId}">Source character encoding (Configuration)
+                        <bs:helpIcon iconTitle="Source character encoding for the project"/></label>
+                    </th>
+                    <td>
+                        <props:selectProperty name="${optionsBean.engineConfigId}" className="longField">
+                            <c:forEach items="${optionsBean.engineConfigList}" var="item">
+                                <props:option value="${item.id}" >${item.name}</props:option>
+                            </c:forEach>
+                        </props:selectProperty>
+                        <span class="error" id="error_${optionsBean.engineConfigId}"></span>
+                    </td>
+                </tr>
             </table>
+
         </td>
     </tr>
 </l:settingsGroup>
