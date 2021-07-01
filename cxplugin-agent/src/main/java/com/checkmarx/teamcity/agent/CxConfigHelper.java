@@ -68,6 +68,14 @@ public class CxConfigHelper {
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
+        /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
+        then Project will get scanned as per SAST set configuration Id.
+         */
+        Integer engConfigId = convertToIntegerIfNotNull(buildParameters.get(ENGINE_CONFIG_ID), ENGINE_CONFIG_ID);
+        if (engConfigId == null) {
+            throw new InvalidParameterException("Invalid Engine Configuration Id.");
+        }
+        ret.setEngineConfigurationId(engConfigId);
 
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {

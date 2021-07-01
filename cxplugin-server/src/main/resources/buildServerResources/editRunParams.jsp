@@ -5,7 +5,6 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
-
     <script type="text/javascript">
     window.updateDependencyScanSectionVisibility = function() {
         var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
@@ -114,6 +113,7 @@
                     if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
                     }
 
                 },
@@ -151,6 +151,7 @@
                     if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
                     }
 
                 },
@@ -298,7 +299,7 @@ validateSCAParameters: function (credentials) {
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
 
 <style>
-    #cxPresetId, #cxTeamId {
+    #cxPresetId, #cxTeamId,#cxEngineConfigId {
         width: 535px;
     }
 
@@ -468,6 +469,18 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                 </c:forEach>
             </props:selectProperty>
             <span class="error" id="error_${optionsBean.teamId}"></span>
+        </td>`
+    </tr>
+    <tr>
+        <th><label for="${optionsBean.engineConfigId}">Source character encoding (Configuration)<l:star/>
+            <bs:helpIcon iconTitle="Source character encoding for the project"/></label></th>
+        <td>
+            <props:selectProperty name="${optionsBean.engineConfigId}" className="longField">
+                <c:forEach items="${optionsBean.engineConfigList}" var="item">
+                    <props:option value="${item.id}" >${item.name}</props:option>
+                </c:forEach>
+            </props:selectProperty>
+            <span class="error" id="error_${optionsBean.engineConfigId}"></span>
         </td>
     </tr>
 </l:settingsGroup>
