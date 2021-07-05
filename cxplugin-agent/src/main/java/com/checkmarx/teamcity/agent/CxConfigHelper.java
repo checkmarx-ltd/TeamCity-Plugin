@@ -69,6 +69,7 @@ public class CxConfigHelper {
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
 
+
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
@@ -90,6 +91,16 @@ public class CxConfigHelper {
             	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
             
             ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
+
+            /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
+            then Project will get scanned as per SAST set configuration Id.
+            */
+            Integer engConfigId = convertToIntegerIfNotNull(buildParameters.get(ENGINE_CONFIG_ID), ENGINE_CONFIG_ID);
+            if (engConfigId == null) {
+                throw new InvalidParameterException("Invalid Engine Configuration Id.");
+            }
+            ret.setEngineConfigurationId(engConfigId);
+
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
         }
 

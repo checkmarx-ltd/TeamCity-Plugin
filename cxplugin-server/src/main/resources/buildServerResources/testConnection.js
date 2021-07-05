@@ -75,6 +75,7 @@ window.Checkmarx = {
                     if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
                     }
 
                 },
@@ -112,6 +113,7 @@ window.Checkmarx = {
                     if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
                     }
 
                 },
