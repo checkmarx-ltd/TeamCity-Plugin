@@ -6,6 +6,7 @@ import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
+import com.cx.restclient.dto.EngineConfiguration;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
@@ -27,6 +28,7 @@ public class CxOptions {
     public static final Logger log = LoggerFactory.getLogger(CxOptions.class);
     private List<Team> teamList = Collections.singletonList(new Team(NO_TEAM_PATH, CxConstants.NO_TEAM_MESSAGE));
     private List<Preset> presetList = Collections.singletonList(new Preset(NO_PRESET_ID, CxConstants.NO_PRESET_MESSAGE));
+    private List<EngineConfiguration> engineConfigList = Collections.singletonList(new EngineConfiguration(CxConstants.NO_ENGINE_CONFIG_MESSAGE));
 
     @NotNull
     public String getUseDefaultServer() {
@@ -82,6 +84,15 @@ public class CxOptions {
     @NotNull
     public List<Team> getTeamList() {
         return teamList;
+    }
+
+    @NotNull
+    public String getEngineConfigId() {
+        return ENGINE_CONFIG_ID;
+    }
+    @NotNull
+    public List<EngineConfiguration> getEngineConfigList() {
+        return engineConfigList;
     }
 
     @NotNull
@@ -452,7 +463,12 @@ public class CxOptions {
             sastClient.login();
             presetList = sastClient.getPresetList();
             teamList = sastClient.getTeamList();
-
+            /* Getting list of Engine configurations and adding Project Default as extra engine configuration */
+            engineConfigList = sastClient.getEngineConfiguration();
+            if(engineConfigList != null) {
+                EngineConfiguration sastEngineConfig = getProjectDefaultConfig();
+                engineConfigList.add(sastEngineConfig);
+            }
         } catch (Exception ex) {
             String result = ex.getMessage();
             Loggers.SERVER.error("Failed to retrieve preset and teams from server: " + result);
@@ -482,6 +498,12 @@ public class CxOptions {
             sastClient.login();
             presetList = sastClient.getPresetList();
             teamList = sastClient.getTeamList();
+            /* Getting list of Engine configurations and adding Project Default as extra engine configuration */
+            engineConfigList = sastClient.getEngineConfiguration();
+            if(engineConfigList != null) {
+                EngineConfiguration sastEngineConfig = getProjectDefaultConfig();
+                engineConfigList.add(sastEngineConfig);
+            }
 
         } catch (Exception ex) {
             String result = ex.getMessage();
@@ -489,6 +511,17 @@ public class CxOptions {
         }
     }
 
+    /**
+     * This method returns project default configuration.
+     *
+     * @return EngineConfiguration
+     */
+    private EngineConfiguration getProjectDefaultConfig(){
+        EngineConfiguration sastEngineConfig = new EngineConfiguration();
+        sastEngineConfig.setId(PROJECT_DEFAULT_CONFIG_ID);
+        sastEngineConfig.setName(PROJECT_DEFAULT);
+        return sastEngineConfig;
+    }
     /*String scaServerUrl,String scaAccessControlUrl,String scaUsername,String scaPassword,String scaTenant*/
 
     public void testScaConnection() throws MalformedURLException {
@@ -510,6 +543,7 @@ public class CxOptions {
         return "CxOptions{" +
                 "teamList=" + teamList +
                 ", presetList=" + presetList +
+                ", engineConfigList=" + engineConfigList +
                 '}';
     }
 

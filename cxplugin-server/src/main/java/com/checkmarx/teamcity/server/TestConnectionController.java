@@ -5,6 +5,7 @@ import com.checkmarx.teamcity.common.CxParam;
 import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.EngineConfiguration;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
@@ -31,7 +32,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
-import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
+import static com.checkmarx.teamcity.common.CxParam.*;
 
 class TestConnectionController extends BaseController {
 
@@ -43,6 +44,7 @@ class TestConnectionController extends BaseController {
     private String result = "";
     private List<Preset> presets;
     private List<Team> teams;
+    private List<EngineConfiguration> engineConfigurations;
     private CxClientDelegator clientDelegator;
 
     public TestConnectionController(@NotNull SBuildServer server,
@@ -64,6 +66,7 @@ class TestConnectionController extends BaseController {
         TestConnectionResponse res = new TestConnectionResponse();
         res.setPresetList(Collections.singletonList(new Preset(CxParam.NO_PRESET_ID, NO_PRESET_MESSAGE)));
         res.setTeamPathList(Collections.singletonList(new Team(CxParam.GENERATE_PDF_REPORT, NO_TEAM_MESSAGE)));
+        res.setEngineConfigList(Collections.singletonList(new EngineConfiguration(NO_ENGINE_CONFIG_MESSAGE)));
 
 
         TestConnectionRequest credi = extractRequestBody(httpServletRequest);
@@ -87,7 +90,16 @@ class TestConnectionController extends BaseController {
                     throw new Exception("invalid preset teamPath");
                 }
 
-                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams);
+                engineConfigurations = sastClient.getEngineConfiguration();
+                if (engineConfigurations == null) {
+                    throw new Exception("Error while getting Engine configurations.");
+                }else{
+                    EngineConfiguration sastEngineConfig = new EngineConfiguration();
+                    sastEngineConfig.setId(PROJECT_DEFAULT_CONFIG_ID);
+                    sastEngineConfig.setName(PROJECT_DEFAULT);
+                    engineConfigurations.add(sastEngineConfig);
+                }
+                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams,engineConfigurations);
                 writeHttpServletResponse(httpServletResponse, res);
                 LOG.info("Checkmarx test connection: Connection successful");
                 return null;

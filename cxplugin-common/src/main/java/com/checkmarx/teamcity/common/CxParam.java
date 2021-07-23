@@ -16,6 +16,7 @@ public abstract class CxParam {
     public static final String PROJECT_NAME = "cxProjectName";
     public static final String PRESET_ID = "cxPresetId";
     public static final String TEAM_ID = "cxTeamId";
+    public static final String ENGINE_CONFIG_ID = "cxEngineConfigId";
     public static final String EXCLUDE_FOLDERS = "cxExcludeFolders";
     public static final String FILTER_PATTERNS = "cxFilterPatterns";
     public static final String SCAN_TIMEOUT_IN_MINUTES = "cxScanTimeoutInMinutes";
@@ -43,6 +44,8 @@ public abstract class CxParam {
 
     public static final String NO_TEAM_PATH = "noTeamPath";
     public static final int NO_PRESET_ID = -1;
+    public static final int PROJECT_DEFAULT_CONFIG_ID = 0;
+    public static final String PROJECT_DEFAULT = "Project Default (Only for CxSAST 9.3.0+)";
 
     public static final String GLOBAL_SERVER_URL = "cxGlobalServerUrl";
     public static final String GLOBAL_USERNAME = "cxGlobalUsername";

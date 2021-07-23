@@ -75,6 +75,45 @@ window.Checkmarx = {
                     if(!credentials.global) {
                         Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
                         Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+        }
+    },
+    testScaSASTConnection: function (credentials) {
+        if (Checkmarx.validateSASTCredentials(credentials)) {
+            var messageElm = jQuery('#testScaSASTConnectionMsg');
+            var buttonElm = jQuery('#testScaSastConnection');
+			console.log('testScaSASTConnection');
+            messageElm.removeAttr("style");
+            messageElm.text('');
+            buttonElm.attr("disabled", true);
+            buttonElm.css('cursor','wait');
+            jQuery.ajax({
+                type: 'POST',
+                url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(credentials),
+                success: function (data) {
+                    buttonElm.attr("disabled", false);
+                    buttonElm.removeAttr("style");
+
+                    messageElm.text( data.message);
+                    if(data.success) {
+                        messageElm.css('color','green');
+                    } else {
+                        messageElm.css('color','red');
+                    }
+
+                    if(!credentials.global) {
+                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
                     }
 
                 },

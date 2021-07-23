@@ -36,6 +36,7 @@ public abstract class CxConstants {
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
     public final static String NO_PRESET_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see presets list";
     public final static String NO_TEAM_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see teams list";
+    public final static String NO_ENGINE_CONFIG_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see engine configuration list";
     public final static String UNABLE_TO_CONNECT_MESSAGE = "Unable to connect to the server. Please check the server logs for further information";
 
     public static final String URL_NOT_EMPTY_MESSAGE = "Server URL must not be empty";

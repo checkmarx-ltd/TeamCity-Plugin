@@ -1,5 +1,6 @@
 package com.checkmarx.teamcity.server;
 
+import com.cx.restclient.dto.EngineConfiguration;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 
@@ -14,13 +15,16 @@ public class TestConnectionResponse {
     public String message;
     public List<Preset> presetList;
     public List<Team> teamPathList;
+    public List<EngineConfiguration> engineConfigList;
 
 
-    public TestConnectionResponse(boolean success, String message, List<Preset> presetList, List<Team> teamPathList) {
+    public TestConnectionResponse(boolean success, String message, List<Preset> presetList, List<Team> teamPathList,
+                                  List<EngineConfiguration> engineConfigList) {
         this.success = success;
         this.message = message;
         this.presetList = presetList;
         this.teamPathList = teamPathList;
+        this.engineConfigList = engineConfigList;
     }
 
     public boolean isSuccess() {
@@ -56,6 +60,14 @@ public class TestConnectionResponse {
 
     public void setTeamPathList(List<Team> teamPathList) {
         this.teamPathList = teamPathList;
+    }
+
+    public List<EngineConfiguration> getEngineConfigList() {
+        return engineConfigList;
+    }
+
+    public void setEngineConfigList(List<EngineConfiguration> engineConfigList) {
+        this.engineConfigList = engineConfigList;
     }
 }
 
