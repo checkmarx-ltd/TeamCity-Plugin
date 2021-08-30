@@ -96,9 +96,7 @@ public class CxConfigHelper {
             then Project will get scanned as per SAST set configuration Id.
             */
             Integer engConfigId = convertToIntegerIfNotNull(buildParameters.get(ENGINE_CONFIG_ID), ENGINE_CONFIG_ID);
-            if (engConfigId == null) {
-                throw new InvalidParameterException("Invalid Engine Configuration Id.");
-            }
+
             ret.setEngineConfigurationId(engConfigId);
 
             ret.setGeneratePDFReport(TRUE.equals(buildParameters.get(GENERATE_PDF_REPORT)));
