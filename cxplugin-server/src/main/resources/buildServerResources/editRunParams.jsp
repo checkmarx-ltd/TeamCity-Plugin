@@ -616,6 +616,17 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                 </tr>
                 </tbody>
                 <tr>
+                    <th>
+                        <label for="${optionsBean.customFields}">Scan level - custom fields
+                            <bs:helpIcon iconTitle="Tag individual scans with custom values so extrapolate and generate reports based on certain data slices"/>
+                        </label>
+                    </th>
+                    <td>
+                        <props:textProperty name="${optionsBean.customFields}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.customFields}"></span>
+                    </td>
+                </tr>
+                <tr>
                     <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
                         <bs:helpIcon
                                 iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>

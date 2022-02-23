@@ -1,16 +1,12 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxUtility;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
-
 import jetbrains.buildServer.agent.AgentRunningBuild;
-
-import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -18,12 +14,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static com.checkmarx.teamcity.common.CxConstants.TRUE;
-import static com.checkmarx.teamcity.common.CxConstants.FALSE;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
-import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
+
+import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 
 
 /**
@@ -91,6 +85,8 @@ public class CxConfigHelper {
             	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
             
             ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
+
+            ret.setCustomFields(customFieldFormat(buildParameters.get(CUSTOM_FIELDS)));
 
             /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
             then Project will get scanned as per SAST set configuration Id.
@@ -192,6 +188,16 @@ public class CxConfigHelper {
         }
         return ret;
     }
+
+    private static String customFieldFormat(String customFields) {
+        if(customFields != null && !customFields.isEmpty()) {
+            customFields = customFields.replaceAll(":", "\":\"");
+            customFields = customFields.replaceAll(",", "\",\"");
+            customFields = "{\"".concat(customFields).concat("\"}");
+        }
+        return customFields;
+    }
+
     private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
 		AstScaConfig scaConfig = new AstScaConfig();
 		

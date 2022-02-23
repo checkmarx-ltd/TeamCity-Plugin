@@ -4,12 +4,11 @@ import com.checkmarx.teamcity.common.CxConstants;
 import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.EngineConfiguration;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
-import com.cx.restclient.dto.EngineConfiguration;
 import com.cx.restclient.sast.dto.Preset;
 import jetbrains.buildServer.log.Loggers;
-import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 
 
 public class CxOptions {
@@ -117,10 +117,15 @@ public class CxOptions {
 
 
     @NotNull
+    public String getCustomFields() {
+        return CUSTOM_FIELDS;
+    }
+
+    @NotNull
     public String getIsIncremental() {
         return IS_INCREMENTAL;
     }
-    
+
     @NotNull
     public String getIsPeriodicFullScan() {
         return PERIODIC_FULL_SCAN;

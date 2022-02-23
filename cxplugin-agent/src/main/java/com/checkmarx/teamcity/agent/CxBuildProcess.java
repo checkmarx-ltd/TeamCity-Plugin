@@ -225,6 +225,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());
             logger.info("Scan comment: " + config.getScanComment());            
             logger.info("Is incremental scan: " + config.getIncremental());
+            logger.info("Custom Fields: " + config.getCustomFields());
             logger.info("Generate PDF report: " + config.getGeneratePDFReport());
             logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());
             if (config.getSastThresholdsEnabled()) {
