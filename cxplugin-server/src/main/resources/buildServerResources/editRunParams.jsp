@@ -777,7 +777,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <bs:helpIcon iconTitle="Perform SCA scan using dependency resolution by SCA Resolver tool."/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="SCAResolver" id="ScaResolverEnabled"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="SCAResolver" id="ScaResolverEnabled"/>
         </td>
     </tr>
      <tr class="dependencyScanRow scaInput enableSCAResolver">
@@ -799,7 +799,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <bs:helpIcon iconTitle="Perform SCA scan by uploading manifests file(s)/source to SCA Service."/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="ManifestFile" id="ManifestFileEnabled"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="ManifestFile" id="ManifestFileEnabled"/>
         </td>
     </tr>
     

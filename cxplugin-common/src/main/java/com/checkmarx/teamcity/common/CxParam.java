@@ -27,6 +27,7 @@ public abstract class CxParam {
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
     public static final String DEPENDENCY_SCANNER_TYPE = "dependencyScannerType";
+    public static final String DEPENDENCY_SCA_SCAN_TYPE = "dependencyScaScanType";
     public static final String SAST_ENABLED = "cxSastEnabled";
     public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
     public static final String OSA_ARCHIVE_INCLUDE_PATTERNS = "cxOsaArchiveIncludePatterns";

@@ -145,6 +145,11 @@ public class CxOptions {
     public String getDependencyScannerType() {
         return DEPENDENCY_SCANNER_TYPE;
     }
+    
+    @NotNull
+    public String getDependencyScaScanType() {
+        return DEPENDENCY_SCA_SCAN_TYPE;
+    }
 
     @NotNull
     public String getSastEnabled() {
