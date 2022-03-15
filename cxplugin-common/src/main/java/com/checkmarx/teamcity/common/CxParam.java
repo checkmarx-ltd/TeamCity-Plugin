@@ -90,6 +90,8 @@ public abstract class CxParam {
     //SCA Params
     public static final String SCA_API_URL = "scaApiUrl";
     public static final String SCA_ACCESS_CONTROL_URL = "scaAccessControlUrl";
+    public static final String SCA_RESOLVER_ADD_PARAMETERS = "scaResolverAddParameters";
+    public static final String SCA_RESOLVER_PATH = "scaResolverPath";
     public static final String SCA_WEB_APP_URL = "scaWebAppUrl";
     public static final String SCA_USERNAME = "scaUserName";
     public static final String SCA_PASSWORD = "scaPass";

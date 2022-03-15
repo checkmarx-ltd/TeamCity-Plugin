@@ -64,4 +64,7 @@ public abstract class CxConstants {
     public static final int FULL_SCAN_CYCLE_MAX = 99;
     public static final String CX_BUILD_NUMBER = "BUILD_NUMBER";
 
+    public static final String SCA_RESOLVER_PATH_NOT_EMPTY_MESSAGE = "SCA resolver path must not be empty";
+    public static final String SCA_RESOLVER_ADD_PARAMETERS_NOT_EMPTY_MESSAGE = "SCA resolver additional parameters must not be empty";
+
 }

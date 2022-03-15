@@ -781,17 +781,17 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         </td>
     </tr>
      <tr class="dependencyScanRow scaInput enableSCAResolver">
-        <th><label for="${optionsBean.scaAccessControlUrl}">Path to SCA Resolver
+        <th><label for="${optionsBean.scaResolverPath}">Path to SCA Resolver
             <bs:helpIcon iconTitle="fill this with the SCA Resolver Path"/>
         </label></th>
-        <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
+        <td><props:textProperty name="${optionsBean.scaResolverPath}" className="longField"/></td>
     </tr>
     
      <tr class="dependencyScanRow scaInput enableSCAResolver">
-        <th><label for="${optionsBean.scaAccessControlUrl}">SCA Resolver Additional Parameters
+        <th><label for="${optionsBean.scaResolverAddParameters}">SCA Resolver Additional Parameters
             <bs:helpIcon iconTitle="fill this with the SCA Resolver Additional Parameters"/>
         </label></th>
-        <td><props:textProperty name="${optionsBean.scaAccessControlUrl}" className="longField"/></td>
+        <td><props:textProperty name="${optionsBean.scaResolverAddParameters}" className="longField"/></td>
     </tr>
     
     <tr class="dependencyScanRow scaInput">
