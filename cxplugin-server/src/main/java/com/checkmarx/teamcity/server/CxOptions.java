@@ -150,6 +150,11 @@ public class CxOptions {
     public String getDependencyScannerType() {
         return DEPENDENCY_SCANNER_TYPE;
     }
+    
+    @NotNull
+    public String getDependencyScaScanType() {
+        return DEPENDENCY_SCA_SCAN_TYPE;
+    }
 
     @NotNull
     public String getSastEnabled() {
@@ -352,6 +357,16 @@ public class CxOptions {
     @NotNull
     public String getScaAccessControlUrl() {
         return SCA_ACCESS_CONTROL_URL;
+    }
+
+    @NotNull
+    public String getScaResolverAddParameters() {
+        return SCA_RESOLVER_ADD_PARAMETERS;
+    }
+
+    @NotNull
+    public String getScaResolverPath() {
+        return SCA_RESOLVER_PATH;
     }
 
     @NotNull

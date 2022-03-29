@@ -5,13 +5,16 @@ import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
+import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -248,6 +251,19 @@ public class CxConfigHelper {
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
 
+            //add SCA Resolver code here
+            if (buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE) != null
+                    && "SCAResolver".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE))) {
+                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
+                validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
+                scaConfig.setEnableScaResolver(true);
+            }
+            else
+                scaConfig.setEnableScaResolver(false);
+
+            scaConfig.setPathToScaResolver(buildParameters.get(SCA_RESOLVER_PATH));
+            scaConfig.setScaResolverAddParameters(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
+
             if(StringUtils.isNotEmpty(scaEnvVars))
             {
             	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
@@ -290,7 +306,50 @@ public class CxConfigHelper {
 		}
 		return scaConfig;
     }
-    
+
+    private static boolean scaResolverPathExist(String pathToResolver) {
+        pathToResolver = pathToResolver + File.separator + "ScaResolver";
+        if(!SystemUtils.IS_OS_UNIX)
+            pathToResolver = pathToResolver + ".exe";
+
+        File file = new File(pathToResolver);
+        if(!file.exists())
+        {
+            throw new CxClientException("SCA Resolver path does not exist. Path="+file.getAbsolutePath());
+        }
+        return true;
+    }
+
+    private static void validateScaResolverParams(String additionalParams) {
+
+        String[] arguments = additionalParams.split(" ");
+        Map<String, String> params = new HashMap<>();
+
+        for (int i = 0; i <  arguments.length ; i++) {
+            if(arguments[i].startsWith("-") && (i+1 != arguments.length && !arguments[i+1].startsWith("-")))
+                params.put(arguments[i], arguments[i+1]);
+            else
+                params.put(arguments[i], "");
+        }
+
+        String dirPath = params.get("-s");
+        if(StringUtils.isEmpty(dirPath))
+            throw new CxClientException("Source code path (-s <source code path>) is not provided.");
+        fileExists(dirPath);
+
+        String projectName = params.get("-n");
+        if(StringUtils.isEmpty(projectName))
+            throw new CxClientException("Project name parameter (-n <project name>) must be provided to ScaResolver.");
+
+    }
+
+    private static void fileExists(String file) {
+
+        File resultPath = new File(file);
+        if (!resultPath.exists()) {
+            throw new CxClientException("Path does not exist. Path= " + resultPath.getAbsolutePath());
+        }
+    }
 
     private static List<String> getTrimmedConfigPaths(String[] strArrayFile) {
     	List<String> paths = new ArrayList<String>();

@@ -18,8 +18,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
+
+import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxParam.SCA_RESOLVER_ADD_PARAMETERS;
+
 import static com.checkmarx.teamcity.common.CxParam.CUSTOM_FIELDS;
 import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
+
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
@@ -114,6 +119,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 		if (TRUE.equals(properties.get(CxParam.DEPENDENCY_SCAN_ENABLED))) {
 			if (TRUE.equals(properties.get(CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS))) {
 				if ("SCA".equalsIgnoreCase(properties.get(DEPENDENCY_SCANNER_TYPE))) {
+                    validateScaResolver(properties, result);
 					if (TRUE.equals(properties.get(CxParam.IS_EXPLOITABLE_PATH))) {
 						if ((PropertiesUtil.isEmptyOrNull(properties.get(CxParam.SCA_SAST_PROJECT_FULLPATH))) && 
 								(PropertiesUtil.isEmptyOrNull(properties.get(CxParam.SCA_SAST_PROJECT_ID))) ) {
@@ -126,7 +132,19 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 		}
 	}
 
-	private void validateProjectName(String projectName, List<InvalidProperty> result) {
+    private void validateScaResolver(Map<String, String> properties, List<InvalidProperty> result) {
+        if (properties.get(DEPENDENCY_SCA_SCAN_TYPE) != null
+                && "SCAResolver".equalsIgnoreCase(properties.get(DEPENDENCY_SCA_SCAN_TYPE))) {
+            if(PropertiesUtil.isEmptyOrNull(properties.get(SCA_RESOLVER_ADD_PARAMETERS))) {
+                result.add(new InvalidProperty(CxParam.SCA_RESOLVER_ADD_PARAMETERS, SCA_RESOLVER_ADD_PARAMETERS_NOT_EMPTY_MESSAGE));
+            }
+            if(PropertiesUtil.isEmptyOrNull(properties.get(SCA_RESOLVER_PATH))) {
+                result.add(new InvalidProperty(CxParam.SCA_RESOLVER_PATH, SCA_RESOLVER_PATH_NOT_EMPTY_MESSAGE));
+            }
+        }
+    }
+
+    private void validateProjectName(String projectName, List<InvalidProperty> result) {
         if (PropertiesUtil.isEmptyOrNull(projectName)) {
             result.add(new InvalidProperty(CxParam.PROJECT_NAME, PROJECT_NAME_NOT_EMPTY_MESSAGE));
             return;
