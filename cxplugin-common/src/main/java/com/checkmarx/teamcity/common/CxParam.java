@@ -22,11 +22,13 @@ public abstract class CxParam {
     public static final String SCAN_TIMEOUT_IN_MINUTES = "cxScanTimeoutInMinutes";
     public static final String SCAN_COMMENT = "cxScanComment";
     public static final String IS_INCREMENTAL = "cxIsIncremental";
+    public static final String CUSTOM_FIELDS = "cxCustomFields";
     public static final String PERIODIC_FULL_SCAN = "cxIsPeriodicFullScan";
     public static final String PERIODIC_FULL_SCAN_AFTER = "cxPeriodicFullScanAfter";
     public static final String GENERATE_PDF_REPORT = "cxGeneratePDFReport";
     public static final String OSA_ENABLED = "cxOsaEnabled";
     public static final String DEPENDENCY_SCANNER_TYPE = "dependencyScannerType";
+    public static final String DEPENDENCY_SCA_SCAN_TYPE = "dependencyScaScanType";
     public static final String SAST_ENABLED = "cxSastEnabled";
     public static final String OSA_FILTER_PATTERNS = "cxOsaFilterPatterns";
     public static final String OSA_ARCHIVE_INCLUDE_PATTERNS = "cxOsaArchiveIncludePatterns";
@@ -89,6 +91,8 @@ public abstract class CxParam {
     //SCA Params
     public static final String SCA_API_URL = "scaApiUrl";
     public static final String SCA_ACCESS_CONTROL_URL = "scaAccessControlUrl";
+    public static final String SCA_RESOLVER_ADD_PARAMETERS = "scaResolverAddParameters";
+    public static final String SCA_RESOLVER_PATH = "scaResolverPath";
     public static final String SCA_WEB_APP_URL = "scaWebAppUrl";
     public static final String SCA_USERNAME = "scaUserName";
     public static final String SCA_PASSWORD = "scaPass";

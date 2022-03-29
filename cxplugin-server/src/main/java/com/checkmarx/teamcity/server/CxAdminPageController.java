@@ -4,7 +4,6 @@ package com.checkmarx.teamcity.server;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.log.Loggers;
-import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jdom.Element;
@@ -19,6 +18,7 @@ import java.net.URL;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 
 
 public class CxAdminPageController extends BaseFormXmlController {

@@ -56,6 +56,7 @@ public abstract class CxConstants {
     public static final String SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE = "Scan timeout must be a number greater than zero";
     public static final String THRESHOLD_POSITIVE_INTEGER_MESSAGE = "Threshold must be 0 or greater, or leave blank for no thresholds";
     public static final String WRONG_PERIODIC_FULL_SCAN_INTERVAL = "The value must be a number between 1 and 99.";
+    public static final String CUSTOM_FIELDS_FORMAT_ERROR_MESSAGE = "Custom Fields must to have next format: key1:val1,key2:val2";
 
     public static final String TEAMCITY_PLUGIN_VERSION = "cx.teamcity.plugin.version";
 
@@ -63,5 +64,8 @@ public abstract class CxConstants {
     public static final int FULL_SCAN_CYCLE_MIN = 1;
     public static final int FULL_SCAN_CYCLE_MAX = 99;
     public static final String CX_BUILD_NUMBER = "BUILD_NUMBER";
+
+    public static final String SCA_RESOLVER_PATH_NOT_EMPTY_MESSAGE = "SCA resolver path must not be empty";
+    public static final String SCA_RESOLVER_ADD_PARAMETERS_NOT_EMPTY_MESSAGE = "SCA resolver additional parameters must not be empty";
 
 }

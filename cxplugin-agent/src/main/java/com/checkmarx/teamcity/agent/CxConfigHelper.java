@@ -1,113 +1,27 @@
 package com.checkmarx.teamcity.agent;
 
-import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
-import static com.checkmarx.teamcity.common.CxConstants.FALSE;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
-import static com.checkmarx.teamcity.common.CxConstants.TRUE;
-import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
-import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCAN_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.ENGINE_CONFIG_ID;
-import static com.checkmarx.teamcity.common.CxParam.EXCLUDE_FOLDERS;
-import static com.checkmarx.teamcity.common.CxParam.FILTER_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.GENERATE_PDF_REPORT;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_DEPENDENCY_SCANNER_TYPE;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_EXCLUDE_FOLDERS;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_FILTER_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_HIGH_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_IS_EXPLOITABLE_PATH;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_IS_SYNCHRONOUS;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_LOW_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_MEDIUM_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_HIGH_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_LOW_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_MEDIUM_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_THRESHOLD_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_PROJECT_POLICY_VIOLATION;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_URL;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCAN_TIMEOUT_IN_MINUTES;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_ACCESS_CONTROL_URL;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_API_URL;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_CONFIGFILE;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_ENV_VARIABLE;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_TENANT;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_WEB_APP_URL;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SERVER_URL;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_THRESHOLD_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.GLOBAL_USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.HIGH_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.IS_EXPLOITABLE_PATH;
-import static com.checkmarx.teamcity.common.CxParam.IS_INCLUDE_SOURCES;
-import static com.checkmarx.teamcity.common.CxParam.IS_INCREMENTAL;
-import static com.checkmarx.teamcity.common.CxParam.IS_SYNCHRONOUS;
-import static com.checkmarx.teamcity.common.CxParam.LOW_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.MEDIUM_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.OSA_ARCHIVE_INCLUDE_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.OSA_FILTER_PATTERNS;
-import static com.checkmarx.teamcity.common.CxParam.OSA_HIGH_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.OSA_INSTALL_BEFORE_SCAN;
-import static com.checkmarx.teamcity.common.CxParam.OSA_LOW_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.OSA_MEDIUM_THRESHOLD;
-import static com.checkmarx.teamcity.common.CxParam.OSA_THRESHOLD_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS;
-import static com.checkmarx.teamcity.common.CxParam.PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.PERIODIC_FULL_SCAN;
-import static com.checkmarx.teamcity.common.CxParam.PERIODIC_FULL_SCAN_AFTER;
-import static com.checkmarx.teamcity.common.CxParam.PRESET_ID;
-import static com.checkmarx.teamcity.common.CxParam.PROJECT_NAME;
-import static com.checkmarx.teamcity.common.CxParam.PROJECT_POLICY_VIOLATION;
-import static com.checkmarx.teamcity.common.CxParam.SAST_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.SCAN_COMMENT;
-import static com.checkmarx.teamcity.common.CxParam.SCAN_TIMEOUT_IN_MINUTES;
-import static com.checkmarx.teamcity.common.CxParam.SCA_ACCESS_CONTROL_URL;
-import static com.checkmarx.teamcity.common.CxParam.SCA_API_URL;
-import static com.checkmarx.teamcity.common.CxParam.SCA_CONFIGFILE;
-import static com.checkmarx.teamcity.common.CxParam.SCA_ENV_VARIABLE;
-import static com.checkmarx.teamcity.common.CxParam.SCA_PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_PROJECT_FULLPATH;
-import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_PROJECT_ID;
-import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_PASSWORD;
-import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_URL;
-import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.SCA_TEAMPATH;
-import static com.checkmarx.teamcity.common.CxParam.SCA_TENANT;
-import static com.checkmarx.teamcity.common.CxParam.SCA_USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.SCA_WEB_APP_URL;
-import static com.checkmarx.teamcity.common.CxParam.SERVER_URL;
-import static com.checkmarx.teamcity.common.CxParam.TEAM_ID;
-import static com.checkmarx.teamcity.common.CxParam.THRESHOLD_ENABLED;
-import static com.checkmarx.teamcity.common.CxParam.USERNAME;
-import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SAST_CONFIG;
-import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SCAN_CONTROL;
-import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SERVER;
-import static com.checkmarx.teamcity.common.CxParam.USE_SAST_DEFAULT_SERVER;
-import static com.checkmarx.teamcity.common.CxUtility.decrypt;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.checkmarx.teamcity.common.CxUtility;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.sast.utils.LegacyClient;
+import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
-
 import jetbrains.buildServer.agent.AgentRunningBuild;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.checkmarx.teamcity.common.CxConstants.*;
+import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 
 
 /**
@@ -185,6 +99,8 @@ public class CxConfigHelper {
             	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
             
             ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
+
+            ret.setCustomFields(customFieldFormat(buildParameters.get(CUSTOM_FIELDS)));
 
             /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
             then Project will get scanned as per SAST set configuration Id.
@@ -295,6 +211,16 @@ public class CxConfigHelper {
         commonClient = null;
     }		
 	}
+
+    private static String customFieldFormat(String customFields) {
+        if(customFields != null && !customFields.isEmpty()) {
+            customFields = customFields.replaceAll(":", "\":\"");
+            customFields = customFields.replaceAll(",", "\",\"");
+            customFields = "{\"".concat(customFields).concat("\"}");
+        }
+        return customFields;
+    }
+
     private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
 		AstScaConfig scaConfig = new AstScaConfig();
 		
@@ -350,6 +276,19 @@ public class CxConfigHelper {
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
 
+            //add SCA Resolver code here
+            if (buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE) != null
+                    && "SCAResolver".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE))) {
+                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
+                validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
+                scaConfig.setEnableScaResolver(true);
+            }
+            else
+                scaConfig.setEnableScaResolver(false);
+
+            scaConfig.setPathToScaResolver(buildParameters.get(SCA_RESOLVER_PATH));
+            scaConfig.setScaResolverAddParameters(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
+
             if(StringUtils.isNotEmpty(scaEnvVars))
             {
             	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
@@ -392,7 +331,50 @@ public class CxConfigHelper {
 		}
 		return scaConfig;
     }
-    
+
+    private static boolean scaResolverPathExist(String pathToResolver) {
+        pathToResolver = pathToResolver + File.separator + "ScaResolver";
+        if(!SystemUtils.IS_OS_UNIX)
+            pathToResolver = pathToResolver + ".exe";
+
+        File file = new File(pathToResolver);
+        if(!file.exists())
+        {
+            throw new CxClientException("SCA Resolver path does not exist. Path="+file.getAbsolutePath());
+        }
+        return true;
+    }
+
+    private static void validateScaResolverParams(String additionalParams) {
+
+        String[] arguments = additionalParams.split(" ");
+        Map<String, String> params = new HashMap<>();
+
+        for (int i = 0; i <  arguments.length ; i++) {
+            if(arguments[i].startsWith("-") && (i+1 != arguments.length && !arguments[i+1].startsWith("-")))
+                params.put(arguments[i], arguments[i+1]);
+            else
+                params.put(arguments[i], "");
+        }
+
+        String dirPath = params.get("-s");
+        if(StringUtils.isEmpty(dirPath))
+            throw new CxClientException("Source code path (-s <source code path>) is not provided.");
+        fileExists(dirPath);
+
+        String projectName = params.get("-n");
+        if(StringUtils.isEmpty(projectName))
+            throw new CxClientException("Project name parameter (-n <project name>) must be provided to ScaResolver.");
+
+    }
+
+    private static void fileExists(String file) {
+
+        File resultPath = new File(file);
+        if (!resultPath.exists()) {
+            throw new CxClientException("Path does not exist. Path= " + resultPath.getAbsolutePath());
+        }
+    }
 
     private static List<String> getTrimmedConfigPaths(String[] strArrayFile) {
     	List<String> paths = new ArrayList<String>();
