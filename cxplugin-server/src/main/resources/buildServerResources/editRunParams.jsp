@@ -12,12 +12,12 @@
             overrideSASTChecked = jQuery('#useSASTDefaultServer').prop('checked'),
             osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
-            isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
+
+            isEnableExpPath = jQuery('#isExploitablePath').prop('checked'),
             isEnableSCAResolver = jQuery('#ScaResolverEnabled').prop('checked'),
             isManifestFileEnabled = jQuery('#ManifestFileEnabled').prop('checked'),
-            isOverriding = depScanEnabled && overrideChecked;
+             isOverriding = depScanEnabled && overrideChecked;
             
-        	
         	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
@@ -861,7 +861,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
         </label></th>
         <td> 
        
-        <props:checkboxProperty name="${optionsBean.isExploitablePath}" id="enableExpPath" onclick="updateDependencyScanSectionVisibility()"/>
+        <props:checkboxProperty name="${optionsBean.isExploitablePath}" onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath">
