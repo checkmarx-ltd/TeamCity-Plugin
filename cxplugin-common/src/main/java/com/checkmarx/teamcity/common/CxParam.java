@@ -93,6 +93,7 @@ public abstract class CxParam {
     public static final String SCA_USERNAME = "scaUserName";
     public static final String SCA_PASSWORD = "scaPass";
     public static final String SCA_TENANT = "scaTenant";
+    public static final String SCA_TEAMPATH = "scaTeampath";
     public static final String SCA_CONFIGFILE = "scaConfigFile";
     public static final String SCA_ENV_VARIABLE = "scaEnvVariable";
     public static final String IS_INCLUDE_SOURCES = "isIncludeSources";

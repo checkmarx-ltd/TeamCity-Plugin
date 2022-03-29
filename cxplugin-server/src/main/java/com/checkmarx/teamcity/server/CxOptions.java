@@ -368,6 +368,10 @@ public class CxOptions {
     public String getScaTenant() {
         return SCA_TENANT;
     }
+    @NotNull
+    public String getScaTeampath() {
+        return SCA_TEAMPATH;
+    }
     
     @NotNull
     public String getScaConfigFile() {

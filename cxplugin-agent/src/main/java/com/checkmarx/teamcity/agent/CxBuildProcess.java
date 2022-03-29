@@ -249,7 +249,10 @@ public class CxBuildProcess extends CallableBuildProcess {
 	        if (config.isOsaEnabled()) {	            
 	        	logger.info(" CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
 	        	logger.info(" Execute dependency managers 'install packages' command before CxOSA Scan: " + config.getOsaRunInstall());            
-	        }	        
+	        } else if(config.isAstScaEnabled())	{
+	        	logger.info(" CxSCA Tenant: " + config.getAstScaConfig().getTenant());
+	        	logger.info(" CxSCA TeamPath: " + config.getAstScaConfig().getTeamPath());
+	        }
         }
         logger.info("------------------------------------------------------------------------");
     }

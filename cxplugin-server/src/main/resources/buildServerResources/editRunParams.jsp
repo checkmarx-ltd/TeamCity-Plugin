@@ -753,7 +753,12 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-
+	<tr class="dependencyScanRow scaInput">
+	        <th><label for="${optionsBean.scaTeampath}">CxSCA Teampath
+	            <bs:helpIcon iconTitle="Team that gets assigned for new SCA project getting created. When this is left blank SAST team will be assigned for the SCA project."/>
+	        </label></th>
+	        <td><props:textProperty name="${optionsBean.scaTeampath}" className="longField"/></td>
+	    </tr>
     <tr class="dependencyScanRow scaInput">
          <td>
              <form>

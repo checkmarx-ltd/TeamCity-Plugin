@@ -1,29 +1,113 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.teamcity.common.CxConstants;
-import com.checkmarx.teamcity.common.CxUtility;
-import com.checkmarx.teamcity.common.InvalidParameterException;
-import com.cx.restclient.ast.dto.sca.AstScaConfig;
-import com.cx.restclient.configuration.CxScanConfig;
-import com.cx.restclient.dto.ScannerType;
-import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
-
-import jetbrains.buildServer.agent.AgentRunningBuild;
-
+import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
+import static com.checkmarx.teamcity.common.CxConstants.FALSE;
+import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
+import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
+import static com.checkmarx.teamcity.common.CxConstants.TRUE;
+import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
+import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCAN_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.ENGINE_CONFIG_ID;
+import static com.checkmarx.teamcity.common.CxParam.EXCLUDE_FOLDERS;
+import static com.checkmarx.teamcity.common.CxParam.FILTER_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.GENERATE_PDF_REPORT;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_DEPENDENCY_SCANNER_TYPE;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_EXCLUDE_FOLDERS;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_EXECUTE_DEPENDENCY_MANAGER;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_FILTER_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_HIGH_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_IS_EXPLOITABLE_PATH;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_IS_SYNCHRONOUS;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_LOW_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_MEDIUM_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_HIGH_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_LOW_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_MEDIUM_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_OSA_THRESHOLD_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_PROJECT_POLICY_VIOLATION;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_URL;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SAST_SERVER_USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCAN_TIMEOUT_IN_MINUTES;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_ACCESS_CONTROL_URL;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_API_URL;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_CONFIGFILE;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_ENV_VARIABLE;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_TENANT;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SCA_WEB_APP_URL;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_SERVER_URL;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_THRESHOLD_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.GLOBAL_USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.HIGH_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.IS_EXPLOITABLE_PATH;
+import static com.checkmarx.teamcity.common.CxParam.IS_INCLUDE_SOURCES;
+import static com.checkmarx.teamcity.common.CxParam.IS_INCREMENTAL;
+import static com.checkmarx.teamcity.common.CxParam.IS_SYNCHRONOUS;
+import static com.checkmarx.teamcity.common.CxParam.LOW_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.MEDIUM_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.OSA_ARCHIVE_INCLUDE_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.OSA_FILTER_PATTERNS;
+import static com.checkmarx.teamcity.common.CxParam.OSA_HIGH_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.OSA_INSTALL_BEFORE_SCAN;
+import static com.checkmarx.teamcity.common.CxParam.OSA_LOW_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.OSA_MEDIUM_THRESHOLD;
+import static com.checkmarx.teamcity.common.CxParam.OSA_THRESHOLD_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.OVERRIDE_GLOBAL_CONFIGURATIONS;
+import static com.checkmarx.teamcity.common.CxParam.PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.PERIODIC_FULL_SCAN;
+import static com.checkmarx.teamcity.common.CxParam.PERIODIC_FULL_SCAN_AFTER;
+import static com.checkmarx.teamcity.common.CxParam.PRESET_ID;
+import static com.checkmarx.teamcity.common.CxParam.PROJECT_NAME;
+import static com.checkmarx.teamcity.common.CxParam.PROJECT_POLICY_VIOLATION;
+import static com.checkmarx.teamcity.common.CxParam.SAST_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.SCAN_COMMENT;
+import static com.checkmarx.teamcity.common.CxParam.SCAN_TIMEOUT_IN_MINUTES;
+import static com.checkmarx.teamcity.common.CxParam.SCA_ACCESS_CONTROL_URL;
+import static com.checkmarx.teamcity.common.CxParam.SCA_API_URL;
+import static com.checkmarx.teamcity.common.CxParam.SCA_CONFIGFILE;
+import static com.checkmarx.teamcity.common.CxParam.SCA_ENV_VARIABLE;
+import static com.checkmarx.teamcity.common.CxParam.SCA_PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_PROJECT_FULLPATH;
+import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_PROJECT_ID;
+import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_PASSWORD;
+import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_URL;
+import static com.checkmarx.teamcity.common.CxParam.SCA_SAST_SERVER_USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.SCA_TEAMPATH;
+import static com.checkmarx.teamcity.common.CxParam.SCA_TENANT;
+import static com.checkmarx.teamcity.common.CxParam.SCA_USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.SCA_WEB_APP_URL;
+import static com.checkmarx.teamcity.common.CxParam.SERVER_URL;
+import static com.checkmarx.teamcity.common.CxParam.TEAM_ID;
+import static com.checkmarx.teamcity.common.CxParam.THRESHOLD_ENABLED;
+import static com.checkmarx.teamcity.common.CxParam.USERNAME;
+import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SAST_CONFIG;
+import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SCAN_CONTROL;
+import static com.checkmarx.teamcity.common.CxParam.USE_DEFAULT_SERVER;
+import static com.checkmarx.teamcity.common.CxParam.USE_SAST_DEFAULT_SERVER;
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static com.checkmarx.teamcity.common.CxConstants.TRUE;
-import static com.checkmarx.teamcity.common.CxConstants.FALSE;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
-import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
-import static com.checkmarx.teamcity.common.CxParam.*;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.checkmarx.teamcity.common.CxUtility;
+import com.checkmarx.teamcity.common.InvalidParameterException;
+import com.cx.restclient.ast.dto.sca.AstScaConfig;
+import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ScannerType;
+import com.cx.restclient.sast.utils.LegacyClient;
+import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
+
+import jetbrains.buildServer.agent.AgentRunningBuild;
 
 
 /**
@@ -33,7 +117,8 @@ public class CxConfigHelper {
 
     private static final String PARAMETER_PREFIX = "Parameter [";
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
-
+    private static String teamPath;
+    private static LegacyClient commonClient = null;
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory,  Map<String,String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
 
@@ -68,8 +153,17 @@ public class CxConfigHelper {
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
-
-
+        try {
+        	initializeCommonClient(ret, logger);
+        	commonClient.login();
+			teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
+		} catch (Exception e) {
+            logger.error("Failed to get team name by team id: " + e.toString());
+        } finally {
+            if (commonClient != null) {
+                commonClient.close();
+            }
+        }
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
@@ -192,6 +286,15 @@ public class CxConfigHelper {
         }
         return ret;
     }
+
+    private static void initializeCommonClient(CxScanConfig config, CxLoggerAdapter logger) {
+    	try {
+    	commonClient = CommonClientFactory.getInstance(config, logger);
+    } catch (Exception e) {
+        logger.debug("Failed to initialize cx client " + e.getMessage(), e);
+        commonClient = null;
+    }		
+	}
     private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
 		AstScaConfig scaConfig = new AstScaConfig();
 		
@@ -239,6 +342,11 @@ public class CxConfigHelper {
             scaConfig.setPassword(decrypt(buildParameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
             scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+            if(buildParameters.get(SCA_TEAMPATH)!= null) {
+            scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
+            } else {
+            	scaConfig.setTeamPath(teamPath);
+            }
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
 
