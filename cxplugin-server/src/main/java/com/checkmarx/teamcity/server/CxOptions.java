@@ -117,10 +117,15 @@ public class CxOptions {
 
 
     @NotNull
+    public String getCustomFields() {
+        return CUSTOM_FIELDS;
+    }
+
+    @NotNull
     public String getIsIncremental() {
         return IS_INCREMENTAL;
     }
-    
+
     @NotNull
     public String getIsPeriodicFullScan() {
         return PERIODIC_FULL_SCAN;

@@ -89,6 +89,8 @@ public class CxConfigHelper {
             
             ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
 
+            ret.setCustomFields(customFieldFormat(buildParameters.get(CUSTOM_FIELDS)));
+
             /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
             then Project will get scanned as per SAST set configuration Id.
             */
@@ -189,6 +191,16 @@ public class CxConfigHelper {
         }
         return ret;
     }
+
+    private static String customFieldFormat(String customFields) {
+        if(customFields != null && !customFields.isEmpty()) {
+            customFields = customFields.replaceAll(":", "\":\"");
+            customFields = customFields.replaceAll(",", "\",\"");
+            customFields = "{\"".concat(customFields).concat("\"}");
+        }
+        return customFields;
+    }
+
     private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
 		AstScaConfig scaConfig = new AstScaConfig();
 		

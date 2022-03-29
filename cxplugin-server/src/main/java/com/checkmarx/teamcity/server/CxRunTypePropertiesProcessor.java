@@ -18,8 +18,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
+
 import static com.checkmarx.teamcity.common.CxParam.*;
 import static com.checkmarx.teamcity.common.CxParam.SCA_RESOLVER_ADD_PARAMETERS;
+
+import static com.checkmarx.teamcity.common.CxParam.CUSTOM_FIELDS;
+import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
+
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
@@ -56,6 +61,11 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         validateProjectName(properties.get(CxParam.PROJECT_NAME), result);
         validIncrementalSettings(properties, result);
 
+        if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(properties.get(CUSTOM_FIELDS))) {
+            validateCustomFieldsFormat(CUSTOM_FIELDS, CUSTOM_FIELDS_FORMAT_ERROR_MESSAGE, properties, result);
+        }
+
+
         if (PropertiesUtil.isEmptyOrNull(properties.get(CxParam.PRESET_ID))) {
             result.add(new InvalidProperty(CxParam.PRESET_ID, PRESET_NOT_EMPTY_MESSAGE));
         }
@@ -90,7 +100,15 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         return result;
     }
 
-	private void validIncrementalSettings(Map<String, String> properties, List<InvalidProperty> result) {
+    private void validateCustomFieldsFormat(String parameterName, String errorMessage, Map<String, String> properties, List<InvalidProperty> result) {
+        Pattern pattern = Pattern.compile("(^([a-zA-Z0-9]*):([a-zA-Z0-9]*)+(,([a-zA-Z0-9]*):([a-zA-Z0-9]*)+)*$)");
+        Matcher match = pattern.matcher(properties.get(parameterName));
+        if (!match.find()) {
+            result.add(new InvalidProperty(parameterName, errorMessage));
+        }
+    }
+
+    private void validIncrementalSettings(Map<String, String> properties, List<InvalidProperty> result) {
 		if (TRUE.equals(properties.get(CxParam.IS_INCREMENTAL)) && TRUE.equals(properties.get(CxParam.PERIODIC_FULL_SCAN))) {
 			if(!validateRange(properties.get(CxParam.PERIODIC_FULL_SCAN_AFTER), FULL_SCAN_CYCLE_MIN, FULL_SCAN_CYCLE_MAX))
 	            result.add(new InvalidProperty(CxParam.PERIODIC_FULL_SCAN_AFTER, WRONG_PERIODIC_FULL_SCAN_INTERVAL));
