@@ -67,6 +67,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         ScanResults ret = new ScanResults();
 
         try {
+            logger.info("Retrieving config parameters :");
             Map<String, String> allParameters = buildRunnerContext.getBuildParameters().getAllParameters();
             for (Map.Entry<String, String> entry : allParameters.entrySet()) {
                 if (entry.getKey().contains(".CX_")) {
@@ -77,12 +78,15 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
 
             Map<String, String> runnerParameters = buildRunnerContext.getRunnerParameters();
+            logger.info("-->Runner parameters");
             Map<String, String> sharedConfigParameters = agentRunningBuild.getSharedConfigParameters();
+            logger.info("-->Shared Config parameters");
             checkoutDirectory = agentRunningBuild.getCheckoutDirectory();
             buildDirectory = new File(agentRunningBuild.getBuildTempDirectory() + "/" + agentRunningBuild.getProjectName() + "/" + agentRunningBuild.getBuildTypeName() + "/" + agentRunningBuild.getBuildNumber());
             Map<String,String> otherParameters = new HashMap<>();
             otherParameters.put(CX_BUILD_NUMBER, agentRunningBuild.getBuildNumber());
-            
+
+            logger.info("Resolving Configurations");
             config = CxConfigHelper.resolveConfigurations(runnerParameters, sharedConfigParameters, checkoutDirectory, buildDirectory, otherParameters, agentRunningBuild, logger);
             pluginVersion = sharedConfigParameters.get(CxConstants.TEAMCITY_PLUGIN_VERSION);
 
