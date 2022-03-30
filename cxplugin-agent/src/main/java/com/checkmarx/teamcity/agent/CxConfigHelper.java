@@ -5,6 +5,7 @@ import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
+import com.cx.restclient.sast.utils.LegacyClient;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
 import jetbrains.buildServer.agent.AgentRunningBuild;
@@ -30,7 +31,8 @@ public class CxConfigHelper {
 
     private static final String PARAMETER_PREFIX = "Parameter [";
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
-
+    private static String teamPath;
+    private static LegacyClient commonClient = null;
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory,  Map<String,String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
 
@@ -65,8 +67,17 @@ public class CxConfigHelper {
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
-
-
+        try {
+        	initializeCommonClient(ret, logger);
+        	commonClient.login();
+			teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
+		} catch (Exception e) {
+            logger.error("Failed to get team name by team id: " + e.getMessage());
+        } finally {
+            if (commonClient != null) {
+                commonClient.close();
+            }
+        }
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
@@ -192,6 +203,15 @@ public class CxConfigHelper {
         return ret;
     }
 
+    private static void initializeCommonClient(CxScanConfig config, CxLoggerAdapter logger) {
+    	try {
+    	commonClient = CommonClientFactory.getInstance(config, logger);
+    } catch (Exception e) {
+        logger.debug("Failed to initialize cx client " + e.getMessage(), e);
+        commonClient = null;
+    }		
+	}
+
     private static String customFieldFormat(String customFields) {
         if(customFields != null && !customFields.isEmpty()) {
             customFields = customFields.replaceAll(":", "\":\"");
@@ -248,6 +268,12 @@ public class CxConfigHelper {
             scaConfig.setPassword(decrypt(buildParameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
             scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+            
+            if(!StringUtils.isEmpty(buildParameters.get(SCA_TEAMPATH))) {
+            scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
+            } else {
+            	scaConfig.setTeamPath(teamPath);
+            }
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
 

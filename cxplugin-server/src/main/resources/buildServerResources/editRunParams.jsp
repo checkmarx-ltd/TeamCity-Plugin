@@ -26,8 +26,8 @@
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
         
-        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
-        jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
+        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
         
         jQuery('.enableSCAResolver')[isOverriding && scaEnabled && isEnableSCAResolver? 'show' : 'hide']();
         jQuery('.enableManifestFile')[isOverriding && scaEnabled && isManifestFileEnabled? 'show' : 'hide']();
@@ -771,7 +771,12 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-
+	<tr class="dependencyScanRow scaInput">
+	        <th><label for="${optionsBean.scaTeampath}">CxSCA Teampath
+	            <bs:helpIcon iconTitle="Team that gets assigned for new SCA project getting created. When this is left blank SAST team will be assigned for the SCA project."/>
+	        </label></th>
+	        <td><props:textProperty name="${optionsBean.scaTeampath}" className="longField"/></td>
+	    </tr>
     <tr class="dependencyScanRow scaInput">
          <td>
              <form>
