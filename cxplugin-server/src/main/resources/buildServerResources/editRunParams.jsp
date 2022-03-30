@@ -26,8 +26,8 @@
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
         
-        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
-        jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
+        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
         
         jQuery('.enableSCAResolver')[isOverriding && scaEnabled && isEnableSCAResolver? 'show' : 'hide']();
         jQuery('.enableManifestFile')[isOverriding && scaEnabled && isManifestFileEnabled? 'show' : 'hide']();
