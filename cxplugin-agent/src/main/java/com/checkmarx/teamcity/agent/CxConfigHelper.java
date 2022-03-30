@@ -72,7 +72,7 @@ public class CxConfigHelper {
         	commonClient.login();
 			teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
 		} catch (Exception e) {
-            logger.error("Failed to get team name by team id: " + e.toString());
+            logger.error("Failed to get team name by team id: " + e.getMessage());
         } finally {
             if (commonClient != null) {
                 commonClient.close();
@@ -268,7 +268,8 @@ public class CxConfigHelper {
             scaConfig.setPassword(decrypt(buildParameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
             scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-            if(buildParameters.get(SCA_TEAMPATH)!= null) {
+            
+            if(!StringUtils.isEmpty(buildParameters.get(SCA_TEAMPATH))) {
             scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
             } else {
             	scaConfig.setTeamPath(teamPath);
