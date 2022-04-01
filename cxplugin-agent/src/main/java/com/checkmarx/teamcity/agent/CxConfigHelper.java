@@ -280,7 +280,7 @@ public class CxConfigHelper {
             //add SCA Resolver code here
             if (buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE) != null
                     && "SCAResolver".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE))) {
-                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
+//                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
                 validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
                 scaConfig.setEnableScaResolver(true);
             }
@@ -361,7 +361,7 @@ public class CxConfigHelper {
         String dirPath = params.get("-s");
         if(StringUtils.isEmpty(dirPath))
             throw new CxClientException("Source code path (-s <source code path>) is not provided.");
-        fileExists(dirPath);
+//        fileExists(dirPath);
 
         String projectName = params.get("-n");
         if(StringUtils.isEmpty(projectName))
