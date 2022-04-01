@@ -12,9 +12,12 @@
             overrideSASTChecked = jQuery('#useSASTDefaultServer').prop('checked'),
             osaEnabled = jQuery('#OsaEnabled').prop('checked'),
             scaEnabled = jQuery('#enableSca').prop('checked'),
-            isEnableExpPath = jQuery('#enableExpPath').prop('checked'),
-            isOverriding = depScanEnabled && overrideChecked;
-        	
+
+            isEnableExpPath = jQuery('#isExploitablePath').prop('checked'),
+            isEnableSCAResolver = jQuery('#ScaResolverEnabled').prop('checked'),
+            isManifestFileEnabled = jQuery('#ManifestFileEnabled').prop('checked'),
+             isOverriding = depScanEnabled && overrideChecked;
+            
         	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
@@ -23,8 +26,12 @@
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
         
-        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath ? 'show' : 'hide']();
-        jQuery('.sastDetailsRow')[isSASTOverridingForSCA ? 'show' : 'hide']();
+        jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
+        
+        jQuery('.enableSCAResolver')[isOverriding && scaEnabled && isEnableSCAResolver? 'show' : 'hide']();
+        jQuery('.enableManifestFile')[isOverriding && scaEnabled && isManifestFileEnabled? 'show' : 'hide']();
+        
     }
 
     console.log('updateDependencyScanSectionVisibility');
@@ -616,6 +623,17 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                 </tr>
                 </tbody>
                 <tr>
+                    <th>
+                        <label for="${optionsBean.customFields}">Scan level - custom fields
+                            <bs:helpIcon iconTitle="Tag individual scans with custom values so extrapolate and generate reports based on certain data slices"/>
+                        </label>
+                    </th>
+                    <td>
+                        <props:textProperty name="${optionsBean.customFields}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.customFields}"></span>
+                    </td>
+                </tr>
+                <tr>
                     <th><label for="${optionsBean.generatePDFReport}">Generate CxSAST PDF Report
                         <bs:helpIcon
                                 iconTitle="Downloadable PDF report with scan results from the Checkmarx server. The report is available via \"Artifacts\" tab"/></label>
@@ -753,7 +771,12 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-
+	<tr class="dependencyScanRow scaInput">
+	        <th><label for="${optionsBean.scaTeampath}">CxSCA Teampath
+	            <bs:helpIcon iconTitle="Team that gets assigned for new SCA project getting created. When this is left blank SAST team will be assigned for the SCA project."/>
+	        </label></th>
+	        <td><props:textProperty name="${optionsBean.scaTeampath}" className="longField"/></td>
+	    </tr>
     <tr class="dependencyScanRow scaInput">
          <td>
              <form>
@@ -764,8 +787,41 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             </form>
         </td>
     </tr>
-    <!-- SCA FEATURES -->
+    
     <tr class="dependencyScanRow scaInput">
+        <th><label for="ScaResolverEnabled">Perform SCA scan using dependency resolution by SCA Resolver tool.
+            <bs:helpIcon iconTitle="Perform SCA scan using dependency resolution by SCA Resolver tool."/>
+        </label></th>
+        <td>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="SCAResolver" id="ScaResolverEnabled"/>
+        </td>
+    </tr>
+     <tr class="dependencyScanRow scaInput enableSCAResolver">
+        <th><label for="${optionsBean.scaResolverPath}">Path to SCA Resolver
+            <bs:helpIcon iconTitle="fill this with the SCA Resolver Path"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaResolverPath}" className="longField"/></td>
+    </tr>
+    
+     <tr class="dependencyScanRow scaInput enableSCAResolver">
+        <th><label for="${optionsBean.scaResolverAddParameters}">SCA Resolver Additional Parameters
+            <bs:helpIcon iconTitle="fill this with the SCA Resolver Additional Parameters"/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaResolverAddParameters}" className="longField"/></td>
+    </tr>
+    
+    <tr class="dependencyScanRow scaInput">
+        <th><label for="ManifestFileEnabled">Perform SCA scan by uploading manifests file(s)/source to SCA Service.
+            <bs:helpIcon iconTitle="Perform SCA scan by uploading manifests file(s)/source to SCA Service."/>
+        </label></th>
+        <td>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="ManifestFile" id="ManifestFileEnabled"/>
+        </td>
+    </tr>
+    
+    
+    <!-- SCA FEATURES -->
+    <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.scaConfigFile}">Package Manager's Config File(s) Path
 
             <bs:helpIcon
@@ -779,7 +835,7 @@ Example: c:\user\.m2\settings.xml, c:\user\npm\.npmrc"/>
                                      cols="50" className="longField"/></td>
     </tr>
     
-    <tr class="dependencyScanRow scaInput">
+    <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.scaEnvVariable}">Private Registry Environment Variable
 
             <bs:helpIcon
@@ -792,7 +848,7 @@ Example: param1:value1,param2:value2"/>
                                      cols="50" className="longField"/></td>
     </tr>
     
-     <tr class="dependencyScanRow scaInput">
+     <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.isIncludeSources}">Include Sources
             <bs:helpIcon iconTitle="When this flag is enabled, it will include entire source code in the zip file to be scanned."/>
         </label></th>
@@ -800,7 +856,7 @@ Example: param1:value1,param2:value2"/>
         </td>
     </tr>
     
-    <tr class="dependencyScanRow scaInput">
+    <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
             <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
 In this section, provide details like CxSAST server url, credentials.
@@ -810,7 +866,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
         </label></th>
         <td> 
        
-        <props:checkboxProperty name="${optionsBean.isExploitablePath}" id="enableExpPath" onclick="updateDependencyScanSectionVisibility()"/>
+        <props:checkboxProperty name="${optionsBean.isExploitablePath}" onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath">

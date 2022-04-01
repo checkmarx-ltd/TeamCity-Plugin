@@ -1,29 +1,27 @@
 package com.checkmarx.teamcity.agent;
 
-import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxUtility;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ScannerType;
+import com.cx.restclient.sast.utils.LegacyClient;
+import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
-
 import jetbrains.buildServer.agent.AgentRunningBuild;
-
-import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static com.checkmarx.teamcity.common.CxConstants.TRUE;
-import static com.checkmarx.teamcity.common.CxConstants.FALSE;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MIN;
-import static com.checkmarx.teamcity.common.CxConstants.FULL_SCAN_CYCLE_MAX;
-import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
+
+import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 
 
 /**
@@ -33,7 +31,8 @@ public class CxConfigHelper {
 
     private static final String PARAMETER_PREFIX = "Parameter [";
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
-
+    private static String teamPath;
+    private static LegacyClient commonClient = null;
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
                                                      File reportDirectory,  Map<String,String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
 
@@ -68,8 +67,17 @@ public class CxConfigHelper {
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
-
-
+        try {
+        	initializeCommonClient(ret, logger);
+        	commonClient.login();
+			teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
+		} catch (Exception e) {
+            logger.error("Failed to get team name by team id: " + e.getMessage());
+        } finally {
+            if (commonClient != null) {
+                commonClient.close();
+            }
+        }
         if(ret.isSastEnabled()){
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
@@ -91,6 +99,8 @@ public class CxConfigHelper {
             	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
             
             ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
+
+            ret.setCustomFields(customFieldFormat(buildParameters.get(CUSTOM_FIELDS)));
 
             /* Added support for Engine Configuration Id when Engine configuration ID is "Project Default"  i.e. 0
             then Project will get scanned as per SAST set configuration Id.
@@ -192,6 +202,25 @@ public class CxConfigHelper {
         }
         return ret;
     }
+
+    private static void initializeCommonClient(CxScanConfig config, CxLoggerAdapter logger) {
+    	try {
+    	commonClient = CommonClientFactory.getInstance(config, logger);
+    } catch (Exception e) {
+        logger.debug("Failed to initialize cx client " + e.getMessage(), e);
+        commonClient = null;
+    }		
+	}
+
+    private static String customFieldFormat(String customFields) {
+        if(customFields != null && !customFields.isEmpty()) {
+            customFields = customFields.replaceAll(":", "\":\"");
+            customFields = customFields.replaceAll(",", "\",\"");
+            customFields = "{\"".concat(customFields).concat("\"}");
+        }
+        return customFields;
+    }
+
     private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
 		AstScaConfig scaConfig = new AstScaConfig();
 		
@@ -239,8 +268,27 @@ public class CxConfigHelper {
             scaConfig.setPassword(decrypt(buildParameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
             scaConfig.setTenant(buildParameters.get(SCA_TENANT));
+            
+            if(!StringUtils.isEmpty(buildParameters.get(SCA_TEAMPATH))) {
+            scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
+            } else {
+            	scaConfig.setTeamPath(teamPath);
+            }
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
+
+            //add SCA Resolver code here
+            if (buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE) != null
+                    && "SCAResolver".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE))) {
+//                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
+                validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
+                scaConfig.setEnableScaResolver(true);
+            }
+            else
+                scaConfig.setEnableScaResolver(false);
+
+            scaConfig.setPathToScaResolver(buildParameters.get(SCA_RESOLVER_PATH));
+            scaConfig.setScaResolverAddParameters(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
 
             if(StringUtils.isNotEmpty(scaEnvVars))
             {
@@ -284,7 +332,50 @@ public class CxConfigHelper {
 		}
 		return scaConfig;
     }
-    
+
+    private static boolean scaResolverPathExist(String pathToResolver) {
+        pathToResolver = pathToResolver + File.separator + "ScaResolver";
+        if(!SystemUtils.IS_OS_UNIX)
+            pathToResolver = pathToResolver + ".exe";
+
+        File file = new File(pathToResolver);
+        if(!file.exists())
+        {
+            throw new CxClientException("SCA Resolver path does not exist. Path="+file.getAbsolutePath());
+        }
+        return true;
+    }
+
+    private static void validateScaResolverParams(String additionalParams) {
+
+        String[] arguments = additionalParams.split(" ");
+        Map<String, String> params = new HashMap<>();
+
+        for (int i = 0; i <  arguments.length ; i++) {
+            if(arguments[i].startsWith("-") && (i+1 != arguments.length && !arguments[i+1].startsWith("-")))
+                params.put(arguments[i], arguments[i+1]);
+            else
+                params.put(arguments[i], "");
+        }
+
+        String dirPath = params.get("-s");
+        if(StringUtils.isEmpty(dirPath))
+            throw new CxClientException("Source code path (-s <source code path>) is not provided.");
+//        fileExists(dirPath);
+
+        String projectName = params.get("-n");
+        if(StringUtils.isEmpty(projectName))
+            throw new CxClientException("Project name parameter (-n <project name>) must be provided to ScaResolver.");
+
+    }
+
+    private static void fileExists(String file) {
+
+        File resultPath = new File(file);
+        if (!resultPath.exists()) {
+            throw new CxClientException("Path does not exist. Path= " + resultPath.getAbsolutePath());
+        }
+    }
 
     private static List<String> getTrimmedConfigPaths(String[] strArrayFile) {
     	List<String> paths = new ArrayList<String>();
