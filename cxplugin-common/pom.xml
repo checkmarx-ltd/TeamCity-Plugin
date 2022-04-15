@@ -14,6 +14,16 @@
       <artifactId>agent-api</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
+	  <exclusions>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</exclusion>
+	</exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -141,7 +151,16 @@
 		    <artifactId>netty-codec-http</artifactId>
 		    <version>4.1.68.Final</version>
 		</dependency>
-        
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.3.18</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>5.3.18</version>
+		</dependency>
   </dependencies>
   <build>
   </build>
