@@ -14,7 +14,38 @@
       <artifactId>agent-api</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
+      <exclusions>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</exclusion>
+		
+	</exclusions>
     </dependency>
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-context</artifactId>
+    	<version>5.3.19</version>
+    	<scope>compile</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-aop</artifactId>
+	    <version>5.3.19</version>
+	    <scope>compile</scope>
+	</dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -115,15 +146,16 @@
 		<version>2.3.31</version>
 	</dependency>
     <dependency>
-       <artifactId>spring-web</artifactId>
+       <artifactId>spring-webmvc</artifactId>
        <groupId>org.springframework</groupId>
        <version>5.3.19</version>
     </dependency>
-<dependency>
+<!-- dependency>
     <groupId>org.springframework</groupId>
     <artifactId>spring-context</artifactId>
     <version>5.3.19</version>
-</dependency>
+    <scope>compile</scope>
+</dependency-->
     <dependency>
           <groupId>io.vertx</groupId>
           <artifactId>vertx-web</artifactId>
@@ -146,7 +178,18 @@
 		    <artifactId>netty-codec-http</artifactId>
 		    <version>4.1.68.Final</version>
 		</dependency>
-        
+        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.3.19</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>5.3.19</version>
+			<scope>compile</scope>
+		</dependency>
   </dependencies>
   <build>
   </build>
