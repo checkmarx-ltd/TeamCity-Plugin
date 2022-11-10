@@ -13,6 +13,7 @@ public abstract class CxParam {
     public static final String SERVER_URL = "cxServerUrl";
     public static final String USERNAME = "cxUsername";
     public static final String PASSWORD = "cxPassword";
+    public static final String IS_PROXY = "cxIsProxy";
     public static final String PROJECT_NAME = "cxProjectName";
     public static final String PRESET_ID = "cxPresetId";
     public static final String TEAM_ID = "cxTeamId";
@@ -52,6 +53,12 @@ public abstract class CxParam {
     public static final String GLOBAL_SERVER_URL = "cxGlobalServerUrl";
     public static final String GLOBAL_USERNAME = "cxGlobalUsername";
     public static final String GLOBAL_PASSWORD = "cxGlobalPassword";
+    public static final String GLOBAL_IS_PROXY = "cxGlobalIsProxy";
+    public static final String GLOBAL_PROXY_HOST = "cxGlobalProxyHost";
+    public static final String GLOBAL_PROXY_PORT = "cxGlobalProxyPort";
+    public static final String GLOBAL_PROXY_USER = "cxGlobalProxyUser";
+    public static final String GLOBAL_PROXY_PASSWORD = "cxGlobalProxyPassword";
+    public static final String GLOBAL_PROXY_HTTPS = "cxGlobalProxyHttps";
     public static final String GLOBAL_EXCLUDE_FOLDERS = "cxGlobalExcludeFolders";
     public static final String GLOBAL_FILTER_PATTERNS = "cxGlobalFilterPatterns";
     public static final String GLOBAL_SCAN_TIMEOUT_IN_MINUTES = "cxGlobalScanTimeoutInMinutes";
@@ -66,7 +73,7 @@ public abstract class CxParam {
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
     public static final String GLOBAL_PROJECT_POLICY_VIOLATION = "cxGlobalProjectPolicyViolation";
     public static final String GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS = "cxGlobalOsaArchiveIncludePatterns";
-    public static final String GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS="CxGlobalDependencyScanFilterPatterns";
+    public static final String GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS = "CxGlobalDependencyScanFilterPatterns";
     public static final String GLOBAL_EXECUTE_DEPENDENCY_MANAGER = "cxGlobalExecuteDependencyManager";
     public static final String GLOBAL_SCA_ENABLED = "cxGlobalScaEnabled";
     public static final String GLOBAL_OSA_ENABLED = "cxGlobalOsaEnabled";
@@ -77,7 +84,7 @@ public abstract class CxParam {
     public static final String GLOBAL_SCA_USERNAME = "cxGlobalSCAUserName";
     public static final String GLOBAL_SCA_PASSWORD = "cxGlobalSCAPassword";
     public static final String GLOBAL_SCA_TENANT = "cxGlobalSCATenant";
-    
+
     public static final String GLOBAL_SCA_CONFIGFILE = "cxGlobalScaConfigFile";
     public static final String GLOBAL_SCA_ENV_VARIABLE = "cxGlobalScaEnvVariable";
     public static final String GLOBAL_IS_EXPLOITABLE_PATH = "cxGlobalIsExploitablePath";
@@ -108,7 +115,7 @@ public abstract class CxParam {
     public static final String SCA_SAST_SERVER_URL = "scaSASTServerUrl";
     public static final String SCA_SAST_SERVER_USERNAME = "scaSASTUserName";
     public static final String SCA_SAST_SERVER_PASSWORD = "scaSASTPassword";
-    
+
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";
     public static final String SCA_LOW = "ScaLow";
@@ -127,15 +134,16 @@ public abstract class CxParam {
             "Validate the provided login credentials and server URL are correct.";
 
     public static final String[] GLOBAL_CONFIGS = {
-            GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
+            GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_IS_PROXY, GLOBAL_PROXY_HOST, GLOBAL_PROXY_PORT,
+            GLOBAL_PROXY_USER, GLOBAL_PROXY_PASSWORD, GLOBAL_PROXY_HTTPS, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
             GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_HIGH_THRESHOLD,
             GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED, GLOBAL_OSA_HIGH_THRESHOLD,
-            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION,
-            GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER,
-            GLOBAL_SCA_ENABLED, GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL,
-            GLOBAL_SCA_WEB_APP_URL, GLOBAL_SCA_USERNAME, GLOBAL_SCA_PASSWORD, GLOBAL_SCA_TENANT, GLOBAL_SCA_CONFIGFILE, GLOBAL_SCA_ENV_VARIABLE, GLOBAL_IS_EXPLOITABLE_PATH
-            , GLOBAL_SAST_SERVER_URL, GLOBAL_SAST_SERVER_USERNAME, GLOBAL_SAST_SERVER_PASSWORD
+            GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD, GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,
+            GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION, GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,
+            GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER, GLOBAL_SCA_ENABLED,
+            GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL, GLOBAL_SCA_WEB_APP_URL,
+            GLOBAL_SCA_USERNAME, GLOBAL_SCA_PASSWORD, GLOBAL_SCA_TENANT, GLOBAL_SCA_CONFIGFILE, GLOBAL_SCA_ENV_VARIABLE,
+            GLOBAL_IS_EXPLOITABLE_PATH, GLOBAL_SAST_SERVER_URL, GLOBAL_SAST_SERVER_USERNAME, GLOBAL_SAST_SERVER_PASSWORD
     };
-
 
 }

@@ -5,8 +5,8 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
-    <script type="text/javascript">
-    window.updateDependencyScanSectionVisibility = function() {
+<script type="text/javascript">
+    window.updateDependencyScanSectionVisibility = function () {
         var depScanEnabled = jQuery('#dependencyScanEnabled').prop('checked'),
             overrideChecked = jQuery('#OverrideGlobalConfigurations').prop('checked'),
             overrideSASTChecked = jQuery('#useSASTDefaultServer').prop('checked'),
@@ -16,28 +16,28 @@
             isEnableExpPath = jQuery('#isExploitablePath').prop('checked'),
             isEnableSCAResolver = jQuery('#ScaResolverEnabled').prop('checked'),
             isManifestFileEnabled = jQuery('#ManifestFileEnabled').prop('checked'),
-             isOverriding = depScanEnabled && overrideChecked;
-            
-        	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
+            isOverriding = depScanEnabled && overrideChecked;
+
+        isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
 
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        
+
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
-        jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
-        
-        jQuery('.enableSCAResolver')[isOverriding && scaEnabled && isEnableSCAResolver? 'show' : 'hide']();
-        jQuery('.enableManifestFile')[isOverriding && scaEnabled && isManifestFileEnabled? 'show' : 'hide']();
-        
+        jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled ? 'show' : 'hide']();
+
+        jQuery('.enableSCAResolver')[isOverriding && scaEnabled && isEnableSCAResolver ? 'show' : 'hide']();
+        jQuery('.enableManifestFile')[isOverriding && scaEnabled && isManifestFileEnabled ? 'show' : 'hide']();
+
     }
 
     console.log('updateDependencyScanSectionVisibility');
     jQuery(updateDependencyScanSectionVisibility);
 
-    window.updatePeriodicScanSectionVisibility = function() {
+    window.updatePeriodicScanSectionVisibility = function () {
         var incrementalScanEnabled = jQuery('#cxIsIncremental').prop('checked'),
             isPeriodicFullScanEnabled = jQuery('#cxIsPeriodicFullScan').prop('checked'),
             periodindFullScanAfter = incrementalScanEnabled && isPeriodicFullScanEnabled;
@@ -53,50 +53,58 @@
     jQuery(updatePeriodicScanSectionVisibility);
 
     window.Checkmarx = {
-    		extractSASTCredentials: function () {
-        return {
-            sastServerUrl: $('scaSASTServerUrl').value,
-            sastUsername: $('scaSASTUserName').value,
-            sastPssd: $('prop:encrypted:scaSASTPassword').value ? $('prop:encrypted:scaSASTPassword').value : $('scaSASTPassword').value
-        };
-    },
-    
-    extractGlobalSASTCredentials: function () {
-        return {
-        	sastServerUrl: $('cxGlobalSastServerUrl').value,
-        	sastUsername: $('cxGlobalSastUsername').value,
-        	sastPssd: $('cxGlobalSastPassword').value,
-            global: true
-        }
-    },
-    extractCredentials: function () {
-        return {
-            serverUrl: $('cxServerUrl').value,
-            username: $('cxUsername').value,
-            pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
-        };
-    },
-    
-    extractGlobalCredentials: function () {
-        return {
-            serverUrl: $('cxGlobalServerUrl').value,
-            username: $('cxGlobalUsername').value,
-            pssd: $('cxGlobalPassword').value,
-            global: true
-        }
-    },
-       extractGlobalSCAparameters: function () {
-        return {
-            serverUrl: $('cxGlobalSCAServerUrl').value,
-            accessControlServerUrl: $('cxGlobalSCAAccessControlServerURL').value,
-            webAppURL: $('cxGlobalSCAWebAppURL').value,
-            scaUserName: $('cxGlobalSCAUserName').value,
-            scaPassword: $('cxGlobalSCAPassword').value,
-            scaTenant: $('cxGlobalSCATenant').value,
-            global: true
-        }
-    },
-    extractSCAparameters: function () {
+        extractSASTCredentials: function () {
+            return {
+                sastServerUrl: $('scaSASTServerUrl').value,
+                sastUsername: $('scaSASTUserName').value,
+                sastPssd: $('prop:encrypted:scaSASTPassword').value ? $('prop:encrypted:scaSASTPassword').value : $('scaSASTPassword').value
+            };
+        },
+
+        extractGlobalSASTCredentials: function () {
+            return {
+                sastServerUrl: $('cxGlobalSastServerUrl').value,
+                sastUsername: $('cxGlobalSastUsername').value,
+                sastPssd: $('cxGlobalSastPassword').value,
+                // isProxy: $('cxGlobalIsProxy').value,
+                global: true
+            }
+        },
+        extractCredentials: function () {
+            return {
+                serverUrl: $('cxServerUrl').value,
+                username: $('cxUsername').value,
+                pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
+                // isProxy: $('cxIsProxy').value
+            };
+        },
+
+        extractGlobalCredentials: function () {
+            return {
+                serverUrl: $('cxGlobalServerUrl').value,
+                username: $('cxGlobalUsername').value,
+                pssd: $('cxGlobalPassword').value,
+                isProxy: $('cxGlobalIsProxy').value,
+                proxyHost: $('cxGlobalProxyHost').value,
+                proxyPort: $('cxGlobalProxyPort').value,
+                proxyUser: $('cxGlobalProxyUser').value,
+                proxyPassword: $('cxGlobalProxyPassword').value,
+                proxyHttps: $('cxGlobalProxyHttps').value,
+                global: true
+            }
+        },
+        extractGlobalSCAparameters: function () {
+            return {
+                serverUrl: $('cxGlobalSCAServerUrl').value,
+                accessControlServerUrl: $('cxGlobalSCAAccessControlServerURL').value,
+                webAppURL: $('cxGlobalSCAWebAppURL').value,
+                scaUserName: $('cxGlobalSCAUserName').value,
+                scaPassword: $('cxGlobalSCAPassword').value,
+                scaTenant: $('cxGlobalSCATenant').value,
+                global: true
+            }
+        },
+        extractSCAparameters: function () {
             return {
                 serverUrl: $('scaApiUrl').value,
                 accessControlServerUrl: $('scaAccessControlUrl').value,
@@ -107,215 +115,211 @@
                 global: false
             }
         },
-    testConnection: function (credentials) {
-        if (Checkmarx.validateCredentials(credentials)) {
-            var messageElm = jQuery('#testConnectionMsg');
-            var buttonElm = jQuery('#testConnection');
-			console.log('testConnection');
-            messageElm.removeAttr("style");
-            messageElm.text('');
-            buttonElm.attr("disabled", true);
-            buttonElm.css('cursor','wait');
-            jQuery.ajax({
-                type: 'POST',
-                url: window['base_uri'] + '/checkmarx/testConnection/',
-                contentType: 'application/json',
-                dataType: 'json',
-                data: JSON.stringify(credentials),
-                success: function (data) {
-                    buttonElm.attr("disabled", false);
-                    buttonElm.removeAttr("style");
+        testConnection: function (credentials) {
+            if (Checkmarx.validateCredentials(credentials)) {
+                var messageElm = jQuery('#testConnectionMsg');
+                var buttonElm = jQuery('#testConnection');
+                console.log('testConnection');
+                messageElm.removeAttr("style");
+                messageElm.text('');
+                buttonElm.attr("disabled", true);
+                buttonElm.css('cursor', 'wait');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: window['base_uri'] + '/checkmarx/testConnection/',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(credentials),
+                    success: function (data) {
+                        buttonElm.attr("disabled", false);
+                        buttonElm.removeAttr("style");
 
-                    messageElm.text( data.message);
-                    if(data.success) {
-                        messageElm.css('color','green');
-                    } else {
-                        messageElm.css('color','red');
+                        messageElm.text(data.message);
+                        if (data.success) {
+                            messageElm.css('color', 'green');
+                        } else {
+                            messageElm.css('color', 'red');
+                        }
+
+                        if (!credentials.global) {
+                            Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                            Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                            Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
+                        }
+
+                    },
+                    error: function (data) {
                     }
+                });
+            }
+        },
+        testScaSASTConnection: function (credentials) {
+            if (Checkmarx.validateSASTCredentials(credentials)) {
+                var messageElm = jQuery('#testScaSASTConnectionMsg');
+                var buttonElm = jQuery('#testScaSASTConnection');
+                console.log('testScaSASTConnection');
+                messageElm.removeAttr("style");
+                messageElm.text('');
+                buttonElm.attr("disabled", true);
+                buttonElm.css('cursor', 'wait');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(credentials),
+                    success: function (data) {
+                        buttonElm.attr("disabled", false);
+                        buttonElm.removeAttr("style");
 
-                    if(!credentials.global) {
-                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
-                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
-                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
+                        messageElm.text(data.message);
+                        if (data.success) {
+                            messageElm.css('color', 'green');
+                        } else {
+                            messageElm.css('color', 'red');
+                        }
+
+                        if (!credentials.global) {
+                            Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
+                            Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
+                            Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
+                        }
+
+                    },
+                    error: function (data) {
                     }
+                });
+            }
+        },
 
-                },
-                error: function (data) {
-                }
-            });
-        }
-    },
-    testScaSASTConnection: function (credentials) {
-        if (Checkmarx.validateSASTCredentials(credentials)) {
-            var messageElm = jQuery('#testScaSASTConnectionMsg');
-            var buttonElm = jQuery('#testScaSASTConnection');
-			console.log('testScaSASTConnection');
-            messageElm.removeAttr("style");
-            messageElm.text('');
-            buttonElm.attr("disabled", true);
-            buttonElm.css('cursor','wait');
-            jQuery.ajax({
-                type: 'POST',
-                url: window['base_uri'] + '/checkmarx/testScaSastConnection/',
-                contentType: 'application/json',
-                dataType: 'json',
-                data: JSON.stringify(credentials),
-                success: function (data) {
-                    buttonElm.attr("disabled", false);
-                    buttonElm.removeAttr("style");
+        testSCAConnection: function (credentials) {
+            if (Checkmarx.validateSCAParameters(credentials)) {
+                var messageElm = jQuery('#testSCAConnectionMsg');
+                var buttonElm = jQuery('#testConnectionSCA');
 
-                    messageElm.text( data.message);
-                    if(data.success) {
-                        messageElm.css('color','green');
-                    } else {
-                        messageElm.css('color','red');
-                    }
+                messageElm.removeAttr("style");
+                messageElm.text('');
+                buttonElm.attr("disabled", true);
+                buttonElm.css('cursor', 'wait');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: window['base_uri'] + '/checkmarx/testSCAConnection/',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(credentials),
+                    success: function (data) {
+                        buttonElm.attr("disabled", false);
+                        buttonElm.removeAttr("style");
 
-                    if(!credentials.global) {
-                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
-                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
-                        Checkmarx.populateDropdownList(data.engineConfigList, '#cxEngineConfigId', 'id', 'name');
-                    }
-
-                },
-                error: function (data) {
-                }
-            });
-        }
-    },
-    
- testSCAConnection: function (credentials) {
-        if (Checkmarx.validateSCAParameters(credentials)) {
-            var messageElm = jQuery('#testSCAConnectionMsg');
-            var buttonElm = jQuery('#testConnectionSCA');
-
-            messageElm.removeAttr("style");
-            messageElm.text('');
-            buttonElm.attr("disabled", true);
-            buttonElm.css('cursor','wait');
-            jQuery.ajax({
-                type: 'POST',
-                url: window['base_uri'] + '/checkmarx/testSCAConnection/',
-                contentType: 'application/json',
-                dataType: 'json',
-                data: JSON.stringify(credentials),
-                success: function (data) {
-                    buttonElm.attr("disabled", false);
-                    buttonElm.removeAttr("style");
-
-                    messageElm.text( data.message);
-                    if(data.success) {
-                        messageElm.css('color','green');
-                    } else {
-                        messageElm.css('color','red');
-                    }
+                        messageElm.text(data.message);
+                        if (data.success) {
+                            messageElm.css('color', 'green');
+                        } else {
+                            messageElm.css('color', 'red');
+                        }
 
 //                    if(!credentials.global) {
 //                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
 //                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
 //                    }
 
-                },
-                error: function (data) {
-                }
-            });
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        },
+
+        validateCredentials: function (credentials) {
+            var messageElm = jQuery('#testConnectionMsg');
+            if (!credentials.serverUrl) {
+                messageElm.text('URL must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            if (!credentials.username) {
+                messageElm.text('Username must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            if (!credentials.pssd) {
+                messageElm.text('Password must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            return true;
+
+        },
+
+        validateSASTCredentials: function (credentials) {
+            var messageElm = jQuery('#testScaSASTConnectionMsg');
+            if (!credentials.sastServerUrl) {
+                messageElm.text('URL must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            if (!credentials.sastUsername) {
+                messageElm.text('Username must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            if (!credentials.sastPssd) {
+                messageElm.text('Password must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+
+            return true;
+
+        },
+
+        validateSCAParameters: function (credentials) {
+            var messageElm = jQuery('#testSCAConnectionMsg');
+            if (!credentials.serverUrl) {
+                messageElm.text('URL must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+            if (!credentials.scaUserName) {
+                messageElm.text('User name must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+            if (!credentials.scaPassword) {
+                messageElm.text('Password must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+            if (!credentials.accessControlServerUrl) {
+                messageElm.text('Access control URL must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+            if (!credentials.scaTenant) {
+                messageElm.text('tenant must not be empty');
+                messageElm.css('color', 'red');
+                return false;
+            }
+            return true;
+
+        },
+
+        populateDropdownList: function (data, selector, key, name) {
+            jQuery(selector).empty();
+            var l = data.length;
+            for (var i = 0; i < l; ++i) {
+                jQuery(selector).append('<option value="' + data[i][key] + '">' + data[i][name] + '</option>');
+            }
         }
-    },
 
+    };
 
-    validateCredentials: function (credentials) {
-        var messageElm = jQuery('#testConnectionMsg');
-        if (!credentials.serverUrl) {
-            messageElm.text('URL must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        if (!credentials.username) {
-            messageElm.text('Username must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        if (!credentials.pssd) {
-            messageElm.text('Password must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        return true;
-
-    },
-    
-    validateSASTCredentials: function (credentials) {
-        var messageElm = jQuery('#testScaSASTConnectionMsg');
-        if (!credentials.sastServerUrl) {
-            messageElm.text('URL must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        if (!credentials.sastUsername) {
-            messageElm.text('Username must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        if (!credentials.sastPssd) {
-            messageElm.text('Password must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-
-        return true;
-
-    },
-
-validateSCAParameters: function (credentials) {
-        var messageElm = jQuery('#testSCAConnectionMsg');
-        if (!credentials.serverUrl) {
-            messageElm.text('URL must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-        if (!credentials.scaUserName) {
-            messageElm.text('User name must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-        if (!credentials.scaPassword) {
-            messageElm.text('Password must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-        if (!credentials.accessControlServerUrl) {
-            messageElm.text('Access control URL must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-        if (!credentials.scaTenant) {
-            messageElm.text('tenant must not be empty');
-            messageElm.css('color','red');
-            return false;
-        }
-        return true;
-
-    },
-
-    populateDropdownList: function(data, selector, key, name) {
-        jQuery(selector).empty();
-        var l = data.length;
-         for (var i = 0; i < l; ++i) {
-            jQuery(selector).append('<option value="' + data[i][key] + '">' + data[i][name] + '</option>');
-        }
-}
-
-
-};
-
-
-    </script>
-
+</script>
 
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
@@ -340,8 +344,8 @@ validateSCAParameters: function (credentials) {
 </style>
 
 ${'true'.equals(cxUseDefaultServer) ?
-optionsBean.testConnection(cxGlobalServerUrl, cxGlobalUsername, cxGlobalPassword) :
-optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
+optionsBean.testConnection(cxGlobalServerUrl,cxGlobalUsername,cxGlobalPassword,cxGlobalIsProxy,cxGlobalProxyHost,cxGlobalProxyPort,cxGlobalProxyUser,cxGlobalProxyPassword,cxGlobalProxyHttps) :
+optionsBean.testConnection(cxServerUrl,cxUsername,cxPassword,cxIsProxy,cxGlobalProxyHost,cxGlobalProxyPort,cxGlobalProxyUser,cxGlobalProxyPassword,cxGlobalProxyHttps)}
 
 ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
@@ -359,6 +363,13 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 </c:if>
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultSastConfig] != 'true'}">
     <c:set var="hideDefaultSastConfigSection" value="${optionsBean.noDisplay}"/>
+</c:if>
+
+<c:if test="${propertiesBean.properties[optionsBean.globalProxyHttps] == 'true'}">
+    <c:set var="globalProxyHttps" value="true"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.globalProxyHttps] != 'true'}">
+    <c:set var="globalProxyHttps" value="false"/>
 </c:if>
 
 <c:if test="${propertiesBean.properties[optionsBean.globalIsSynchronous] == 'true'}">
@@ -418,8 +429,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
     <tr>
         <th>
             <label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
-            Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
+                Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
+                Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
         </th>
         <td>
             <c:set var="onclick">
@@ -450,6 +461,10 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <span class="error" id="error_${optionsBean.password}"></span>
         </td>
     </tr>
+<%--    <tr>
+        <th><label for="${optionsBean.isProxy}">isProxy<l:star/></label></th>
+        <td><props:checkboxProperty name="${optionsBean.isProxy}"/></td>
+    </tr>--%>
     <td>
         <form>
             <input id="testConnection" type="button" name="TestConnection" value="Connect to Server"
@@ -492,7 +507,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                 </c:forEach>
             </props:selectProperty>
             <span class="error" id="error_${optionsBean.teamId}"></span>
-        </td>`
+        </td>
+        `
     </tr>
 
 </l:settingsGroup>
@@ -541,7 +557,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                         <bs:helpIcon
                                 iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/>
                     </label></th>
-                    <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true" rows="5"
+                    <td><props:multilineProperty name="${optionsBean.filterPatterns}" linkTitle="" expanded="true"
+                                                 rows="5"
                                                  cols="50" className="longField"/></td>
                 </tr>
                 <tr>
@@ -571,7 +588,9 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                         <bs:helpIcon
                                 iconTitle="Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.java, **/*.html, !**/test/**/XYZ*"/></th>
                     <td>
-                        <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50" class="multilineProperty" disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
+                        <textarea id="globalFilterPatterns123" wrap="off" type="text" rows="5" cols="50"
+                                  class="multilineProperty"
+                                  disabled>${propertiesBean.properties[optionsBean.globalFilterPatterns]}</textarea>
                     </td>
                 </tr>
 
@@ -597,9 +616,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <th><label for="${optionsBean.isIncremental}">Enable Incremental Scan
                         <bs:helpIcon iconTitle="Run incremental scan instead of full scan"/></label></th>
                     <td>
-
-
-                    <props:checkboxProperty name="${optionsBean.isIncremental}" onclick="updatePeriodicScanSectionVisibility()" />
+                        <props:checkboxProperty name="${optionsBean.isIncremental}"
+                                                onclick="updatePeriodicScanSectionVisibility()"/>
                     </td>
                 </tr>
                 <tbody id="incrementalSection" ${hideIncrementalSection}>
@@ -608,7 +626,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     </label></th>
                     <td>
 
-                    	<props:checkboxProperty name="${optionsBean.isPeriodicFullScan}" onclick="updatePeriodicScanSectionVisibility()" />
+                        <props:checkboxProperty name="${optionsBean.isPeriodicFullScan}"
+                                                onclick="updatePeriodicScanSectionVisibility()"/>
                     </td>
                 </tr>
                 </tbody>
@@ -617,15 +636,16 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <th><label for="${optionsBean.periodicFullScanAfter}">Schedule periodic full scans (1-99)
                         <bs:helpIcon iconTitle="Number of incremental scans between full scans."/></label></th>
                     <td>
-                    	 <props:textProperty name="${optionsBean.periodicFullScanAfter}" className="longField"/>
-                    	 <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
+                        <props:textProperty name="${optionsBean.periodicFullScanAfter}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.periodicFullScanAfter}"></span>
                     </td>
                 </tr>
                 </tbody>
                 <tr>
                     <th>
                         <label for="${optionsBean.customFields}">Scan level - custom fields
-                            <bs:helpIcon iconTitle="Tag individual scans with custom values so extrapolate and generate reports based on certain data slices"/>
+                            <bs:helpIcon
+                                    iconTitle="Tag individual scans with custom values so extrapolate and generate reports based on certain data slices"/>
                         </label>
                     </th>
                     <td>
@@ -647,7 +667,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     <td>
                         <props:selectProperty name="${optionsBean.engineConfigId}" className="longField">
                             <c:forEach items="${optionsBean.engineConfigList}" var="item">
-                                <props:option value="${item.id}" >${item.name}</props:option>
+                                <props:option value="${item.id}">${item.name}</props:option>
                             </c:forEach>
                         </props:selectProperty>
                         <span class="error" id="error_${optionsBean.engineConfigId}"></span>
@@ -673,25 +693,24 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
                     iconTitle="Enable dependency scan to choose between CxOSA and CxSCA"/></label>
         </th>
         <td>
-
-
-        <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}" onclick="updateDependencyScanSectionVisibility()" /></td>
+            <props:checkboxProperty name="${optionsBean.dependencyScanEnabled}"
+                                    onclick="updateDependencyScanSectionVisibility()"/></td>
     </tr>
 
     <tr id="overrideGlobalDSSettings">
         <th>
             <label for="${optionsBean.overrideGlobalConfigurations}">Override global dependency scan settings
-            <bs:helpIcon iconTitle="Override the Global Dependency Scan Configurations"/>
+                <bs:helpIcon iconTitle="Override the Global Dependency Scan Configurations"/>
             </label>
         </th>
         <td>
-            <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}" onclick="updateDependencyScanSectionVisibility()"/>
+            <props:checkboxProperty name="${optionsBean.overrideGlobalConfigurations}"
+                                    onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
 
     <tr class="dependencyScanRow">
         <th><label for="${optionsBean.osaFilterPatterns}">Include/Exclude Wildcard Patterns
-
             <bs:helpIcon
                     iconTitle="Include/Exclude definition will not affect dependencies resolved from package manager manifest files.</br> Comma separated list of include or exclude wildcard patterns. Exclude patterns start with exclamation mark \"!\". Example: **/*.jar, **/*.dll, !**/test/**/XYZ*"/>
         </label></th>
@@ -704,7 +723,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}"
+                                       onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
         </td>
     </tr>
     <tr class="dependencyScanRow osaInput">
@@ -717,8 +737,9 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         <td><props:textProperty name="${optionsBean.osaArchiveIncludePatterns}" className="longField"/></td>
     </tr>
 
-      <tr class="dependencyScanRow osaInput">
-        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command before Scan
+    <tr class="dependencyScanRow osaInput">
+        <th><label for="${optionsBean.osaInstallBeforeScan}">Execute dependency managers "install packages" command
+            before Scan
 
             <bs:helpIcon
                     iconTitle="Select this option in order to be able to scan packages from various dependency managers (NPM, Bower, Nugget, Python and more.) as part of the CxOSA scan"/>
@@ -771,55 +792,59 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         </label></th>
         <td><props:textProperty name="${optionsBean.scaTenant}" className="longField"/></td>
     </tr>
-	<tr class="dependencyScanRow scaInput">
-	        <th><label for="${optionsBean.scaTeampath}">CxSCA Teampath
-	            <bs:helpIcon iconTitle="Team that gets assigned for new SCA project getting created. When this is left blank SAST team will be assigned for the SCA project."/>
-	        </label></th>
-	        <td><props:textProperty name="${optionsBean.scaTeampath}" className="longField"/></td>
-	    </tr>
     <tr class="dependencyScanRow scaInput">
-         <td>
-             <form>
-
+        <th><label for="${optionsBean.scaTeampath}">CxSCA Teampath
+            <bs:helpIcon
+                    iconTitle="Team that gets assigned for new SCA project getting created. When this is left blank SAST team will be assigned for the SCA project."/>
+        </label></th>
+        <td><props:textProperty name="${optionsBean.scaTeampath}" className="longField"/></td>
+    </tr>
+    <tr class="dependencyScanRow scaInput">
+        <td>
+            <form>
                 <input id="testConnectionSCA" type="button" name="TestConnectionSCA" value="Test Connection"
                        onclick="Checkmarx.testSCAConnection(Checkmarx.extractSCAparameters())"/>
                 <span id="testSCAConnectionMsg"></span>
             </form>
         </td>
     </tr>
-    
+
     <tr class="dependencyScanRow scaInput">
         <th><label for="ScaResolverEnabled">Perform SCA scan using dependency resolution by SCA Resolver tool.
             <bs:helpIcon iconTitle="Perform SCA scan using dependency resolution by SCA Resolver tool."/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="SCAResolver" id="ScaResolverEnabled"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}"
+                                       onclick="updateDependencyScanSectionVisibility()" value="SCAResolver"
+                                       id="ScaResolverEnabled"/>
         </td>
     </tr>
-     <tr class="dependencyScanRow scaInput enableSCAResolver">
+    <tr class="dependencyScanRow scaInput enableSCAResolver">
         <th><label for="${optionsBean.scaResolverPath}">Path to SCA Resolver
             <bs:helpIcon iconTitle="fill this with the SCA Resolver Path"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaResolverPath}" className="longField"/></td>
     </tr>
-    
-     <tr class="dependencyScanRow scaInput enableSCAResolver">
+
+    <tr class="dependencyScanRow scaInput enableSCAResolver">
         <th><label for="${optionsBean.scaResolverAddParameters}">SCA Resolver Additional Parameters
             <bs:helpIcon iconTitle="fill this with the SCA Resolver Additional Parameters"/>
         </label></th>
         <td><props:textProperty name="${optionsBean.scaResolverAddParameters}" className="longField"/></td>
     </tr>
-    
+
     <tr class="dependencyScanRow scaInput">
         <th><label for="ManifestFileEnabled">Perform SCA scan by uploading manifests file(s)/source to SCA Service.
             <bs:helpIcon iconTitle="Perform SCA scan by uploading manifests file(s)/source to SCA Service."/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}" onclick="updateDependencyScanSectionVisibility()" value="ManifestFile" id="ManifestFileEnabled"/>
+            <props:radioButtonProperty name="${optionsBean.dependencyScaScanType}"
+                                       onclick="updateDependencyScanSectionVisibility()" value="ManifestFile"
+                                       id="ManifestFileEnabled"/>
         </td>
     </tr>
-    
-    
+
+
     <!-- SCA FEATURES -->
     <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.scaConfigFile}">Package Manager's Config File(s) Path
@@ -834,7 +859,7 @@ Example: c:\user\.m2\settings.xml, c:\user\npm\.npmrc"/>
         <td><props:multilineProperty name="${optionsBean.scaConfigFile}" linkTitle="" expanded="true" rows="5"
                                      cols="50" className="longField"/></td>
     </tr>
-    
+
     <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.scaEnvVariable}">Private Registry Environment Variable
 
@@ -847,15 +872,16 @@ Example: param1:value1,param2:value2"/>
         <td><props:multilineProperty name="${optionsBean.scaEnvVariable}" linkTitle="" expanded="true" rows="5"
                                      cols="50" className="longField"/></td>
     </tr>
-    
-     <tr class="dependencyScanRow scaInput enableManifestFile">
+
+    <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.isIncludeSources}">Include Sources
-            <bs:helpIcon iconTitle="When this flag is enabled, it will include entire source code in the zip file to be scanned."/>
+            <bs:helpIcon
+                    iconTitle="When this flag is enabled, it will include entire source code in the zip file to be scanned."/>
         </label></th>
-        <td> <props:checkboxProperty name="${optionsBean.isIncludeSources}"/>
+        <td><props:checkboxProperty name="${optionsBean.isIncludeSources}"/>
         </td>
     </tr>
-    
+
     <tr class="dependencyScanRow scaInput enableManifestFile">
         <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
             <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
@@ -864,19 +890,21 @@ At the job level, two more parameters need to be configured. These project full 
 <p>
 Example of Project Full Path: CxServer/team1/projectname."/>
         </label></th>
-        <td> 
-       
-        <props:checkboxProperty name="${optionsBean.isExploitablePath}" onclick="updateDependencyScanSectionVisibility()"/>
+        <td>
+
+            <props:checkboxProperty name="${optionsBean.isExploitablePath}"
+                                    onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath">
         <th>
             <label for="${optionsBean.useSASTDefaultServer}">Use Global Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
-            Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
+                Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
+                Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
         </th>
         <td>
-            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
+            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}"
+                                    onclick="updateDependencyScanSectionVisibility()"/>
         </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
@@ -901,13 +929,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
         </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-    <td>
-        <form>
-            <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
-                   onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
-            <span id="testScaSASTConnectionMsg"></span>
-        </form>
-    </td>
+        <td>
+            <form>
+                <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
+                       onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
+                <span id="testScaSASTConnectionMsg"></span>
+            </form>
+        </td>
     </tr>
     <tr class="dependencyScanRow scaInput expPath">
         <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
@@ -916,17 +944,17 @@ Example of Project Full Path: CxServer/team1/projectname."/>
             <span class="error" id="error_${optionsBean.scaSASTProjectFullPath}"></span>
         </td>
     </tr>
-    
-    <tr  class="dependencyScanRow scaInput expPath">
+
+    <tr class="dependencyScanRow scaInput expPath">
         <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
         <td>
             <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>
             <span class="error" id="error_${optionsBean.scaSASTProjectID}"></span>
         </td>
     </tr>
-   
+
     <!-- END SCA FEATURES -->
-    
+
     </tbody>
     </tbody>
 
@@ -970,7 +998,8 @@ Example of Project Full Path: CxServer/team1/projectname."/>
             <table class="scanControlSectionTable" width="101%">
                 <tr>
                     <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's policy enforcement
-                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
+                        <bs:helpIcon
+                                iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
                     </th>
                     <td>
                         <props:checkboxProperty name="${optionsBean.projectPolicyViolation}"/>
@@ -1075,7 +1104,8 @@ Example of Project Full Path: CxServer/team1/projectname."/>
             <table class="scanControlSectionTable" width="101%">
                 <tr>
                     <th>Enable Project's policy enforcement
-                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></th>
+                        <bs:helpIcon
+                                iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalProjectPolicydEnabled ? 'checked' : ''}/>
                     </td>

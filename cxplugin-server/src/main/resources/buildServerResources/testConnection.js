@@ -21,6 +21,12 @@ window.Checkmarx = {
             serverUrl: $('cxGlobalServerUrl').value,
             username: $('cxGlobalUsername').value,
             pssd: $('cxGlobalPassword').value,
+            isProxy: $('cxGlobalIsProxy').checked,
+            proxyHost: $('cxGlobalProxyHost').value,
+            proxyPort: $('cxGlobalProxyPort').value,
+            proxyUser: $('cxGlobalProxyUser').value,
+            proxyPassword: $('cxGlobalProxyPassword').value,
+            proxyHttps: $('cxGlobalProxyHttps').checked,
             global: true
         }
     },

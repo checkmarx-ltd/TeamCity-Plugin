@@ -6,15 +6,23 @@ import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.EngineConfiguration;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +47,12 @@ class TestConnectionController extends BaseController {
     public static final Logger log = LoggerFactory.getLogger(TestConnectionController.class);
     private static final com.intellij.openapi.diagnostic.Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
 
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder()
+            .registerTypeAdapter(int.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Integer.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(double.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Double.class, new EmptyStringToNumberTypeAdapter())
+            .create();
 
     private String result = "";
     private List<Preset> presets;
@@ -70,10 +83,15 @@ class TestConnectionController extends BaseController {
 
 
         TestConnectionRequest credi = extractRequestBody(httpServletRequest);
+        ProxyConfig proxyConfig = null;
+        if (credi.isProxy() && StringUtils.isNotEmpty(credi.getProxyHost()) && credi.getProxyPort() > 0) {
+            proxyConfig = new ProxyConfig(credi.getProxyHost(), credi.getProxyPort(), credi.getProxyUser(),
+                    credi.getProxyPassword(), credi.isProxyHttps());
+        }
 
         //create client and perform login
         try {
-            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPssd())) {
+            if (loginToServer(new URL(credi.getServerUrl()), credi.getUsername(), credi.getPssd(), proxyConfig)) {
                 CxSASTClient sastClient = clientDelegator.getSastClient();
                 try {
                     teams = sastClient.getTeamList();
@@ -93,13 +111,13 @@ class TestConnectionController extends BaseController {
                 engineConfigurations = sastClient.getEngineConfiguration();
                 if (engineConfigurations == null) {
                     throw new Exception("Error while getting Engine configurations.");
-                }else{
+                } else {
                     EngineConfiguration sastEngineConfig = new EngineConfiguration();
                     sastEngineConfig.setId(PROJECT_DEFAULT_CONFIG_ID);
                     sastEngineConfig.setName(PROJECT_DEFAULT);
                     engineConfigurations.add(sastEngineConfig);
                 }
-                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams,engineConfigurations);
+                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams, engineConfigurations);
                 writeHttpServletResponse(httpServletResponse, res);
                 LOG.info("Checkmarx test connection: Connection successful");
                 return null;
@@ -130,11 +148,13 @@ class TestConnectionController extends BaseController {
         TestConnectionRequest ret = gson.fromJson(jsonString, TestConnectionRequest.class);
         ret.setServerUrl(StringUtil.trim(ret.getServerUrl()));
         ret.setUsername(StringUtil.trim(ret.getUsername()));
+        ret.setUsername(StringUtil.trim(ret.getUsername()));
         ret.setPssd(CxOptions.decryptPasswordPlainText(ret.getPssd(), ret.isGlobal()));
+        ret.setProxyPassword(CxOptions.decryptPasswordPlainText(ret.getProxyPassword(), ret.isGlobal()));
         return ret;
     }
 
-    private boolean loginToServer(URL url, String username, String pssd) {
+    private boolean loginToServer(URL url, String username, String pssd, ProxyConfig proxyConfig) {
         try {
             CxScanConfig config = new CxScanConfig();
             config.addScannerType(ScannerType.SAST);
@@ -145,6 +165,10 @@ class TestConnectionController extends BaseController {
             config.setDisableCertificateValidation(true);
             String isProxyVar = System.getProperty("cx.isproxy");
             config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+            if (proxyConfig != null){
+                config.setProxy(true);
+                config.setProxyConfig(proxyConfig);
+            }
             clientDelegator = new CxClientDelegator(config, log);
             clientDelegator.getSastClient().login();
 
@@ -167,6 +191,35 @@ class TestConnectionController extends BaseController {
             }
         }
         LOG.info("###############################");
+    }
+
+    public static class EmptyStringToNumberTypeAdapter extends TypeAdapter<Number> {
+        @Override
+        public void write(JsonWriter jsonWriter, Number number) throws IOException {
+            if (number == null) {
+                jsonWriter.nullValue();
+                return;
+            }
+            jsonWriter.value(number);
+        }
+
+        @Override
+        public Number read(JsonReader jsonReader) throws IOException {
+            if (jsonReader.peek() == JsonToken.NULL) {
+                jsonReader.nextNull();
+                return null;
+            }
+
+            try {
+                String value = jsonReader.nextString();
+                if ("".equals(value)) {
+                    return 0;
+                }
+                return NumberUtils.createNumber(value);
+            } catch (NumberFormatException e) {
+                throw new JsonSyntaxException(e);
+            }
+        }
     }
 
 }
