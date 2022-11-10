@@ -2,13 +2,16 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
+import com.checkmarx.teamcity.common.EmptyStringToNumberTypeAdapter;
 import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.util.StringUtil;
@@ -38,7 +41,12 @@ class TestScaSastConnectionController extends BaseController {
     public static final Logger log = LoggerFactory.getLogger(TestScaSastConnectionController.class);
     private static final com.intellij.openapi.diagnostic.Logger LOG = jetbrains.buildServer.log.Loggers.SERVER;
 
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder()
+            .registerTypeAdapter(int.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Integer.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(double.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Double.class, new EmptyStringToNumberTypeAdapter())
+            .create();
 
     private String result = "";
     private List<Preset> presets;
@@ -46,7 +54,7 @@ class TestScaSastConnectionController extends BaseController {
     private CxClientDelegator clientDelegator;
 
     public TestScaSastConnectionController(@NotNull SBuildServer server,
-                                    @NotNull WebControllerManager webControllerManager) {
+                                           @NotNull WebControllerManager webControllerManager) {
         super(server);
         webControllerManager.registerController("/checkmarx/testScaSastConnection/", this);
     }
@@ -67,10 +75,15 @@ class TestScaSastConnectionController extends BaseController {
 
 
         TestScaSastConnectionRequest credi = extractRequestBody(httpServletRequest);
+        ProxyConfig proxyConfig = null;
+        if (credi.isProxy() && StringUtils.isNotEmpty(credi.getProxyHost()) && credi.getProxyPort() > 0) {
+            proxyConfig = new ProxyConfig(credi.getProxyHost(), credi.getProxyPort(), credi.getProxyUser(),
+                    credi.getProxyPassword(), credi.isProxyHttps());
+        }
 
         //create client and perform login
         try {
-            if (loginToServer(new URL(credi.getSastServerUrl()), credi.getSastUsername(), credi.getSastPssd())) {
+            if (loginToServer(new URL(credi.getSastServerUrl()), credi.getSastUsername(), credi.getSastPssd(), proxyConfig)) {
                 CxSASTClient sastClient = clientDelegator.getSastClient();
                 try {
                     teams = sastClient.getTeamList();
@@ -119,10 +132,13 @@ class TestScaSastConnectionController extends BaseController {
         ret.setSastServerUrl(StringUtil.trim(ret.getSastServerUrl()));
         ret.setSastUsername(StringUtil.trim(ret.getSastUsername()));
         ret.setSastPssd(CxOptions.decryptPasswordPlainText(ret.getSastPssd(), ret.isGlobal()));
+        if (StringUtils.isNotEmpty(ret.getProxyPassword())) {
+            ret.setProxyPassword(CxOptions.decryptPasswordPlainText(ret.getProxyPassword(), ret.isGlobal()));
+        }
         return ret;
     }
 
-    private boolean loginToServer(URL url, String username, String pssd) {
+    private boolean loginToServer(URL url, String username, String pssd, ProxyConfig proxyConfig) {
         try {
             CxScanConfig config = new CxScanConfig();
             config.addScannerType(ScannerType.SAST);
@@ -133,6 +149,10 @@ class TestScaSastConnectionController extends BaseController {
             config.setDisableCertificateValidation(true);
             String isProxyVar = System.getProperty("cx.isproxy");
             config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+            if (proxyConfig != null) {
+                config.setProxy(true);
+                config.setProxyConfig(proxyConfig);
+            }
             clientDelegator = new CxClientDelegator(config, log);
             clientDelegator.getSastClient().login();
 

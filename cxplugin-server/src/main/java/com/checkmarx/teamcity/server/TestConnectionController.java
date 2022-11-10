@@ -2,6 +2,7 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
+import com.checkmarx.teamcity.common.EmptyStringToNumberTypeAdapter;
 import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
@@ -12,17 +13,11 @@ import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -150,7 +145,9 @@ class TestConnectionController extends BaseController {
         ret.setUsername(StringUtil.trim(ret.getUsername()));
         ret.setUsername(StringUtil.trim(ret.getUsername()));
         ret.setPssd(CxOptions.decryptPasswordPlainText(ret.getPssd(), ret.isGlobal()));
-        ret.setProxyPassword(CxOptions.decryptPasswordPlainText(ret.getProxyPassword(), ret.isGlobal()));
+        if (StringUtils.isNotEmpty(ret.getProxyPassword())) {
+            ret.setProxyPassword(CxOptions.decryptPasswordPlainText(ret.getProxyPassword(), ret.isGlobal()));
+        }
         return ret;
     }
 
@@ -165,7 +162,7 @@ class TestConnectionController extends BaseController {
             config.setDisableCertificateValidation(true);
             String isProxyVar = System.getProperty("cx.isproxy");
             config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
-            if (proxyConfig != null){
+            if (proxyConfig != null) {
                 config.setProxy(true);
                 config.setProxyConfig(proxyConfig);
             }
@@ -191,35 +188,6 @@ class TestConnectionController extends BaseController {
             }
         }
         LOG.info("###############################");
-    }
-
-    public static class EmptyStringToNumberTypeAdapter extends TypeAdapter<Number> {
-        @Override
-        public void write(JsonWriter jsonWriter, Number number) throws IOException {
-            if (number == null) {
-                jsonWriter.nullValue();
-                return;
-            }
-            jsonWriter.value(number);
-        }
-
-        @Override
-        public Number read(JsonReader jsonReader) throws IOException {
-            if (jsonReader.peek() == JsonToken.NULL) {
-                jsonReader.nextNull();
-                return null;
-            }
-
-            try {
-                String value = jsonReader.nextString();
-                if ("".equals(value)) {
-                    return 0;
-                }
-                return NumberUtils.createNumber(value);
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
-        }
     }
 
 }

@@ -177,12 +177,12 @@
     <c:set var="hideSCAThresholdSection" value="style='display:none'"/>
 </c:if>
 
-<c:if test="${cxGlobalProxyHttps == 'true'}">
+<%--<c:if test="${cxGlobalProxyHttps == 'true'}">
     <c:set var="cxGlobalProxyHttps" value="true"/>
 </c:if>
 <c:if test="${cxGlobalProxyHttps != 'true'}">
     <c:set var="cxGlobalProxyHttps" value="false"/>
-</c:if>
+</c:if>--%>
 
 <div>
     <bs:refreshable containerId="generalSettings" pageUrl="${pageUrl}">
@@ -521,6 +521,13 @@
                         <span class="error" id="invalid_cxGlobalSCATenant"></span>
                     </td>
                 </tr>
+
+                <tr class="globalDependencyScanRow scaInput">
+                    <th><label for="cxGlobalSCAIsProxy">Use proxy</label>
+                    </th>
+                    <td><forms:checkbox name="cxGlobalSCAIsProxy" value="${cxGlobalSCAIsProxy}"
+                                        checked="${cxGlobalSCAIsProxy}"/></td>
+                </tr>
                 <tr class="globalDependencyScanRow scaInput">
                     <td>
                         <form>
@@ -598,6 +605,13 @@ Example of Project Full Path: CxServer/team1/projectname"/></label>
                                value="${cxGlobalSastPassword}" class="longField"/>
                         <span class="error" id="invalid_cxGlobalSastPassword"></span>
                     </td>
+                </tr>
+
+                <tr>
+                    <th><label for="cxGlobalSastIsProxy">Use proxy</label>
+                    </th>
+                    <td><forms:checkbox name="cxGlobalSastIsProxy" value="${cxGlobalSastIsProxy}"
+                                        checked="${cxGlobalSastIsProxy}"/></td>
                 </tr>
 
                 <tr>

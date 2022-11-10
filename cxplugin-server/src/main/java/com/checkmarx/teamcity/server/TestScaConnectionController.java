@@ -2,15 +2,19 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
+import com.checkmarx.teamcity.common.EmptyStringToNumberTypeAdapter;
 import com.cx.restclient.ast.AstScaClient;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ProxyConfig;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,7 +29,12 @@ public class TestScaConnectionController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(TestScaConnectionController.class);
 
-    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder()
+            .registerTypeAdapter(int.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Integer.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(double.class, new EmptyStringToNumberTypeAdapter())
+            .registerTypeAdapter(Double.class, new EmptyStringToNumberTypeAdapter())
+            .create();
 
     public TestScaConnectionController(@NotNull SBuildServer server,
                                        @NotNull WebControllerManager webControllerManager) {
@@ -45,6 +54,11 @@ public class TestScaConnectionController extends BaseController {
         TestScaConnectionResponse res = new TestScaConnectionResponse();
 
         TestScaConnectionRequest credi = extractRequestBody(httpServletRequest);
+        ProxyConfig proxyConfig = null;
+        if (credi.isProxy() && StringUtils.isNotEmpty(credi.getProxyHost()) && credi.getProxyPort() > 0) {
+            proxyConfig = new ProxyConfig(credi.getProxyHost(), credi.getProxyPort(), credi.getProxyUser(),
+                    credi.getProxyPassword(), credi.isProxyHttps());
+        }
 
         CxScanConfig config = new CxScanConfig();
         config.setCxOrigin("TeamCity");
@@ -58,7 +72,13 @@ public class TestScaConnectionController extends BaseController {
         scaConfig.setWebAppUrl(credi.getWebAppURL());
         config.setDisableCertificateValidation(true);
         config.setAstScaConfig(scaConfig);
-        AstScaClient scaClient = new AstScaClient(config,log);
+        String isProxyVar = System.getProperty("cx.isproxy");
+        config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+        if (proxyConfig != null) {
+            config.setProxy(true);
+            config.setProxyConfig(proxyConfig);
+        }
+        AstScaClient scaClient = new AstScaClient(config, log);
         try {
             scaClient.testScaConnection();
             res.setSuccess(true);
@@ -90,7 +110,9 @@ public class TestScaConnectionController extends BaseController {
         ret.setScaPassword(CxOptions.decryptPasswordPlainText(ret.getScaPassword(), ret.isGlobal()));
         ret.setScaTenant(StringUtil.trim(ret.getScaTenant()));
         ret.setWebAppURL(StringUtil.trim(ret.getWebAppURL()));
-        //
+        if (StringUtils.isNotEmpty(ret.getProxyPassword())) {
+            ret.setProxyPassword(CxOptions.decryptPasswordPlainText(ret.getProxyPassword(), ret.isGlobal()));
+        }
         return ret;
     }
 }

@@ -408,8 +408,8 @@ public class CxConfigHelper {
                 if (StringUtils.isNotEmpty(user) && StringUtils.isNotEmpty(password)) {
                     config.setUsername(user);
                     config.setPassword(password);
-                    config.setUseHttps(https != null && TRUE.equals(parameters.get(https)));
                 }
+                config.setUseHttps(StringUtils.isNotEmpty(https) && TRUE.equals(https));
                 ret.setProxyConfig(config);
             }
         }

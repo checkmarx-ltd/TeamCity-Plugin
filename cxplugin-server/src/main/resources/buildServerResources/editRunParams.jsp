@@ -66,7 +66,12 @@
                 sastServerUrl: $('cxGlobalSastServerUrl').value,
                 sastUsername: $('cxGlobalSastUsername').value,
                 sastPssd: $('cxGlobalSastPassword').value,
-                // isProxy: $('cxGlobalIsProxy').value,
+                isProxy: $('cxGlobalSastIsProxy').checked,
+                proxyHost: $('cxGlobalProxyHost').value,
+                proxyPort: $('cxGlobalProxyPort').value,
+                proxyUser: $('cxGlobalProxyUser').value,
+                proxyPassword: $('cxGlobalProxyPassword').value,
+                proxyHttps: $('cxGlobalProxyHttps').checked,
                 global: true
             }
         },
@@ -84,12 +89,12 @@
                 serverUrl: $('cxGlobalServerUrl').value,
                 username: $('cxGlobalUsername').value,
                 pssd: $('cxGlobalPassword').value,
-                isProxy: $('cxGlobalIsProxy').value,
+                isProxy: $('cxGlobalIsProxy').checked,
                 proxyHost: $('cxGlobalProxyHost').value,
                 proxyPort: $('cxGlobalProxyPort').value,
                 proxyUser: $('cxGlobalProxyUser').value,
                 proxyPassword: $('cxGlobalProxyPassword').value,
-                proxyHttps: $('cxGlobalProxyHttps').value,
+                proxyHttps: $('cxGlobalProxyHttps').checked,
                 global: true
             }
         },
@@ -101,6 +106,12 @@
                 scaUserName: $('cxGlobalSCAUserName').value,
                 scaPassword: $('cxGlobalSCAPassword').value,
                 scaTenant: $('cxGlobalSCATenant').value,
+                scaIsProxy: $('cxGlobalSCAIsProxy').checked,
+                proxyHost: $('cxGlobalProxyHost').value,
+                proxyPort: $('cxGlobalProxyPort').value,
+                proxyUser: $('cxGlobalProxyUser').value,
+                proxyPassword: $('cxGlobalProxyPassword').value,
+                proxyHttps: $('cxGlobalProxyHttps').checked,
                 global: true
             }
         },
