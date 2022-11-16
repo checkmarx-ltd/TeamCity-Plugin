@@ -52,12 +52,12 @@ public class CxConfigHelper {
         ret.setReportsDir(reportDirectory);
         String isProxyVar = System.getProperty("cx.isproxy");
         ret.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+        setProxySetting(globalParameters, ret);
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
             ret.setUsername(validateNotEmpty(globalParameters.get(GLOBAL_USERNAME), GLOBAL_USERNAME));
             ret.setPassword(decrypt(validateNotEmpty(globalParameters.get(GLOBAL_PASSWORD), GLOBAL_PASSWORD)));
-            setProxySetting(globalParameters, ret);
         } else {
             ret.setUrl(validateNotEmpty(buildParameters.get(SERVER_URL), SERVER_URL));
             ret.setUsername(validateNotEmpty(buildParameters.get(USERNAME), USERNAME));
