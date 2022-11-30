@@ -20,13 +20,14 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.checkmarx.teamcity.agent.CxPluginUtils.printScanBuildFailure;
+import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
 import static com.checkmarx.teamcity.common.CxConstants.REPORT_HTML_NAME;
 import static com.checkmarx.teamcity.common.CxParam.CONNECTION_FAILED_COMPATIBILITY;
-import static com.checkmarx.teamcity.common.CxConstants.CX_BUILD_NUMBER;
 
 /**
  * Created by: Dorg.
@@ -50,7 +51,6 @@ public class CxBuildProcess extends CallableBuildProcess {
     private File checkoutDirectory;
     private File buildDirectory;
     private CxClientDelegator clientDelegator;
-
 
 
     public CxBuildProcess(AgentRunningBuild agentRunningBuild, BuildRunnerContext buildRunnerContext, ArtifactsWatcher artifactsWatcher) {
@@ -83,7 +83,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("-->Shared Config parameters");
             checkoutDirectory = agentRunningBuild.getCheckoutDirectory();
             buildDirectory = new File(agentRunningBuild.getBuildTempDirectory() + "/" + agentRunningBuild.getProjectName() + "/" + agentRunningBuild.getBuildTypeName() + "/" + agentRunningBuild.getBuildNumber());
-            Map<String,String> otherParameters = new HashMap<>();
+            Map<String, String> otherParameters = new HashMap<>();
             otherParameters.put(CX_BUILD_NUMBER, agentRunningBuild.getBuildNumber());
 
             logger.info("Resolving Configurations");
@@ -117,9 +117,9 @@ public class CxBuildProcess extends CallableBuildProcess {
             if (config.isOsaEnabled() || config.isAstScaEnabled()) {
                 Logger.getRootLogger().removeAppender(appenderName);
             }
-            
+
             ret = config.getSynchronous() ? clientDelegator.waitForScanResults() : clientDelegator.getLatestScanResults();
-            
+
             if (config.getEnablePolicyViolations()) {
                 clientDelegator.printIsProjectViolated(ret);
             }
@@ -131,27 +131,27 @@ public class CxBuildProcess extends CallableBuildProcess {
                     (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
                     (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
                     (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
-            	
-					StringBuilder scanFailedAtServer = new StringBuilder();
-					if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady() ))
-						scanFailedAtServer.append("CxSAST scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-					if (config.isOsaEnabled() && (ret.getOsaResults() == null || !ret.getOsaResults().isOsaResultsReady() ))
-						scanFailedAtServer.append("CxSAST OSA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-					if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady())) 
-						scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-									
-					if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty())
-						scanFailedAtServer.append(scanSummary.toString());
-					else if (scanSummary.hasErrors())
-						scanFailedAtServer.append("\n").append(scanSummary.toString());				 
-					            	
-					printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);
-					
-					//handle hard failures. In case of threshold or policy failure, we still need to generate report before returning.
-					//Hence, cannot return yet
-					if(!scanSummary.hasErrors()) 
-						return BuildFinishedStatus.FINISHED_FAILED;
-            	}
+
+                StringBuilder scanFailedAtServer = new StringBuilder();
+                if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady()))
+                    scanFailedAtServer.append("CxSAST scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+                if (config.isOsaEnabled() && (ret.getOsaResults() == null || !ret.getOsaResults().isOsaResultsReady()))
+                    scanFailedAtServer.append("CxSAST OSA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+                if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady()))
+                    scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
+
+                if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty())
+                    scanFailedAtServer.append(scanSummary.toString());
+                else if (scanSummary.hasErrors())
+                    scanFailedAtServer.append("\n").append(scanSummary.toString());
+
+                printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);
+
+                //handle hard failures. In case of threshold or policy failure, we still need to generate report before returning.
+                //Hence, cannot return yet
+                if (!scanSummary.hasErrors())
+                    return BuildFinishedStatus.FINISHED_FAILED;
+            }
             //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
@@ -162,10 +162,10 @@ public class CxBuildProcess extends CallableBuildProcess {
 
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             }
-            
+
             if (config.getSynchronous() && config.isSastEnabled() && ((ret.getSastResults() != null
-					&& ret.getSastResults().getException() != null
-					&& ret.getSastResults().getScanId() > 0))) {
+                    && ret.getSastResults().getException() != null
+                    && ret.getSastResults().getScanId() > 0))) {
                 cancelScan(clientDelegator);
             }
             if (ret.getSastResults() != null) {
@@ -178,16 +178,15 @@ public class CxBuildProcess extends CallableBuildProcess {
             String summaryStr = clientDelegator.generateHTMLSummary(ret);
             File htmlFile = new File(buildDirectory, REPORT_HTML_NAME);
             try {
-                FileUtils.writeStringToFile(htmlFile, summaryStr);
+                FileUtils.writeStringToFile(htmlFile, summaryStr, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 logger.error("Failed to generate full html report: " + e.getMessage());
             }
             publishArtifact(htmlFile.getAbsolutePath());
-            if(scanSummary.hasErrors()) {
-            	return BuildFinishedStatus.FINISHED_FAILED;
+            if (scanSummary.hasErrors()) {
+                return BuildFinishedStatus.FINISHED_FAILED;
             }
-            ///////////////
-            
+
             return BuildFinishedStatus.FINISHED_SUCCESS;
         } catch (InterruptedException e) {
             logger.error("Interrupted exception: " + e.getMessage());
@@ -227,7 +226,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("Folder exclusions: " + config.getSastFolderExclusions());
             logger.info("Filter pattern: " + config.getSastFilterPattern());
             logger.info("Scan timeout in minutes: " + config.getSastScanTimeoutInMinutes());
-            logger.info("Scan comment: " + config.getScanComment());            
+            logger.info("Scan comment: " + config.getScanComment());
             logger.info("Is incremental scan: " + config.getIncremental());
             logger.info("Custom Fields: " + config.getCustomFields());
             logger.info("Generate PDF report: " + config.getGeneratePDFReport());
@@ -239,25 +238,25 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
-        logger.info("Dependency Scan enabled : " + (config.isOsaEnabled() || config.isAstScaEnabled()));        
-        if(config.isOsaEnabled() || config.isAstScaEnabled()) {
-        	String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();
-        	logger.info("Dependency Scan type : " + scannerType);
-        	logger.info("Dependency scan configuration:");
-        	logger.info(" Include/Exclude Filter patterns: " + config.getOsaFilterPattern());	        
-        	logger.info(" Dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
-	        if (config.getOsaThresholdsEnabled()) {
-	        	logger.info(" Dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
-	        	logger.info(" Dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
-	        	logger.info(" Dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
-	        }
-	        if (config.isOsaEnabled()) {	            
-	        	logger.info(" CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
-	        	logger.info(" Execute dependency managers 'install packages' command before CxOSA Scan: " + config.getOsaRunInstall());            
-	        } else if(config.isAstScaEnabled())	{
-	        	logger.info(" CxSCA Tenant: " + config.getAstScaConfig().getTenant());
-	        	logger.info(" CxSCA TeamPath: " + config.getAstScaConfig().getTeamPath());
-	        }
+        logger.info("Dependency Scan enabled : " + (config.isOsaEnabled() || config.isAstScaEnabled()));
+        if (config.isOsaEnabled() || config.isAstScaEnabled()) {
+            String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();
+            logger.info("Dependency Scan type : " + scannerType);
+            logger.info("Dependency scan configuration:");
+            logger.info(" Include/Exclude Filter patterns: " + config.getOsaFilterPattern());
+            logger.info(" Dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
+            if (config.getOsaThresholdsEnabled()) {
+                logger.info(" Dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
+                logger.info(" Dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
+                logger.info(" Dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
+            }
+            if (config.isOsaEnabled()) {
+                logger.info(" CxOSA archive extract patterns: " + config.getOsaArchiveIncludePatterns());
+                logger.info(" Execute dependency managers 'install packages' command before CxOSA Scan: " + config.getOsaRunInstall());
+            } else if (config.isAstScaEnabled()) {
+                logger.info(" CxSCA Tenant: " + config.getAstScaConfig().getTenant());
+                logger.info(" CxSCA TeamPath: " + config.getAstScaConfig().getTeamPath());
+            }
         }
         logger.info("------------------------------------------------------------------------");
     }

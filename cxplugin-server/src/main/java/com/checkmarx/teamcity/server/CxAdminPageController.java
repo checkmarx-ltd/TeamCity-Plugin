@@ -53,6 +53,9 @@ public class CxAdminPageController extends BaseFormXmlController {
         String sastAndOsaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalPassword");
         cxAdminConfig.setConfiguration(GLOBAL_PASSWORD, sastAndOsaPassword);
 
+        String proxyPassword = ensurePasswordEncryption(request, "encryptedCxGlobalProxyPassword");
+        cxAdminConfig.setConfiguration(GLOBAL_PROXY_PASSWORD, proxyPassword);
+
         String scaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSCAPassword");
         cxAdminConfig.setConfiguration(GLOBAL_SCA_PASSWORD, scaPassword);
         

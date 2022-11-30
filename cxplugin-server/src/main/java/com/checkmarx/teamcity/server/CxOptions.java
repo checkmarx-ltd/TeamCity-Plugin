@@ -5,6 +5,7 @@ import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.EngineConfiguration;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
@@ -19,6 +20,7 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 import static com.checkmarx.teamcity.common.CxParam.*;
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 
@@ -61,6 +63,11 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getIsProxy() {
+        return IS_PROXY;
+    }
+
+    @NotNull
     public String getProjectName() {
         return PROJECT_NAME;
     }
@@ -90,6 +97,7 @@ public class CxOptions {
     public String getEngineConfigId() {
         return ENGINE_CONFIG_ID;
     }
+
     @NotNull
     public List<EngineConfiguration> getEngineConfigList() {
         return engineConfigList;
@@ -130,7 +138,7 @@ public class CxOptions {
     public String getIsPeriodicFullScan() {
         return PERIODIC_FULL_SCAN;
     }
-    
+
     @NotNull
     public String getPeriodicFullScanAfter() {
         return PERIODIC_FULL_SCAN_AFTER;
@@ -150,7 +158,7 @@ public class CxOptions {
     public String getDependencyScannerType() {
         return DEPENDENCY_SCANNER_TYPE;
     }
-    
+
     @NotNull
     public String getDependencyScaScanType() {
         return DEPENDENCY_SCA_SCAN_TYPE;
@@ -180,46 +188,47 @@ public class CxOptions {
     public String getIsSynchronous() {
         return IS_SYNCHRONOUS;
     }
-    
+
     @NotNull
     public String getIsIncludeSources() {
         return IS_INCLUDE_SOURCES;
     }
-    
+
     @NotNull
     public String getIsExploitablePath() {
         return IS_EXPLOITABLE_PATH;
     }
-    
+
     @NotNull
     public String getScaSASTUserName() {
         return SCA_SAST_SERVER_USERNAME;
     }
-    
+
     @NotNull
     public String getScaSASTServerUrl() {
         return SCA_SAST_SERVER_URL;
     }
-    
+
     @NotNull
     public String getScaSASTPassword() {
         return SCA_SAST_SERVER_PASSWORD;
     }
+
     @NotNull
     public String getScaSASTProjectFullPath() {
         return SCA_SAST_PROJECT_FULLPATH;
     }
-    
+
     @NotNull
     public String getScaSASTProjectID() {
         return SCA_SAST_PROJECT_ID;
     }
-    
+
     @NotNull
     public String getUseSASTDefaultServer() {
         return USE_SAST_DEFAULT_SERVER;
     }
-    
+
     @NotNull
     public String getThresholdEnabled() {
         return THRESHOLD_ENABLED;
@@ -271,6 +280,36 @@ public class CxOptions {
     }
 
     @NotNull
+    public String getGlobalIsProxy() {
+        return GLOBAL_IS_PROXY;
+    }
+
+    @NotNull
+    public String getGlobalProxyHost() {
+        return GLOBAL_PROXY_HOST;
+    }
+
+    @NotNull
+    public String getGlobalProxyPort() {
+        return GLOBAL_PROXY_PORT;
+    }
+
+    @NotNull
+    public String getGlobalProxyUser() {
+        return GLOBAL_PROXY_USER;
+    }
+
+    @NotNull
+    public String getGlobalProxyPassword() {
+        return GLOBAL_PROXY_PASSWORD;
+    }
+
+    @NotNull
+    public String getGlobalProxyHttps() {
+        return GLOBAL_PROXY_HTTPS;
+    }
+
+    @NotNull
     public String getGlobalSastServerUrl() {
         return GLOBAL_SAST_SERVER_URL;
     }
@@ -279,6 +318,7 @@ public class CxOptions {
     public String getGlobalSastUsername() {
         return GLOBAL_SAST_SERVER_USERNAME;
     }
+
     @NotNull
     public String getGlobalExcludeFolders() {
         return GLOBAL_EXCLUDE_FOLDERS;
@@ -388,19 +428,20 @@ public class CxOptions {
     public String getScaTenant() {
         return SCA_TENANT;
     }
+
     @NotNull
     public String getScaTeampath() {
         return SCA_TEAMPATH;
     }
-    
+
     @NotNull
     public String getScaConfigFile() {
         return SCA_CONFIGFILE;
     }
-    
+
     @NotNull
     public String getScaEnvVariable() {
-    	return SCA_ENV_VARIABLE;
+        return SCA_ENV_VARIABLE;
     }
 
     @NotNull
@@ -479,17 +520,25 @@ public class CxOptions {
     }
 
 
-    public void testConnection(String serverUrl, String username, String pssd) {
+    public void testConnection(String serverUrl, String username, String pssd, String cxGlobalIsProxy,
+                               String cxGlobalProxyHost, String cxGlobalProxyPort, String cxGlobalProxyUser,
+                               String cxGlobalProxyPassword, String cxGlobalProxyHttps) {
 
         try {
-            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl);
+            ProxyConfig proxyConfig = null;
+            if (TRUE.equalsIgnoreCase(cxGlobalIsProxy) && StringUtils.isNotEmpty(cxGlobalProxyHost) &&
+                    StringUtils.isNotEmpty(cxGlobalProxyPort) && Integer.parseInt(cxGlobalProxyPort) > 0) {
+                proxyConfig = new ProxyConfig(cxGlobalProxyHost, Integer.parseInt(cxGlobalProxyPort), cxGlobalProxyUser,
+                        decrypt(cxGlobalProxyPassword), TRUE.equalsIgnoreCase(cxGlobalProxyHttps));
+            }
+            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl, proxyConfig);
             CxSASTClient sastClient = delegator.getSastClient();
             sastClient.login();
             presetList = sastClient.getPresetList();
             teamList = sastClient.getTeamList();
             /* Getting list of Engine configurations and adding Project Default as extra engine configuration */
             engineConfigList = sastClient.getEngineConfiguration();
-            if(engineConfigList != null) {
+            if (engineConfigList != null) {
                 EngineConfiguration sastEngineConfig = getProjectDefaultConfig();
                 engineConfigList.add(sastEngineConfig);
             }
@@ -499,8 +548,8 @@ public class CxOptions {
         }
     }
 
-    private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl) throws MalformedURLException {
-            pssd = decrypt(pssd);
+    private CxClientDelegator delegatorBuilder(String pssd, String username, String serverUrl, ProxyConfig proxyConfig) throws MalformedURLException {
+        pssd = decrypt(pssd);
         CxScanConfig config = new CxScanConfig();
         config.addScannerType(ScannerType.SAST);
         config.setUsername(username);
@@ -510,21 +559,25 @@ public class CxOptions {
         config.setDisableCertificateValidation(true);
         String isProxyVar = System.getProperty("cx.isproxy");
         config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+        if (proxyConfig != null) {
+            config.setProxy(true);
+            config.setProxyConfig(proxyConfig);
+        }
         CxClientDelegator clientDelegator = new CxClientDelegator(config, log);
         return clientDelegator;
     }
-    
+
     public void testSASTConnection(String serverUrl, String username, String pssd) {
 
         try {
-            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl);
+            CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl, null);
             CxSASTClient sastClient = delegator.getSastClient();
             sastClient.login();
             presetList = sastClient.getPresetList();
             teamList = sastClient.getTeamList();
             /* Getting list of Engine configurations and adding Project Default as extra engine configuration */
             engineConfigList = sastClient.getEngineConfiguration();
-            if(engineConfigList != null) {
+            if (engineConfigList != null) {
                 EngineConfiguration sastEngineConfig = getProjectDefaultConfig();
                 engineConfigList.add(sastEngineConfig);
             }
@@ -540,7 +593,7 @@ public class CxOptions {
      *
      * @return EngineConfiguration
      */
-    private EngineConfiguration getProjectDefaultConfig(){
+    private EngineConfiguration getProjectDefaultConfig() {
         EngineConfiguration sastEngineConfig = new EngineConfiguration();
         sastEngineConfig.setId(PROJECT_DEFAULT_CONFIG_ID);
         sastEngineConfig.setName(PROJECT_DEFAULT);
@@ -575,11 +628,11 @@ public class CxOptions {
 
         try {
             if (!global) {
-            	try {
-            		pssd = RSACipher.decryptWebRequestData(pssd);
-            	}catch(Exception notAbleToDescrypt) {
-            		//try with other decryption
-            	}
+                try {
+                    pssd = RSACipher.decryptWebRequestData(pssd);
+                } catch (Exception notAbleToDescrypt) {
+                    //try with other decryption
+                }
             }
 
             return decrypt(pssd);
