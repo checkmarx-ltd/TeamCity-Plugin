@@ -529,7 +529,7 @@ public class CxOptions {
             if (TRUE.equalsIgnoreCase(cxGlobalIsProxy) && StringUtils.isNotEmpty(cxGlobalProxyHost) &&
                     StringUtils.isNotEmpty(cxGlobalProxyPort) && Integer.parseInt(cxGlobalProxyPort) > 0) {
                 proxyConfig = new ProxyConfig(cxGlobalProxyHost, Integer.parseInt(cxGlobalProxyPort), cxGlobalProxyUser,
-                        cxGlobalProxyPassword, TRUE.equalsIgnoreCase(cxGlobalProxyHttps));
+                        decrypt(cxGlobalProxyPassword), TRUE.equalsIgnoreCase(cxGlobalProxyHttps));
             }
             CxClientDelegator delegator = delegatorBuilder(pssd, username, serverUrl, proxyConfig);
             CxSASTClient sastClient = delegator.getSastClient();

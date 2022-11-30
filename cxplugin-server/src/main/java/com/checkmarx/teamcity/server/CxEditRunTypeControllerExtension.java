@@ -67,9 +67,16 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         model.put(CxParam.SERVER_URL, properties.get(CxParam.SERVER_URL));
         model.put(CxParam.USERNAME, properties.get(CxParam.USERNAME));
         model.put(CxParam.PASSWORD, properties.get(CxParam.PASSWORD));
+        model.put(CxParam.IS_PROXY, properties.get(CxParam.IS_PROXY));
         model.put(CxParam.GLOBAL_SERVER_URL, cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL));
         model.put(CxParam.GLOBAL_USERNAME, cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME));
         model.put(CxParam.GLOBAL_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD));
+        model.put(CxParam.GLOBAL_IS_PROXY, cxAdminConfig.getConfiguration(CxParam.GLOBAL_IS_PROXY));
+        model.put(CxParam.GLOBAL_PROXY_HOST, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PROXY_HOST));
+        model.put(CxParam.GLOBAL_PROXY_PORT, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PROXY_PORT));
+        model.put(CxParam.GLOBAL_PROXY_USER, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PROXY_USER));
+        model.put(CxParam.GLOBAL_PROXY_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PROXY_PASSWORD));
+        model.put(CxParam.GLOBAL_PROXY_HTTPS, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PROXY_HTTPS));
 
     }
 

@@ -79,8 +79,14 @@
             return {
                 serverUrl: $('cxServerUrl').value,
                 username: $('cxUsername').value,
-                pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
-                // isProxy: $('cxIsProxy').value
+                pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value,
+                isProxy: $('cxIsProxy').checked,
+                // isProxy: $('cxGlobalIsProxy').checked,
+                proxyHost: $('cxGlobalProxyHost').value,
+                proxyPort: $('cxGlobalProxyPort').value,
+                proxyUser: $('cxGlobalProxyUser').value,
+                proxyPassword: $('cxGlobalProxyPassword').value,
+                proxyHttps: $('cxGlobalProxyHttps').checked
             };
         },
 
@@ -441,7 +447,8 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         <th>
             <label for="${optionsBean.useDefaultServer}">Use Default Credentials<br>
                 Server URL: ${propertiesBean.properties[optionsBean.globalServerUrl]}, <br>
-                Username: ${propertiesBean.properties[optionsBean.globalUsername]}</label>
+                Username: ${propertiesBean.properties[optionsBean.globalUsername]},
+                IsProxy: ${propertiesBean.properties[optionsBean.globalIsProxy]}</label>
         </th>
         <td>
             <c:set var="onclick">
@@ -472,10 +479,10 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <span class="error" id="error_${optionsBean.password}"></span>
         </td>
     </tr>
-<%--    <tr>
+    <tr>
         <th><label for="${optionsBean.isProxy}">isProxy<l:star/></label></th>
         <td><props:checkboxProperty name="${optionsBean.isProxy}"/></td>
-    </tr>--%>
+    </tr>
     <td>
         <form>
             <input id="testConnection" type="button" name="TestConnection" value="Connect to Server"

@@ -3,7 +3,14 @@ window.Checkmarx = {
         return {
             serverUrl: $('cxServerUrl').value,
             username: $('cxUsername').value,
-            pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value
+            pssd: $('prop:encrypted:cxPassword').value ? $('prop:encrypted:cxPassword').value : $('cxPassword').value,
+            isProxy: $('cxIsProxy').checked,
+            // isProxy: $('cxGlobalIsProxy').checked,
+            proxyHost: $('cxGlobalProxyHost').value,
+            proxyPort: $('cxGlobalProxyPort').value,
+            proxyUser: $('cxGlobalProxyUser').value,
+            proxyPassword: $('cxGlobalProxyPassword').value,
+            proxyHttps: $('cxGlobalProxyHttps').checked
         };
     },
 

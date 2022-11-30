@@ -52,7 +52,7 @@ public class CxConfigHelper {
         ret.setReportsDir(reportDirectory);
         String isProxyVar = System.getProperty("cx.isproxy");
         ret.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
-        setProxySetting(globalParameters, ret);
+        setProxySetting(globalParameters, buildParameters.get(IS_PROXY), ret);
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
@@ -391,8 +391,9 @@ public class CxConfigHelper {
         return null;
     }
 
-    private static void setProxySetting(Map<String, String> parameters, CxScanConfig ret) {
-        if (parameters.get(GLOBAL_IS_PROXY) != null && TRUE.equals(parameters.get(GLOBAL_IS_PROXY))) {
+    private static void setProxySetting(Map<String, String> parameters, String buildIsProxy, CxScanConfig ret) {
+        if ((StringUtils.isNotEmpty(buildIsProxy) && TRUE.equals(parameters.get(buildIsProxy))) ||
+                (StringUtils.isNotEmpty(parameters.get(GLOBAL_IS_PROXY)) && TRUE.equals(parameters.get(GLOBAL_IS_PROXY)))) {
             ret.setProxy(true);
             String host = parameters.get(GLOBAL_PROXY_HOST);
             String portStr = parameters.get(GLOBAL_PROXY_PORT);

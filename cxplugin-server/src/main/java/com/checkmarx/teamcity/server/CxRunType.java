@@ -57,6 +57,7 @@ public class CxRunType extends RunType {
         parameters.put(CxParam.SERVER_URL, "");
         parameters.put(CxParam.USERNAME, "");
         parameters.put(CxParam.PASSWORD, "");
+        parameters.put(CxParam.IS_PROXY, CxConstants.FALSE);
         parameters.put(CxParam.PROJECT_NAME, "");
         parameters.put(CxParam.FILTER_PATTERNS, CxConstants.DEFAULT_FILTER_PATTERN);
         parameters.put(CxParam.OSA_ARCHIVE_INCLUDE_PATTERNS, CxConstants.DEFAULT_OSA_ARCHIVE_INCLUDE_PATTERNS);
