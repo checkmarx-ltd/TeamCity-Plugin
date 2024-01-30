@@ -120,7 +120,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             
             ret = config.getSynchronous() ? clientDelegator.waitForScanResults() : clientDelegator.getLatestScanResults();
             
-            if (config.getEnablePolicyViolations()) {
+            if (((config.isSastEnabled()||config.isOsaEnabled()) && config.getEnablePolicyViolations()) || (config.isAstScaEnabled() && config.getEnablePolicyViolationsSCA())) {
                 clientDelegator.printIsProjectViolated(ret);
             }
 
@@ -239,6 +239,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
+        logger.info("SCA Policy violations enabled: " + config.getEnablePolicyViolationsSCA());
         logger.info("Dependency Scan enabled : " + (config.isOsaEnabled() || config.isAstScaEnabled()));        
         if(config.isOsaEnabled() || config.isAstScaEnabled()) {
         	String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();

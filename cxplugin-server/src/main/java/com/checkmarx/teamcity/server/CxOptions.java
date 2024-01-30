@@ -26,6 +26,7 @@ import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 public class CxOptions {
 
     public static final Logger log = LoggerFactory.getLogger(CxOptions.class);
+//	private static final String PROJECT_SCA_POLICY_VIOLATION = null;
     private List<Team> teamList = Collections.singletonList(new Team(NO_TEAM_PATH, CxConstants.NO_TEAM_MESSAGE));
     private List<Preset> presetList = Collections.singletonList(new Preset(NO_PRESET_ID, CxConstants.NO_PRESET_MESSAGE));
     private List<EngineConfiguration> engineConfigList = Collections.singletonList(new EngineConfiguration(CxConstants.NO_ENGINE_CONFIG_MESSAGE));
@@ -343,10 +344,20 @@ public class CxOptions {
     public String getProjectPolicyViolation() {
         return PROJECT_POLICY_VIOLATION;
     }
+    
+    @NotNull
+    public String getProjectSCAPolicyViolation() {
+        return PROJECT_SCA_POLICY_VIOLATION;
+    }
 
     @NotNull
     public String getGlobalProjectPolicyViolation() {
         return GLOBAL_PROJECT_POLICY_VIOLATION;
+    }
+    
+    @NotNull
+    public String getGlobalProjectSCAPolicyViolation() {
+        return GLOBAL_PROJECT_SCA_POLICY_VIOLATION;
     }
 
     @NotNull

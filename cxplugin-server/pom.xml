@@ -26,13 +26,55 @@
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk18on</artifactId>
+                </exclusion>
+                <exclusion>
+         			<artifactId>commons-collections</artifactId>
+         			<groupId>commons-collections</groupId>
+        		</exclusion>
+        		<exclusion>
+					<groupId>org.bouncycastle</groupId>
+    				<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
+				<exclusion>
+         			<groupId>dom4j</groupId>
+         			<artifactId>dom4j</artifactId>
+				</exclusion>
+<!--				<exclusion>-->
+<!--         			<groupId>org.jdom</groupId>-->
+<!--         			<artifactId>jdom</artifactId>-->
+<!--				</exclusion>-->
+				<exclusion>
+         			<groupId>jdom</groupId>
+         			<artifactId>jdom</artifactId>
+				</exclusion>
+				<exclusion>
+         			<groupId>commons-httpclient</groupId>
+         			<artifactId>commons-httpclient</artifactId>
+				</exclusion>
+<!--				<exclusion>-->
+<!--					<groupId>org.springframework</groupId>-->
+<!--    				<artifactId>spring-webmvc</artifactId>-->
+<!--				</exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.12</version>
+            <version>1.13</version>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.74</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--    		<artifactId>spring-webmvc</artifactId>-->
+<!--            <version>5.3.31</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains.teamcity</groupId>
             <artifactId>server-web-api</artifactId>

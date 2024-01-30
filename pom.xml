@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <teamcity-version>2018.2</teamcity-version>
+        <teamcity-version>2023.11</teamcity-version>
            <!-- properties for scanning this project with SonarCloud-->
         <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin1</sonar.projectKey>
         <sonar.moduleKey>

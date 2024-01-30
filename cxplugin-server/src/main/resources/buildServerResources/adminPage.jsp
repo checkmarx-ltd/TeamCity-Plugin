@@ -266,11 +266,19 @@
             <table class="scanControlSectionTable" width="101%">
 
               <tr>
-                <th><label for="cxGlobalProjectPolicyViolation">Enable Project's policy enforcement
+                <th><label for="cxGlobalProjectPolicyViolation">Enable Project's SAST and OSA policy enforcement
                   <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
                 </th>
                 <td><forms:checkbox name="cxGlobalProjectPolicyViolation" value="${cxGlobalProjectPolicyViolation}"
                                     checked="${cxGlobalProjectPolicyViolation}"/></td>
+              </tr>
+              
+              <tr>
+                <th><label for="cxGlobalProjectSCAPolicyViolation">Enable Project's SCA policy enforcement
+                  <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated."/></label>
+                </th>
+                <td><forms:checkbox name="cxGlobalProjectSCAPolicyViolation" value="${cxGlobalProjectSCAPolicyViolation}"
+                                    checked="${cxGlobalProjectSCAPolicyViolation}"/></td>
               </tr>
 
               <tr>
