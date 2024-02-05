@@ -229,21 +229,23 @@ public class CxConfigHelper {
 		AstScaConfig scaConfig = new AstScaConfig();
 		
 		if(fromGlobal) {
-			scaConfig.setAccessControlUrl(buildParameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
-            scaConfig.setWebAppUrl(buildParameters.get(GLOBAL_SCA_WEB_APP_URL));
-            scaConfig.setApiUrl(buildParameters.get(GLOBAL_SCA_API_URL));
-            scaConfig.setPassword(decrypt(buildParameters.get(GLOBAL_SCA_PASSWORD)));
-            scaConfig.setUsername(buildParameters.get(GLOBAL_SCA_USERNAME));
-            scaConfig.setTenant(buildParameters.get(GLOBAL_SCA_TENANT));
+			
+			//change to global parameter
+			scaConfig.setAccessControlUrl(globalParameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
+            scaConfig.setWebAppUrl(globalParameters.get(GLOBAL_SCA_WEB_APP_URL));
+            scaConfig.setApiUrl(globalParameters.get(GLOBAL_SCA_API_URL));
+            scaConfig.setPassword(decrypt(globalParameters.get(GLOBAL_SCA_PASSWORD)));
+            scaConfig.setUsername(globalParameters.get(GLOBAL_SCA_USERNAME));
+            scaConfig.setTenant(globalParameters.get(GLOBAL_SCA_TENANT));
             // As we dont have include source option at global level, the flag can be set to false
             scaConfig.setIncludeSources(false);
-            String scaEnvVars = buildParameters.get(GLOBAL_SCA_ENV_VARIABLE);
+            String scaEnvVars = globalParameters.get(GLOBAL_SCA_ENV_VARIABLE);
 
             if(StringUtils.isNotEmpty(scaEnvVars))
             {
             	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
             }
-            String configFilePaths = buildParameters.get(GLOBAL_SCA_CONFIGFILE);
+            String configFilePaths = globalParameters.get(GLOBAL_SCA_CONFIGFILE);
 			if (StringUtils.isNotEmpty(configFilePaths)) {
 				String[] strArrayFile = configFilePaths.split(",");
 				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
@@ -251,12 +253,12 @@ public class CxConfigHelper {
 			}
 			
 			//set the exp path params
-
-			String isExpPath = buildParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
+			//depricated
+			String isExpPath = globalParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
 			if (TRUE.equals(isExpPath)) {
-				String scaSASTServerUrl = buildParameters.get(GLOBAL_SAST_SERVER_URL);
-				String scaSASTServerUserName = buildParameters.get(GLOBAL_SAST_SERVER_USERNAME);
-				String scaSASTServerPassword = decrypt(buildParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
+				String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
+				String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
+				String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
 
 				scaConfig.setSastServerUrl(scaSASTServerUrl);
 				scaConfig.setSastUsername(scaSASTServerUserName);

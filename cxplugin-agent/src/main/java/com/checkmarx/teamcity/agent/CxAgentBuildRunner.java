@@ -21,7 +21,7 @@ public class CxAgentBuildRunner implements AgentBuildRunner, AgentBuildRunnerInf
     @NotNull
     @Override
     public BuildProcess createBuildProcess(@NotNull AgentRunningBuild agentRunningBuild, @NotNull BuildRunnerContext buildRunnerContext) throws RunBuildException {
-        return new CxBuildProcess(agentRunningBuild, buildRunnerContext, artifactsWatcher);
+        return (BuildProcess) new CxBuildProcess(agentRunningBuild, buildRunnerContext, artifactsWatcher);
     }
 
     @NotNull

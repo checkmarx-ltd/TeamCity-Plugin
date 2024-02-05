@@ -458,7 +458,9 @@
                                     </td>
 
                                   </tr>
-                                   </tbody>
+                                  </tbody>
+                                   
+                                   
          <!-- SCA FEATURES  -->
      <tr class="globalDependencyScanRow scaInput">
              <th><label for="cxGlobalScaConfigFile">Package Manager's Config File(s) Path
