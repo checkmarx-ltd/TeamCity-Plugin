@@ -163,6 +163,7 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
+        String enableSCAPolicyViolation = PROJECT_SCA_POLICY_VIOLATION;
         Map<String, String> parameters = buildParameters;
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
@@ -178,12 +179,15 @@ public class CxConfigHelper {
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
+            enableSCAPolicyViolation = GLOBAL_PROJECT_SCA_POLICY_VIOLATION;
+
 
             parameters = globalParameters;
         }
 
         ret.setSynchronous(TRUE.equals(parameters.get(isSynchronous)));
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
+        ret.setEnablePolicyViolationsSCA(TRUE.equals(parameters.get(enableSCAPolicyViolation)));
 
 
         if (ret.isSastEnabled()) {

@@ -24,7 +24,17 @@
         var temp = document.createElement('div');
         temp.textContent = str;
         return temp.innerHTML;
+    } 
+    
+    function handleRadioButtonClick(scanType) {
+			cxGlobalOsaEnabled = jQuery('#cxGlobalOsaEnabled').prop('checked'),
+            cxGlobalScaEnabled = jQuery('#cxGlobalScaEnabled').prop('checked'),
+
+        jQuery('#osaInput')[cxGlobalOsaEnabled ? 'show' : 'hide']();
+        jQuery('#scaInput')[cxGlobalScaEnabled ? 'show' : 'hide']();
     }
+    
+    jQuery(handleRadioButtonClick);
 
   var SettingsForm = OO.extend(BS.AbstractPasswordForm, {
     formElement: function () {
@@ -147,15 +157,20 @@
 <c:if test="${globalDependencyScanEnabled != 'true'}">
 	<c:set var="hideGlobalDependencyScanRow" value="style='display:none'"/>
 </c:if>
-[9:27 PM] Susmita Gorai
-<c:if test="${cxGlobalDependencyScanType == 'OSA'}">
-    <c:set var="hideOsaInput" value=""/>
-    <c:set var="hideScaInput" value="style='display:none'"/>
-</c:if>
-<c:if test="${cxGlobalDependencyScanType == 'SCA'}">
-    <c:set var="hideOsaInput" value="style='display:none'"/>
-    <c:set var="hideScaInput" value=""/>
-</c:if>
+<c:choose>
+    <c:when test="${cxGlobalDependencyScanType == 'OSA'}">
+        <c:set var="hideOsaInput" value=""/>
+        <c:set var="hideScaInput" value="style='display:none'"/>
+    </c:when>
+    <c:when test="${cxGlobalDependencyScanType == 'SCA'}">
+        <c:set var="hideOsaInput" value="style='display:none'"/>
+        <c:set var="hideScaInput" value=""/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="hideOsaInput" value="style='display:none'"/>
+        <c:set var="hideScaInput" value="style='display:none'"/>
+    </c:otherwise>
+</c:choose>
 <c:if test="${cxGlobalOsaThresholdEnabled != 'true'}">
   <c:set var="hideOsaThresholdSection" value="style='display:none'"/>
 </c:if>
@@ -266,7 +281,7 @@
 					<table class="scanControlSectionTable" width="101%">
 						<tr>
 							<th>
-								<label for="cxGlobalProjectPolicyViolation">Enable Project's policy enforcement
+								<th><label for="cxGlobalProjectPolicyViolation">Enable Project's SAST and OSA policy enforcement
 									<bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/>
 								</label>
 							</th>
@@ -274,6 +289,13 @@
 								<forms:checkbox name="cxGlobalProjectPolicyViolation" value="${cxGlobalProjectPolicyViolation}" checked="${cxGlobalProjectPolicyViolation}"/>
 							</td>
 						</tr>
+						<tr>
+                <th><label for="cxGlobalProjectSCAPolicyViolation">Enable Project's SCA policy enforcement
+                  <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated."/></label>
+                </th>
+                <td><forms:checkbox name="cxGlobalProjectSCAPolicyViolation" value="${cxGlobalProjectSCAPolicyViolation}"
+                                    checked="${cxGlobalProjectSCAPolicyViolation}"/></td>
+              </tr>
 						<tr>
 							<th>
 								<label for="cxGlobalThresholdEnabled">Enable CxSAST Vulnerability Thresholds
@@ -383,15 +405,15 @@
 					</td>
 				</tr>
 				<tr>
-					<th>
-						<label for="cxGlobalOsaEnabled">Use CxOSA dependency scanner
-									<bs:helpIcon iconTitle="Select CxOSA dependency scanner to perform CxOSA dependency scan"/>
-						</label>
-					</th>
-					<td>
-						<forms:radioButton id="cxGlobalOsaEnabled" checked="${cxGlobalDependencyScanType == 'OSA'}" name="cxGlobalDependencyScanType" value="OSA" onclick="$('osaInput').toggle()"/>
-					</td>
-				</tr>
+    <th>
+        <label for="cxGlobalOsaEnabled">Use CxOSA dependency scanner
+            <bs:helpIcon iconTitle="Select CxOSA dependency scanner to perform CxOSA dependency scan"/>
+        </label>
+    </th>
+    <td>
+        <forms:radioButton id="cxGlobalOsaEnabled" checked="${cxGlobalDependencyScanType == 'OSA'}" name="cxGlobalDependencyScanType" value="OSA" onclick="handleRadioButtonClick()"/>
+    </td>
+</tr>
 				<tbody id="osaInput" ${hideOsaInput}>
 				<tr>
 					<th>
@@ -416,15 +438,15 @@
 				</tr>
 			</tbody>
 			<tr>
-				<th>
-					<label for="cxGlobalScaEnabled">Use CxSCA dependency scanner
-								<bs:helpIcon iconTitle="Select CxSCA dependency scanner to perform CxSCA dependency scan"/>
-						</label>
-					</th>
-						<td>
-							<forms:radioButton id="cxGlobalScaEnabled" checked="${cxGlobalDependencyScanType == 'SCA'}" name="cxGlobalDependencyScanType" value="SCA" onclick="$('scaInput').toggle()"/>						
-				</td>
-			</tr>
+    <th>
+        <label for="cxGlobalScaEnabled">Use CxSCA dependency scanner
+            <bs:helpIcon iconTitle="Select CxSCA dependency scanner to perform CxSCA dependency scan"/>
+        </label>
+    </th>
+    <td>
+        <forms:radioButton id="cxGlobalScaEnabled" checked="${cxGlobalDependencyScanType == 'SCA'}" name="cxGlobalDependencyScanType" value="SCA" onclick="handleRadioButtonClick()"/>
+    </td>
+</tr>
 			<tbody id="scaInput" ${hideScaInput}>
 			<tr>
 				<th>

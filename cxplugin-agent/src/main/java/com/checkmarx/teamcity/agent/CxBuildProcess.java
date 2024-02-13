@@ -123,7 +123,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             
             ret = config.getSynchronous() ? clientDelegator.waitForScanResults() : clientDelegator.getLatestScanResults();
             
-            if (config.getEnablePolicyViolations()) {
+            if (((config.isSastEnabled()||config.isOsaEnabled()) && config.getEnablePolicyViolations()) || (config.isAstScaEnabled() && config.getEnablePolicyViolationsSCA())) {
                 clientDelegator.printIsProjectViolated(ret);
             }
             
@@ -133,7 +133,7 @@ public class CxBuildProcess extends CallableBuildProcess {
                     (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
                     (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
                     (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
-            																				//debug the getter					
+            																								
 					StringBuilder scanFailedAtServer = new StringBuilder();
 					
 					if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady() ))
@@ -151,6 +151,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 					            					
 					//handle hard failures. In case of threshold or policy failure, we still need to generate report before returning.
 					//Hence, cannot return yet
+					//Only for business level errors
 					if(!scanSummary.hasErrors() && config.getSynchronous() )
 						return BuildFinishedStatus.FINISHED_FAILED;
             	}
