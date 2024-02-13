@@ -31,7 +31,6 @@ public class CxConfigHelper {
 
     private static final String PARAMETER_PREFIX = "Parameter [";
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
-//	private static final String SCA_PROJECT_POLICY_VIOLATION = null;
     private static String teamPath;
     private static LegacyClient commonClient = null;
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
@@ -116,7 +115,7 @@ public class CxConfigHelper {
 
         if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
         {
-            ScannerType scannerType;
+            ScannerType scannerType = null;
             if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
             {
             	ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
@@ -131,6 +130,8 @@ public class CxConfigHelper {
                 }
                 
             } else {
+            	
+            	if(TRUE.equals(globalParameters.get(GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS))){
             	ret.setOsaFilterPattern(globalParameters.get(GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS));
             	if("SCA".equalsIgnoreCase(globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ) {
             		scannerType = ScannerType.AST_SCA;
@@ -138,9 +139,10 @@ public class CxConfigHelper {
             	} 
             	else {
             		scannerType = ScannerType.OSA;
-            		ret.setOsaArchiveIncludePatterns(buildParameters.get(GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
-                    ret.setOsaRunInstall(TRUE.equals(buildParameters.get(GLOBAL_EXECUTE_DEPENDENCY_MANAGER)));
+            		ret.setOsaArchiveIncludePatterns(globalParameters.get(GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
+                    ret.setOsaRunInstall(TRUE.equals(globalParameters.get(GLOBAL_EXECUTE_DEPENDENCY_MANAGER)));
             	}
+            }
             }
             if (scannerType != null) {
                 ret.addScannerType(scannerType);
@@ -161,7 +163,6 @@ public class CxConfigHelper {
 
         String isSynchronous = IS_SYNCHRONOUS;
         String enablePolicyViolation = PROJECT_POLICY_VIOLATION;
-        String enableSCAPolicyViolation = PROJECT_SCA_POLICY_VIOLATION;
         Map<String, String> parameters = buildParameters;
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
@@ -177,14 +178,12 @@ public class CxConfigHelper {
 
             isSynchronous = GLOBAL_IS_SYNCHRONOUS;
             enablePolicyViolation = GLOBAL_PROJECT_POLICY_VIOLATION;
-            enableSCAPolicyViolation = GLOBAL_PROJECT_SCA_POLICY_VIOLATION;
 
             parameters = globalParameters;
         }
 
         ret.setSynchronous(TRUE.equals(parameters.get(isSynchronous)));
         ret.setEnablePolicyViolations(TRUE.equals(parameters.get(enablePolicyViolation)));
-        ret.setEnablePolicyViolationsSCA(TRUE.equals(parameters.get(enableSCAPolicyViolation)));
 
 
         if (ret.isSastEnabled()) {
@@ -229,8 +228,6 @@ public class CxConfigHelper {
 		AstScaConfig scaConfig = new AstScaConfig();
 		
 		if(fromGlobal) {
-			
-			//change to global parameter
 			scaConfig.setAccessControlUrl(globalParameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(globalParameters.get(GLOBAL_SCA_WEB_APP_URL));
             scaConfig.setApiUrl(globalParameters.get(GLOBAL_SCA_API_URL));
@@ -253,7 +250,7 @@ public class CxConfigHelper {
 			}
 			
 			//set the exp path params
-			//depricated
+
 			String isExpPath = globalParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
 			if (TRUE.equals(isExpPath)) {
 				String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);

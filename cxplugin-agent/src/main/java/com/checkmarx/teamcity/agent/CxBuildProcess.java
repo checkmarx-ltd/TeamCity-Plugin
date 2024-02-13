@@ -94,7 +94,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
             printConfiguration();
             if (!config.isSastEnabled() && !(config.isOsaEnabled() || config.isAstScaEnabled())) {
-                logger.error("Both SAST and OSA are disabled. exiting");
+                logger.error("Both SAST and dependency scan are disabled. Exiting.");
                 return null;
             }
             try {
