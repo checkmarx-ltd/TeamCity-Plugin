@@ -382,6 +382,13 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
     <c:set var="globalProjectPolicydEnabled" value="false"/>
 </c:if>
 
+<c:if test="${propertiesBean.properties[optionsBean.globalProjectSCAPolicyViolation] == 'true'}">
+    <c:set var="globalProjectSCAPolicydEnabled" value="true"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.globalProjectSCAPolicyViolation] != 'true'}">
+    <c:set var="globalProjectSCAPolicydEnabled" value="false"/>
+</c:if>
+
 <c:if test="${propertiesBean.properties[optionsBean.globalOsaThresholdEnabled] == 'true'}">
     <c:set var="globalOsaThresholdEnabled" value="true"/>
 </c:if>
@@ -969,11 +976,20 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 
             <table class="scanControlSectionTable" width="101%">
                 <tr>
-                    <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's policy enforcement
+                    <th><label for="${optionsBean.projectPolicyViolation}">Enable Project's SAST and OSA policy enforcement
                         <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></label>
                     </th>
                     <td>
                         <props:checkboxProperty name="${optionsBean.projectPolicyViolation}"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="${optionsBean.projectSCAPolicyViolation}">Enable Project's SCA policy enforcement
+                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated."/></label>
+                    </th>
+                    <td>
+                        <props:checkboxProperty name="${optionsBean.projectSCAPolicyViolation}"/>
 
                     </td>
                 </tr>
@@ -1074,10 +1090,17 @@ Example of Project Full Path: CxServer/team1/projectname."/>
         <td colspan="2">
             <table class="scanControlSectionTable" width="101%">
                 <tr>
-                    <th>Enable Project's policy enforcement
+                    <th>Enable Project's SAST and OSA policy enforcement
                         <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalProjectPolicydEnabled ? 'checked' : ''}/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Enable Project's SCA policy enforcement
+                        <bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated."/></th>
+                    <td>
+                        <input type="checkbox" disabled ${globalProjectSCAPolicydEnabled ? 'checked' : ''}/>
                     </td>
                 </tr>
                 <tr>

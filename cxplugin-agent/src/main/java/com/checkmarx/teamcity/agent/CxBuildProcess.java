@@ -20,7 +20,9 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.checkmarx.teamcity.agent.CxPluginUtils.printScanBuildFailure;
@@ -92,7 +94,7 @@ public class CxBuildProcess extends CallableBuildProcess {
 
             printConfiguration();
             if (!config.isSastEnabled() && !(config.isOsaEnabled() || config.isAstScaEnabled())) {
-                logger.error("Both SAST and OSA are disabled. exiting");
+                logger.error("Both SAST and dependency scan are disabled. Exiting.");
                 return null;
             }
             try {
@@ -114,45 +116,47 @@ public class CxBuildProcess extends CallableBuildProcess {
                 Logger.getRootLogger().addAppender(new CxAppender(agentRunningBuild.getBuildLogger(), appenderName));
             }
             ret = clientDelegator.initiateScan();
+            
             if (config.isOsaEnabled() || config.isAstScaEnabled()) {
                 Logger.getRootLogger().removeAppender(appenderName);
             }
             
             ret = config.getSynchronous() ? clientDelegator.waitForScanResults() : clientDelegator.getLatestScanResults();
             
-            if (config.getEnablePolicyViolations()) {
+            if (((config.isSastEnabled()||config.isOsaEnabled()) && config.getEnablePolicyViolations()) || (config.isAstScaEnabled() && config.getEnablePolicyViolationsSCA())) {
                 clientDelegator.printIsProjectViolated(ret);
             }
-
-
-            //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
+            
+          //assert if expected exception is thrown  OR when vulnerabilities under threshold OR when policy violated
             ScanSummary scanSummary = new ScanSummary(config, ret.getSastResults(), ret.getOsaResults(), ret.getScaResults());
             if (scanSummary.hasErrors() || ret.getGeneralException() != null ||
                     (config.isSastEnabled() && (ret.getSastResults() == null || ret.getSastResults().getException() != null)) ||
                     (config.isOsaEnabled() && (ret.getOsaResults() == null || ret.getOsaResults().getException() != null)) ||
                     (config.isAstScaEnabled() && (ret.getScaResults() == null || ret.getScaResults().getException() != null))) {
-            	
+            																								
 					StringBuilder scanFailedAtServer = new StringBuilder();
+					
 					if (config.isSastEnabled() && (ret.getSastResults() == null || !ret.getSastResults().isSastResultsReady() ))
 						scanFailedAtServer.append("CxSAST scan results are not found. Scan might have failed at the server or aborted by the server.\n");
 					if (config.isOsaEnabled() && (ret.getOsaResults() == null || !ret.getOsaResults().isOsaResultsReady() ))
 						scanFailedAtServer.append("CxSAST OSA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-					if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady())) 
-						scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");
-									
-					if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty())
+					if (config.isAstScaEnabled() && (ret.getScaResults() == null || !ret.getScaResults().isScaResultReady()))
+						scanFailedAtServer.append("CxAST SCA scan results are not found. Scan might have failed at the server or aborted by the server.\n");									
+					if (scanSummary.hasErrors() && scanFailedAtServer.toString().isEmpty()){
 						scanFailedAtServer.append(scanSummary.toString());
-					else if (scanSummary.hasErrors())
-						scanFailedAtServer.append("\n").append(scanSummary.toString());				 
-					            	
-					printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);
-					
+						printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);}
+					else if (scanSummary.hasErrors()){
+						scanFailedAtServer.append("\n").append(scanSummary.toString());
+						printScanBuildFailure(scanFailedAtServer.toString(), ret, logger);}
+					            					
 					//handle hard failures. In case of threshold or policy failure, we still need to generate report before returning.
 					//Hence, cannot return yet
-					if(!scanSummary.hasErrors()) 
+					//Only for business level errors
+					if(!scanSummary.hasErrors() && config.getSynchronous() )
 						return BuildFinishedStatus.FINISHED_FAILED;
             	}
-            //Asynchronous MODE
+            
+          //Asynchronous MODE
             if (!config.getSynchronous()) {
                 logger.info("Running in Asynchronous mode. Not waiting for scan to finish");
                 if (ret.getException() != null || ret.getGeneralException() != null) {
@@ -239,6 +243,7 @@ public class CxBuildProcess extends CallableBuildProcess {
             }
         }
         logger.info("Policy violations enabled: " + config.getEnablePolicyViolations());
+        logger.info("SCA Policy violations enabled: " + config.getEnablePolicyViolationsSCA());
         logger.info("Dependency Scan enabled : " + (config.isOsaEnabled() || config.isAstScaEnabled()));        
         if(config.isOsaEnabled() || config.isAstScaEnabled()) {
         	String scannerType = config.isOsaEnabled() ? ScannerType.OSA.getDisplayName() : ScannerType.AST_SCA.getDisplayName();

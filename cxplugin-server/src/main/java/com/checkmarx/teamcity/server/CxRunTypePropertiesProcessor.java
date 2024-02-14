@@ -101,7 +101,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     }
 
     private void validateCustomFieldsFormat(String parameterName, String errorMessage, Map<String, String> properties, List<InvalidProperty> result) {
-        Pattern pattern = Pattern.compile("(^([a-zA-Z0-9]*):([a-zA-Z0-9]*)+(,([a-zA-Z0-9]*):([a-zA-Z0-9]*)+)*$)");
+    	Pattern pattern = Pattern.compile("^([a-zA-Z0-9#._!%@;$&\\/\\*\\^\\-\\s\\w]*):([a-zA-Z0-9#._!%@;$&\\/\\*\\^\\-\\s\\w]*)+(,([a-zA-Z0-9#._!%@;$&\\/\\*\\^\\-\\s\\w]*):([a-zA-Z0-9#._!%@;$&\\/\\*\\^\\-\\s\\w]*)+)*$");
         Matcher match = pattern.matcher(properties.get(parameterName));
         if (!match.find()) {
             result.add(new InvalidProperty(parameterName, errorMessage));
