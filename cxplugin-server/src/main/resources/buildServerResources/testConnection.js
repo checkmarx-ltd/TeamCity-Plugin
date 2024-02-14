@@ -244,7 +244,12 @@ validateSCAParameters: function (credentials) {
         jQuery(selector).empty();
         var l = data.length;
          for (var i = 0; i < l; ++i) {
-            jQuery(selector).append('<option value="' + data[i][key] + '">' + data[i][name] + '</option>');
+            //jQuery(selector).append('<option value="' + val + '">' + name + '</option>');
+	     var option = document.createElement("OPTION");
+	     option.setAttribute("value", data[i][key]);
+	     var name = document.createTextNode(data[i][name]);
+	     option.appendChild(name);
+            jQuery(selector).appendChild(option);	 
         }
 }
 
