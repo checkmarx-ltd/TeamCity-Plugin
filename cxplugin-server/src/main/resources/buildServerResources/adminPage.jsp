@@ -281,7 +281,7 @@
 					<table class="scanControlSectionTable" width="101%">
 						<tr>
 							<th>
-								<th><label for="cxGlobalProjectPolicyViolation">Enable Project's SAST and OSA policy enforcement
+								<label for="cxGlobalProjectPolicyViolation">Enable Project's SAST and OSA policy enforcement
 									<bs:helpIcon iconTitle="Mark the build as failed or unstable if the projects policy is violated.</br> Note: Assigning a policy to a project is done from within CxSAST."/>
 								</label>
 							</th>
