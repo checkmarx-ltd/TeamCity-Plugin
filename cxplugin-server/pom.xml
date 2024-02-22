@@ -42,10 +42,6 @@
          			<groupId>dom4j</groupId>
          			<artifactId>dom4j</artifactId>
 				</exclusion>
-<!--				<exclusion>-->
-<!--         			<groupId>org.jdom</groupId>-->
-<!--         			<artifactId>jdom</artifactId>-->
-<!--				</exclusion>-->
 				<exclusion>
          			<groupId>jdom</groupId>
          			<artifactId>jdom</artifactId>
@@ -54,10 +50,6 @@
          			<groupId>commons-httpclient</groupId>
          			<artifactId>commons-httpclient</artifactId>
 				</exclusion>
-<!--				<exclusion>-->
-<!--					<groupId>org.springframework</groupId>-->
-<!--    				<artifactId>spring-webmvc</artifactId>-->
-<!--				</exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
@@ -70,11 +62,6 @@
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.74</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--    		<artifactId>spring-webmvc</artifactId>-->
-<!--            <version>5.3.31</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains.teamcity</groupId>
             <artifactId>server-web-api</artifactId>
@@ -82,11 +69,5 @@
             <type>war</type>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-core</artifactId>-->
-<!--            <version>4.3.15.RELEASE</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
     </dependencies>
 </project>

@@ -30,10 +30,6 @@
         		    <groupId>dom4j</groupId>
          			<artifactId>dom4j</artifactId>
 				</exclusion>
-<!--			<exclusion>-->
-<!--         		<groupId>org.jdom</groupId>-->
-<!--         		<artifactId>jdom</artifactId>-->
-<!--			</exclusion>-->
 				<exclusion>
 		         	<groupId>jdom</groupId>
 		         	<artifactId>jdom</artifactId>
@@ -49,11 +45,5 @@
             <artifactId>commons-codec</artifactId>
             <version>1.13</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-core</artifactId>-->
-<!--            <version>4.3.15.RELEASE</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
     </dependencies>
 </project>

@@ -35,10 +35,12 @@ public abstract class CxParam {
     public static final String OSA_INSTALL_BEFORE_SCAN = "cxOsaInstallBeforeScan";
     public static final String IS_SYNCHRONOUS = "cxIsSynchronous";
     public static final String THRESHOLD_ENABLED = "cxThresholdEnabled";
+    public static final String CRITICAL_THRESHOLD = "cxCriticalThreshold";
     public static final String HIGH_THRESHOLD = "cxHighThreshold";
     public static final String MEDIUM_THRESHOLD = "cxMediumThreshold";
     public static final String LOW_THRESHOLD = "cxLowThreshold";
     public static final String OSA_THRESHOLD_ENABLED = "cxOsaThresholdEnabled";
+    public static final String OSA_CRITICAL_THRESHOLD = "cxOsaCriticalThreshold";
     public static final String OSA_HIGH_THRESHOLD = "cxOsaHighThreshold";
     public static final String OSA_MEDIUM_THRESHOLD = "cxOsaMediumThreshold";
     public static final String OSA_LOW_THRESHOLD = "cxOsaLowThreshold";
@@ -58,10 +60,12 @@ public abstract class CxParam {
     public static final String GLOBAL_SCAN_TIMEOUT_IN_MINUTES = "cxGlobalScanTimeoutInMinutes";
     public static final String GLOBAL_IS_SYNCHRONOUS = "cxGlobalIsSynchronous";
     public static final String GLOBAL_THRESHOLD_ENABLED = "cxGlobalThresholdEnabled";
+    public static final String GLOBAL_CRITICAL_THRESHOLD = "cxGlobalCriticalThreshold";
     public static final String GLOBAL_HIGH_THRESHOLD = "cxGlobalHighThreshold";
     public static final String GLOBAL_MEDIUM_THRESHOLD = "cxGlobalMediumThreshold";
     public static final String GLOBAL_LOW_THRESHOLD = "cxGlobalLowThreshold";
     public static final String GLOBAL_OSA_THRESHOLD_ENABLED = "cxGlobalOsaThresholdEnabled";
+    public static final String GLOBAL_OSA_CRITICAL_THRESHOLD = "cxGlobalOsaCriticalThreshold";
     public static final String GLOBAL_OSA_HIGH_THRESHOLD = "cxGlobalOsaHighThreshold";
     public static final String GLOBAL_OSA_MEDIUM_THRESHOLD = "cxGlobalOsaMediumThreshold";
     public static final String GLOBAL_OSA_LOW_THRESHOLD = "cxGlobalOsaLowThreshold";
@@ -111,6 +115,7 @@ public abstract class CxParam {
     public static final String SCA_SAST_SERVER_USERNAME = "scaSASTUserName";
     public static final String SCA_SAST_SERVER_PASSWORD = "scaSASTPassword";
     
+    public static final String SCA_CRITICAL = "ScaCritical";
     public static final String SCA_HIGH = "ScaHigh";
     public static final String SCA_MEDIUM = "ScaMedium";
     public static final String SCA_LOW = "ScaLow";
@@ -130,8 +135,8 @@ public abstract class CxParam {
 
     public static final String[] GLOBAL_CONFIGS = {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
-            GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_HIGH_THRESHOLD,
-            GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED, GLOBAL_OSA_HIGH_THRESHOLD,
+            GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_CRITICAL_THRESHOLD, GLOBAL_HIGH_THRESHOLD,
+            GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED,GLOBAL_OSA_CRITICAL_THRESHOLD, GLOBAL_OSA_HIGH_THRESHOLD,
             GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION,GLOBAL_PROJECT_SCA_POLICY_VIOLATION,
             GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER,
             GLOBAL_SCA_ENABLED, GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL,

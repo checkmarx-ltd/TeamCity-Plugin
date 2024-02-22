@@ -123,12 +123,14 @@ public class CxAdminPageController extends BaseFormXmlController {
         if(TRUE.equals(request.getParameter(GLOBAL_IS_SYNCHRONOUS))) {
 
             if(TRUE.equals(request.getParameter(GLOBAL_THRESHOLD_ENABLED))) {
+            	validateNumeric(GLOBAL_CRITICAL_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_HIGH_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_MEDIUM_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_LOW_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
             }
 
             if(TRUE.equals(request.getParameter(GLOBAL_OSA_THRESHOLD_ENABLED))) {
+            	validateNumeric(GLOBAL_OSA_CRITICAL_THRESHOLD,THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_OSA_HIGH_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_OSA_MEDIUM_THRESHOLD,THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_OSA_LOW_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);

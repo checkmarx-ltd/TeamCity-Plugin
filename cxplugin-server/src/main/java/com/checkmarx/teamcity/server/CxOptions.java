@@ -225,6 +225,11 @@ public class CxOptions {
     public String getThresholdEnabled() {
         return THRESHOLD_ENABLED;
     }
+    
+    @NotNull
+    public String getCriticalThreshold() {
+        return CRITICAL_THRESHOLD;
+    }
 
     @NotNull
     public String getHighThreshold() {
@@ -244,6 +249,11 @@ public class CxOptions {
     @NotNull
     public String getOsaThresholdEnabled() {
         return OSA_THRESHOLD_ENABLED;
+    }
+    
+    @NotNull
+    public String getOsaCriticalThreshold() {
+        return OSA_CRITICAL_THRESHOLD;
     }
 
     @NotNull
@@ -304,6 +314,11 @@ public class CxOptions {
     public String getGlobalThresholdEnabled() {
         return GLOBAL_THRESHOLD_ENABLED;
     }
+    
+    @NotNull
+    public String getGlobalCriticalThreshold() {
+        return GLOBAL_CRITICAL_THRESHOLD;
+    }
 
     @NotNull
     public String getGlobalHighThreshold() {
@@ -323,6 +338,11 @@ public class CxOptions {
     @NotNull
     public String getGlobalOsaThresholdEnabled() {
         return GLOBAL_OSA_THRESHOLD_ENABLED;
+    }
+    
+    @NotNull
+    public String getGlobalOsaCriticalThreshold() {
+        return GLOBAL_OSA_CRITICAL_THRESHOLD;
     }
 
     @NotNull
@@ -417,6 +437,11 @@ public class CxOptions {
     @NotNull
     public String getOverrideGlobalConfigurations() {
         return OVERRIDE_GLOBAL_CONFIGURATIONS;
+    }
+    
+    @NotNull
+    public String getScaCritical() {
+        return SCA_CRITICAL;
     }
 
     @NotNull

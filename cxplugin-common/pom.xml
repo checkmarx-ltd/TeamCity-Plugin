@@ -27,10 +27,6 @@
          	<groupId>dom4j</groupId>
          	<artifactId>dom4j</artifactId>
 		</exclusion>
-<!--		<exclusion>-->
-<!--         	<groupId>org.jdom</groupId>-->
-<!--         	<artifactId>jdom</artifactId>-->
-<!--		</exclusion>-->
 		<exclusion>
          	<groupId>jdom</groupId>
          	<artifactId>jdom</artifactId>
@@ -61,48 +57,11 @@
       <artifactId>httpmime</artifactId>
       <version>4.5.13</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--      <artifactId>jackson-databind</artifactId>-->
-<!--      <version>2.9.10</version>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>2024.1.1</version>
+      <version>1.1.1</version>
       <exclusions>
-<!--        <exclusion>-->
-<!--          <groupId>stax</groupId>-->
-<!--          <artifactId>stax-api</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--	      <groupId>org.freemarker</groupId>-->
-<!--		  <artifactId>freemarker</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--	     	<groupId>com.github.junrar</groupId>-->
-<!--			<artifactId>junrar</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <groupId>xpp3</groupId>-->
-<!--          <artifactId>xpp3</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <groupId>guru.nidi</groupId>-->
-<!--          <artifactId>graphviz-java</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <groupId>javax.xml.bind</groupId>-->
-<!--          <artifactId>jaxb-api</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <artifactId>wss-agent-api-client</artifactId>-->
-<!--          <groupId>org.whitesource</groupId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--          <groupId>ch.qos.logback</groupId>-->
-<!--          <artifactId>logback-classic</artifactId>-->
-<!--        </exclusion>-->
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
@@ -119,40 +78,8 @@
          <artifactId>commons-collections</artifactId>
          <groupId>commons-collections</groupId>
         </exclusion>
-<!--        <exclusion>-->
-<!--          <artifactId>vertx-core</artifactId>-->
-<!--          <groupId>io.vertx</groupId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--           <groupId>io.vertx</groupId>-->
-<!--           <artifactId>vertx-web</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--           <groupId>io.netty</groupId> -->
-<!--		    <artifactId>netty-codec-http</artifactId>-->
-<!--        </exclusion>-->
-<!--        <exclusion>-->
-<!--            <artifactId>bcprov-jdk15on</artifactId>-->
-<!--            <groupId>org.bouncycastle</groupId>-->
-<!--        </exclusion>-->
       </exclusions>
     </dependency>
-<!--    <dependency>-->
-<!--			<groupId>com.github.junrar</groupId>-->
-<!--			<artifactId>junrar</artifactId>-->
-<!--			<version>7.4.1</version>-->
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>org.slf4j</groupId>-->
-<!--					<artifactId>slf4j-api</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
-<!--		</dependency>-->
-<!--	<dependency>-->
-<!--		<groupId>org.freemarker</groupId>-->
-<!--		<artifactId>freemarker</artifactId>-->
-<!--		<version>2.3.31</version>-->
-<!--	</dependency>-->
 	<dependency>
     	<groupId>com.google.guava</groupId>
     	<artifactId>guava</artifactId>
@@ -163,29 +90,6 @@
        <groupId>org.springframework</groupId>
        <version>5.3.31</version>
     </dependency>
-<!--    <dependency>-->
-<!--          <groupId>io.vertx</groupId>-->
-<!--          <artifactId>vertx-web</artifactId>-->
-<!--          <version>4.1.0</version>-->
-<!--          <exclusions>-->
-<!--	          <exclusion>-->
-<!--	            <groupId>io.netty</groupId>-->
-<!--	            <artifactId>netty-codec-http2</artifactId>-->
-<!--	          </exclusion>-->
-<!--          </exclusions>-->
-<!--         </dependency>-->
-<!--         <dependency>-->
-<!--             <groupId>io.netty</groupId>-->
-<!--             <artifactId>netty-codec-http2</artifactId>-->
-<!--             <version>4.1.68.Final</version>-->
-<!--        </dependency>-->
-<!--         https://mvnrepository.com/artifact/io.netty/netty-codec-http -->
-<!--		<dependency>-->
-<!--		    <groupId>io.netty</groupId>-->
-<!--		    <artifactId>netty-codec-http</artifactId>-->
-<!--		    <version>4.1.68.Final</version>-->
-<!--		</dependency>-->
-        
   </dependencies>
   <build>
   </build>

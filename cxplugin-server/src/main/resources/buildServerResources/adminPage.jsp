@@ -60,6 +60,11 @@
           $("invalid_cxGlobalScanTimeoutInMinutes").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalScanTimeoutInMinutes"));
         },
+        
+        onInvalid_cxGlobalCriticalThresholdError: function (elem) {
+          $("invalid_cxGlobalCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalCriticalThreshold"));
+        },
 
         onInvalid_cxGlobalHighThresholdError: function (elem) {
           $("invalid_cxGlobalHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
@@ -74,6 +79,11 @@
         onInvalid_cxGlobalLowThresholdError: function (elem) {
           $("invalid_cxGlobalLowThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalLowThreshold"));
+        },
+        
+        onInvalid_cxGlobalOsaCriticalThresholdError: function (elem) {
+          $("invalid_cxGlobalOsaCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+          SettingsForm.highlightErrorField($("cxGlobalOsaCriticalThreshold"));
         },
 
         onInvalid_cxGlobalOsaHighThresholdError: function (elem) {
@@ -310,6 +320,16 @@
 						<tbody id="thresholdSection" ${hideThresholdSection}>
 						<tr>
 							<th>
+								<label for="cxGlobalCriticalThreshold">Critical</label>
+							</th>
+							<td>
+								<forms:textField name="cxGlobalCriticalThreshold" value="${cxGlobalCriticalThreshold}" className="longField"/>
+								<span class="error" id="invalid_cxGlobalCriticalThreshold"/>
+							</td>
+						</tr>
+						<tr>
+						<tr>
+							<th>
 								<label for="cxGlobalHighThreshold">High</label>
 							</th>
 							<td>
@@ -348,6 +368,15 @@
 		</td>
 	</tr>
 	<tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
+	<tr>
+		<th>
+			<label for="cxGlobalOsaCriticalThreshold">Critical</label>
+		</th>
+		<td>
+			<forms:textField name="cxGlobalOsaCriticalThreshold" value="${cxGlobalOsaCriticalThreshold}" className="longField"/>
+			<span class="error" id="invalid_cxGlobalOsaCriticalThreshold"/>
+		</td>
+	</tr>
 	<tr>
 		<th>
 			<label for="cxGlobalOsaHighThreshold">High</label>

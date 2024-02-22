@@ -1008,6 +1008,14 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 
                 <tbody id="thresholdSection" ${hideThresholdSection}>
                 <tr>
+                    <th><label for="${optionsBean.criticalThreshold}">Critical</label>
+                    </th>
+                    <td>
+                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
+                    </td>
+                </tr>
+                <tr>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.highThreshold}" className="longField"/>
@@ -1043,6 +1051,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                             BS.VisibilityHandlers.updateVisibility('scanControlSection')
                         </c:set>
                         <props:checkboxProperty name="${optionsBean.osaThresholdEnabled}" onclick="${onclick}"/>
+                    </td>
+                </tr>
+                <tr class="osaThresholdRow" ${hideOsaThresholdSection}>
+                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
+                    <td>
+                        <props:textProperty name="${optionsBean.osaCriticalThreshold}" className="longField"/>
+                        <span class="error" id="error_${optionsBean.osaCriticalThreshold}"></span>
                     </td>
                 </tr>
                 <tr class="osaThresholdRow" ${hideOsaThresholdSection}>
@@ -1114,6 +1129,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 
                 <tbody  ${globalThresholdEnabled ? '' : optionsBean.noDisplay}>
                 <tr>
+                    <th>Critical</th>
+                    <td>
+                        <input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalCriticalThreshold]}">
+                    </td>
+                </tr>
+                <tr>
                     <th>High</th>
                     <td>
                         <input type="text" class="longField" disabled
@@ -1143,6 +1165,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                         Leave blank for no thresholds."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalOsaThresholdEnabled ? 'checked' : ''}/>
+                    </td>
+                </tr>
+                <tr ${globalOsaThresholdEnabled ? '' : optionsBean.noDisplay}>
+                    <th>Critical</th>
+                    <td>
+                        <input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalOsaCriticalThreshold]}">
                     </td>
                 </tr>
                 <tr ${globalOsaThresholdEnabled ? '' : optionsBean.noDisplay}>
