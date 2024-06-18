@@ -4,9 +4,10 @@ import com.checkmarx.teamcity.common.CxUtility;
 import com.checkmarx.teamcity.common.InvalidParameterException;
 import com.cx.restclient.ast.dto.sca.AstScaConfig;
 import com.cx.restclient.configuration.CxScanConfig;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.dto.ScannerType;
-import com.cx.restclient.sast.utils.LegacyClient;
 import com.cx.restclient.exception.CxClientException;
+import com.cx.restclient.sast.utils.LegacyClient;
 import com.cx.restclient.sca.utils.CxSCAFileSystemUtils;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import java.util.Map;
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 
 /**
@@ -33,25 +35,80 @@ public class CxConfigHelper {
     private static final String PARAMETER_SUFFIX = "] must be positive integer. Actual value: ";
     private static String teamPath;
     private static LegacyClient commonClient = null;
+
+    private static String getVariable(String var) {
+        String value = StringUtils.isNotEmpty(System.getenv(var)) ? System.getenv(var) : System.getProperty(var);
+        return StringUtils.isNotEmpty(value) ? value.trim() : null;
+    }
+
+    private static ProxyConfig genProxyConfig(CxLoggerAdapter logger) {
+        final String HTTP_HOST = getVariable("http.proxyHost");
+        final String HTTP_PORT = getVariable("http.proxyPort");
+        final String HTTP_USERNAME = getVariable("http.proxyUser");
+        final String HTTP_PASSWORD = getVariable("http.proxyPassword");
+        final String HTTP_NON_HOSTS = getVariable("http.nonProxyHosts");
+
+        final String HTTPS_HOST = getVariable("https.proxyHost");
+        final String HTTPS_PORT = getVariable("https.proxyPort");
+        final String HTTPS_USERNAME = getVariable("https.proxyUser");
+        final String HTTPS_PASSWORD = getVariable("https.proxyPassword");
+        final String HTTPS_NON_HOSTS = getVariable("https.nonProxyHosts");
+
+        ProxyConfig proxyConfig = null;
+        try {
+            if (isNotEmpty(HTTP_HOST) && isNotEmpty(HTTP_PORT)) {
+                proxyConfig = new ProxyConfig();
+                proxyConfig.setUseHttps(false);
+                proxyConfig.setHost(HTTP_HOST);
+                proxyConfig.setPort(Integer.parseInt(HTTP_PORT));
+                proxyConfig.setNoproxyHosts(StringUtils.isEmpty(HTTP_NON_HOSTS) ? "" : HTTP_NON_HOSTS);
+                if (isNotEmpty(HTTP_USERNAME) && isNotEmpty(HTTP_PASSWORD)) {
+                    proxyConfig.setUsername(HTTP_USERNAME);
+                    proxyConfig.setPassword(HTTP_PASSWORD);
+                }
+            } else if (isNotEmpty(HTTPS_HOST) && isNotEmpty(HTTPS_PORT)) {
+                proxyConfig = new ProxyConfig();
+                proxyConfig.setUseHttps(true);
+                proxyConfig.setHost(HTTPS_HOST);
+                proxyConfig.setPort(Integer.parseInt(HTTPS_PORT));
+                proxyConfig.setNoproxyHosts(StringUtils.isEmpty(HTTPS_NON_HOSTS) ? "" : HTTPS_NON_HOSTS);
+                if (isNotEmpty(HTTPS_USERNAME) && isNotEmpty(HTTPS_PASSWORD)) {
+                    proxyConfig.setUsername(HTTPS_USERNAME);
+                    proxyConfig.setPassword(HTTPS_PASSWORD);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Fail to set custom proxy", e);
+        }
+
+        return proxyConfig;
+    }
+
     public static CxScanConfig resolveConfigurations(Map<String, String> buildParameters, Map<String, String> globalParameters, File checkoutDirectory,
-                                                     File reportDirectory,  Map<String,String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
+                                                     File reportDirectory, Map<String, String> otherParameters, AgentRunningBuild agentRunningBuild, CxLoggerAdapter logger) throws InvalidParameterException, UnsupportedEncodingException {
 
 
         CxScanConfig ret = new CxScanConfig();
         //to support builds that were configured before this parameter, allow sast scan if parameter is null.
         ret.setSastEnabled(buildParameters.get(SAST_ENABLED) == null || TRUE.equals(buildParameters.get(SAST_ENABLED)));
-        
+
         String originUrl = CxUtility.getCxOriginUrl(agentRunningBuild);
         ret.setCxOriginUrl(originUrl);
         String cxOrigin = CxUtility.getCxOrigin(agentRunningBuild);
         ret.setCxOrigin(cxOrigin);
-        logger.info("CxOrigin : "+ cxOrigin);
-        logger.info("CxOrigin URL : "+ originUrl);
-        
+        logger.info("CxOrigin : " + cxOrigin);
+        logger.info("CxOrigin URL : " + originUrl);
+
         ret.setSourceDir(checkoutDirectory.getAbsolutePath());
         ret.setReportsDir(reportDirectory);
-        String isProxyVar = System.getProperty("cx.isproxy");
-        ret.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+        ProxyConfig proxyConfig = genProxyConfig(logger);
+        if (proxyConfig != null) {
+            ret.setProxy(true);
+            ret.setScaProxy(true);
+            ret.setProxyConfig(proxyConfig);
+            ret.setScaProxyConfig(proxyConfig);
+            logger.info("Proxy configuration have been provided");
+        }
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SERVER))) {
             ret.setUrl(validateNotEmpty(globalParameters.get(GLOBAL_SERVER_URL), GLOBAL_SERVER_URL));
@@ -63,22 +120,21 @@ public class CxConfigHelper {
             ret.setPassword(decrypt(validateNotEmpty(buildParameters.get(PASSWORD), PASSWORD)));
         }
 
-
         ret.setProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
         ret.setPresetId(convertToIntegerIfNotNull(buildParameters.get(PRESET_ID), PRESET_ID));
         ret.setTeamId(validateNotEmpty(buildParameters.get(TEAM_ID), TEAM_ID));
         try {
-        	initializeCommonClient(ret, logger);
-        	commonClient.login();
-			teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
-		} catch (Exception e) {
+            initializeCommonClient(ret, logger);
+            commonClient.login();
+            teamPath = commonClient.getTeamNameById(buildParameters.get(TEAM_ID));
+        } catch (Exception e) {
             logger.error("Failed to get team name by team id: " + e.getMessage());
         } finally {
             if (commonClient != null) {
                 commonClient.close();
             }
         }
-        if(ret.isSastEnabled()){
+        if (ret.isSastEnabled()) {
             if (TRUE.equals(buildParameters.get(USE_DEFAULT_SAST_CONFIG))) {
                 ret.setSastFolderExclusions(globalParameters.get(GLOBAL_EXCLUDE_FOLDERS));
                 ret.setSastFilterPattern(globalParameters.get(GLOBAL_FILTER_PATTERNS));
@@ -92,13 +148,13 @@ public class CxConfigHelper {
 
             ret.setScanComment(buildParameters.get(SCAN_COMMENT));
             ret.setIncremental(TRUE.equals(buildParameters.get(IS_INCREMENTAL)));
-            
-            String periodicFullScan = (buildParameters.get(PERIODIC_FULL_SCAN) == null)? FALSE: buildParameters.get(PERIODIC_FULL_SCAN);
+
+            String periodicFullScan = (buildParameters.get(PERIODIC_FULL_SCAN) == null) ? FALSE : buildParameters.get(PERIODIC_FULL_SCAN);
             int fullScanAfterNumberOfBuilds = -1;
-            if(TRUE.equalsIgnoreCase(periodicFullScan))
-            	fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
-            
-            ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER),buildParameters.get(IS_INCREMENTAL),periodicFullScan, fullScanAfterNumberOfBuilds));
+            if (TRUE.equalsIgnoreCase(periodicFullScan))
+                fullScanAfterNumberOfBuilds = convertToIntegerIfNotNull(buildParameters.get(PERIODIC_FULL_SCAN_AFTER), PERIODIC_FULL_SCAN_AFTER);
+
+            ret.setIncremental(isThisBuildIncremental(otherParameters.get(CX_BUILD_NUMBER), buildParameters.get(IS_INCREMENTAL), periodicFullScan, fullScanAfterNumberOfBuilds));
 
             ret.setCustomFields(customFieldFormat(buildParameters.get(CUSTOM_FIELDS)));
 
@@ -113,42 +169,37 @@ public class CxConfigHelper {
         }
 
 
-        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED)))
-        {
+        if (TRUE.equals(buildParameters.get(DEPENDENCY_SCAN_ENABLED))) {
             ScannerType scannerType = null;
-            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS)))
-            {
-            	ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
-                if("SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE))) {
-                	scannerType = ScannerType.AST_SCA;
-                	ret.setAstScaConfig(getScaConfig(buildParameters,globalParameters, false));
-                }
-                else {
-                	scannerType = ScannerType.OSA;
-                	ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
+            if (TRUE.equals(buildParameters.get(OVERRIDE_GLOBAL_CONFIGURATIONS))) {
+                ret.setOsaFilterPattern(buildParameters.get(OSA_FILTER_PATTERNS));
+                if ("SCA".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCANNER_TYPE))) {
+                    scannerType = ScannerType.AST_SCA;
+                    ret.setAstScaConfig(getScaConfig(buildParameters, globalParameters, false));
+                } else {
+                    scannerType = ScannerType.OSA;
+                    ret.setOsaArchiveIncludePatterns(buildParameters.get(OSA_ARCHIVE_INCLUDE_PATTERNS));
                     ret.setOsaRunInstall(TRUE.equals(buildParameters.get(OSA_INSTALL_BEFORE_SCAN)));
                 }
-                
+
             } else {
-            	
-            	if(TRUE.equals(globalParameters.get(GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS))){
-            	ret.setOsaFilterPattern(globalParameters.get(GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS));
-            	if("SCA".equalsIgnoreCase(globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE)) ) {
-            		scannerType = ScannerType.AST_SCA;
-            		ret.setAstScaConfig(getScaConfig(buildParameters,globalParameters, true));
-            	} 
-            	else {
-            		scannerType = ScannerType.OSA;
-            		ret.setOsaArchiveIncludePatterns(globalParameters.get(GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
-                    ret.setOsaRunInstall(TRUE.equals(globalParameters.get(GLOBAL_EXECUTE_DEPENDENCY_MANAGER)));
-            	}
-            }
+
+                if (TRUE.equals(globalParameters.get(GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS))) {
+                    ret.setOsaFilterPattern(globalParameters.get(GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS));
+                    if ("SCA".equalsIgnoreCase(globalParameters.get(GLOBAL_DEPENDENCY_SCANNER_TYPE))) {
+                        scannerType = ScannerType.AST_SCA;
+                        ret.setAstScaConfig(getScaConfig(buildParameters, globalParameters, true));
+                    } else {
+                        scannerType = ScannerType.OSA;
+                        ret.setOsaArchiveIncludePatterns(globalParameters.get(GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS));
+                        ret.setOsaRunInstall(TRUE.equals(globalParameters.get(GLOBAL_EXECUTE_DEPENDENCY_MANAGER)));
+                    }
+                }
             }
             if (scannerType != null) {
                 ret.addScannerType(scannerType);
             }
         }
-
 
 
         String thresholdEnabled = THRESHOLD_ENABLED;
@@ -211,16 +262,16 @@ public class CxConfigHelper {
     }
 
     private static void initializeCommonClient(CxScanConfig config, CxLoggerAdapter logger) {
-    	try {
-    	commonClient = CommonClientFactory.getInstance(config, logger);
-    } catch (Exception e) {
-        logger.debug("Failed to initialize cx client " + e.getMessage(), e);
-        commonClient = null;
-    }		
-	}
+        try {
+            commonClient = CommonClientFactory.getInstance(config, logger);
+        } catch (Exception e) {
+            logger.debug("Failed to initialize cx client " + e.getMessage(), e);
+            commonClient = null;
+        }
+    }
 
     private static String customFieldFormat(String customFields) {
-        if(customFields != null && !customFields.isEmpty()) {
+        if (customFields != null && !customFields.isEmpty()) {
             customFields = customFields.replaceAll(":", "\":\"");
             customFields = customFields.replaceAll(",", "\",\"");
             customFields = "{\"".concat(customFields).concat("\"}");
@@ -228,11 +279,11 @@ public class CxConfigHelper {
         return customFields;
     }
 
-    private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException{
-		AstScaConfig scaConfig = new AstScaConfig();
-		
-		if(fromGlobal) {
-			scaConfig.setAccessControlUrl(globalParameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
+    private static AstScaConfig getScaConfig(Map<String, String> buildParameters, Map<String, String> globalParameters, boolean fromGlobal) throws InvalidParameterException {
+        AstScaConfig scaConfig = new AstScaConfig();
+
+        if (fromGlobal) {
+            scaConfig.setAccessControlUrl(globalParameters.get(GLOBAL_SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(globalParameters.get(GLOBAL_SCA_WEB_APP_URL));
             scaConfig.setApiUrl(globalParameters.get(GLOBAL_SCA_API_URL));
             scaConfig.setPassword(decrypt(globalParameters.get(GLOBAL_SCA_PASSWORD)));
@@ -242,44 +293,43 @@ public class CxConfigHelper {
             scaConfig.setIncludeSources(false);
             String scaEnvVars = globalParameters.get(GLOBAL_SCA_ENV_VARIABLE);
 
-            if(StringUtils.isNotEmpty(scaEnvVars))
-            {
-            	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
+            if (StringUtils.isNotEmpty(scaEnvVars)) {
+                scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
             }
             String configFilePaths = globalParameters.get(GLOBAL_SCA_CONFIGFILE);
-			if (StringUtils.isNotEmpty(configFilePaths)) {
-				String[] strArrayFile = configFilePaths.split(",");
-				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
-				scaConfig.setConfigFilePaths(trimmedConfigPaths);
-			}
-			
-			//set the exp path params
+            if (StringUtils.isNotEmpty(configFilePaths)) {
+                String[] strArrayFile = configFilePaths.split(",");
+                List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
+                scaConfig.setConfigFilePaths(trimmedConfigPaths);
+            }
 
-			String isExpPath = globalParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
-			if (TRUE.equals(isExpPath)) {
-				String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
-				String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
-				String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
+            //set the exp path params
 
-				scaConfig.setSastServerUrl(scaSASTServerUrl);
-				scaConfig.setSastUsername(scaSASTServerUserName);
-				scaConfig.setSastPassword(scaSASTServerPassword);
-				scaConfig.setSastProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
+            String isExpPath = globalParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
+            if (TRUE.equals(isExpPath)) {
+                String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
+                String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
+                String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
 
-			}
+                scaConfig.setSastServerUrl(scaSASTServerUrl);
+                scaConfig.setSastUsername(scaSASTServerUserName);
+                scaConfig.setSastPassword(scaSASTServerPassword);
+                scaConfig.setSastProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
 
-		}else {
-			scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
+            }
+
+        } else {
+            scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
             scaConfig.setApiUrl(buildParameters.get(SCA_API_URL));
             scaConfig.setPassword(decrypt(buildParameters.get(SCA_PASSWORD)));
             scaConfig.setUsername(buildParameters.get(SCA_USERNAME));
             scaConfig.setTenant(buildParameters.get(SCA_TENANT));
-            
-            if(!StringUtils.isEmpty(buildParameters.get(SCA_TEAMPATH))) {
-            scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
+
+            if (!StringUtils.isEmpty(buildParameters.get(SCA_TEAMPATH))) {
+                scaConfig.setTeamPath(buildParameters.get(SCA_TEAMPATH));
             } else {
-            	scaConfig.setTeamPath(teamPath);
+                scaConfig.setTeamPath(teamPath);
             }
             scaConfig.setIncludeSources(TRUE.equals(buildParameters.get(IS_INCLUDE_SOURCES)));
             String scaEnvVars = buildParameters.get(SCA_ENV_VARIABLE);
@@ -290,65 +340,62 @@ public class CxConfigHelper {
 //                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
                 validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
                 scaConfig.setEnableScaResolver(true);
-            }
-            else
+            } else
                 scaConfig.setEnableScaResolver(false);
 
             scaConfig.setPathToScaResolver(buildParameters.get(SCA_RESOLVER_PATH));
             scaConfig.setScaResolverAddParameters(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
 
-            if(StringUtils.isNotEmpty(scaEnvVars))
-            {
-            	scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
+            if (StringUtils.isNotEmpty(scaEnvVars)) {
+                scaConfig.setEnvVariables(CxSCAFileSystemUtils.convertStringToKeyValueMap(scaEnvVars));
             }
             String configFilePaths = buildParameters.get(SCA_CONFIGFILE);
-			if (StringUtils.isNotEmpty(configFilePaths)) {
-				String[] strArrayFile = configFilePaths.split(",");
-				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
-				scaConfig.setConfigFilePaths(trimmedConfigPaths);
-			}
-			
-			//set the exp path params
+            if (StringUtils.isNotEmpty(configFilePaths)) {
+                String[] strArrayFile = configFilePaths.split(",");
+                List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
+                scaConfig.setConfigFilePaths(trimmedConfigPaths);
+            }
 
-			String isExpPath = buildParameters.get(IS_EXPLOITABLE_PATH);
-			if (TRUE.equals(isExpPath)) {
-				String sastProjectName = buildParameters.get(SCA_SAST_PROJECT_FULLPATH);
-				String sastProjectId = buildParameters.get(SCA_SAST_PROJECT_ID);
-				scaConfig.setSastProjectName(sastProjectName);
-				scaConfig.setSastProjectId(sastProjectId);
-				if (!TRUE.equals(buildParameters.get(USE_SAST_DEFAULT_SERVER))) {
-					String scaSASTServerUrl = buildParameters.get(SCA_SAST_SERVER_URL);
-					String scaSASTServerUserName = buildParameters.get(SCA_SAST_SERVER_USERNAME);
-					String scaSASTServerPassword = decrypt(buildParameters.get(SCA_SAST_SERVER_PASSWORD));
+            //set the exp path params
 
-					scaConfig.setSastServerUrl(scaSASTServerUrl);
-					scaConfig.setSastUsername(scaSASTServerUserName);
-					scaConfig.setSastPassword(scaSASTServerPassword);
-				} else {
-					String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
-					String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
-					String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
+            String isExpPath = buildParameters.get(IS_EXPLOITABLE_PATH);
+            if (TRUE.equals(isExpPath)) {
+                String sastProjectName = buildParameters.get(SCA_SAST_PROJECT_FULLPATH);
+                String sastProjectId = buildParameters.get(SCA_SAST_PROJECT_ID);
+                scaConfig.setSastProjectName(sastProjectName);
+                scaConfig.setSastProjectId(sastProjectId);
+                if (!TRUE.equals(buildParameters.get(USE_SAST_DEFAULT_SERVER))) {
+                    String scaSASTServerUrl = buildParameters.get(SCA_SAST_SERVER_URL);
+                    String scaSASTServerUserName = buildParameters.get(SCA_SAST_SERVER_USERNAME);
+                    String scaSASTServerPassword = decrypt(buildParameters.get(SCA_SAST_SERVER_PASSWORD));
 
-					scaConfig.setSastServerUrl(scaSASTServerUrl);
-					scaConfig.setSastUsername(scaSASTServerUserName);
-					scaConfig.setSastPassword(scaSASTServerPassword);
-				}
-				
+                    scaConfig.setSastServerUrl(scaSASTServerUrl);
+                    scaConfig.setSastUsername(scaSASTServerUserName);
+                    scaConfig.setSastPassword(scaSASTServerPassword);
+                } else {
+                    String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
+                    String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
+                    String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
 
-			}
-		}
-		return scaConfig;
+                    scaConfig.setSastServerUrl(scaSASTServerUrl);
+                    scaConfig.setSastUsername(scaSASTServerUserName);
+                    scaConfig.setSastPassword(scaSASTServerPassword);
+                }
+
+
+            }
+        }
+        return scaConfig;
     }
 
     private static boolean scaResolverPathExist(String pathToResolver) {
         pathToResolver = pathToResolver + File.separator + "ScaResolver";
-        if(!SystemUtils.IS_OS_UNIX)
+        if (!SystemUtils.IS_OS_UNIX)
             pathToResolver = pathToResolver + ".exe";
 
         File file = new File(pathToResolver);
-        if(!file.exists())
-        {
-            throw new CxClientException("SCA Resolver path does not exist. Path="+file.getAbsolutePath());
+        if (!file.exists()) {
+            throw new CxClientException("SCA Resolver path does not exist. Path=" + file.getAbsolutePath());
         }
         return true;
     }
@@ -358,20 +405,20 @@ public class CxConfigHelper {
         String[] arguments = additionalParams.split(" ");
         Map<String, String> params = new HashMap<>();
 
-        for (int i = 0; i <  arguments.length ; i++) {
-            if(arguments[i].startsWith("-") && (i+1 != arguments.length && !arguments[i+1].startsWith("-")))
-                params.put(arguments[i], arguments[i+1]);
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i].startsWith("-") && (i + 1 != arguments.length && !arguments[i + 1].startsWith("-")))
+                params.put(arguments[i], arguments[i + 1]);
             else
                 params.put(arguments[i], "");
         }
 
         String dirPath = params.get("-s");
-        if(StringUtils.isEmpty(dirPath))
+        if (StringUtils.isEmpty(dirPath))
             throw new CxClientException("Source code path (-s <source code path>) is not provided.");
 //        fileExists(dirPath);
 
         String projectName = params.get("-n");
-        if(StringUtils.isEmpty(projectName))
+        if (StringUtils.isEmpty(projectName))
             throw new CxClientException("Project name parameter (-n <project name>) must be provided to ScaResolver.");
 
     }
@@ -385,13 +432,14 @@ public class CxConfigHelper {
     }
 
     private static List<String> getTrimmedConfigPaths(String[] strArrayFile) {
-    	List<String> paths = new ArrayList<String>();
-    	for (int i = 0; i < strArrayFile.length; i++) {
-    		paths.add(strArrayFile[i].trim());
-		}
-		return paths;
-	}
-	private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
+        List<String> paths = new ArrayList<String>();
+        for (int i = 0; i < strArrayFile.length; i++) {
+            paths.add(strArrayFile[i].trim());
+        }
+        return paths;
+    }
+
+    private static Integer convertToIntegerIfNotNull(String param, String paramName) throws InvalidParameterException {
 
         if (param != null && param.length() > 0) {
             try {
@@ -415,8 +463,8 @@ public class CxConfigHelper {
         }
         return param;
     }
-    
-    private static boolean isThisBuildIncremental(String buildNumber, String isIncremental, String isPeriodicFullScan, int fullScanAfter ) {
+
+    private static boolean isThisBuildIncremental(String buildNumber, String isIncremental, String isPeriodicFullScan, int fullScanAfter) {
 
         boolean askedForIncremental = TRUE.equalsIgnoreCase(isIncremental);
         if (!askedForIncremental) {
@@ -434,10 +482,10 @@ public class CxConfigHelper {
         }
 
         int currentBuildNumer = -1;
-        try {		
-        	currentBuildNumer = Integer.parseInt(buildNumber);
-        }catch(Exception wrongNumber) {
-        	return true;
+        try {
+            currentBuildNumer = Integer.parseInt(buildNumber);
+        } catch (Exception wrongNumber) {
+            return true;
         }
         // If user asked to perform full scan after every 9 incremental scans -
         // it means that every 10th scan should be full,

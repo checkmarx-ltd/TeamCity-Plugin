@@ -6,6 +6,7 @@ import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.CxSASTClient;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.EngineConfiguration;
+import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.Team;
 import com.cx.restclient.sast.dto.Preset;
@@ -33,6 +34,7 @@ import java.util.Set;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 class TestConnectionController extends BaseController {
 
@@ -93,13 +95,13 @@ class TestConnectionController extends BaseController {
                 engineConfigurations = sastClient.getEngineConfiguration();
                 if (engineConfigurations == null) {
                     throw new Exception("Error while getting Engine configurations.");
-                }else{
+                } else {
                     EngineConfiguration sastEngineConfig = new EngineConfiguration();
                     sastEngineConfig.setId(PROJECT_DEFAULT_CONFIG_ID);
                     sastEngineConfig.setName(PROJECT_DEFAULT);
                     engineConfigurations.add(sastEngineConfig);
                 }
-                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams,engineConfigurations);
+                res = new TestConnectionResponse(true, CxConstants.CONNECTION_SUCCESSFUL_MESSAGE, presets, teams, engineConfigurations);
                 writeHttpServletResponse(httpServletResponse, res);
                 LOG.info("Checkmarx test connection: Connection successful");
                 return null;
@@ -143,8 +145,15 @@ class TestConnectionController extends BaseController {
             config.setUrl(url.toString().trim());
             config.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
             config.setDisableCertificateValidation(true);
-            String isProxyVar = System.getProperty("cx.isproxy");
-            config.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
+
+            ProxyConfig proxyConfig = genProxyConfig();
+            if (proxyConfig != null) {
+                config.setProxy(true);
+                config.setScaProxy(true);
+                config.setProxyConfig(proxyConfig);
+                config.setScaProxyConfig(proxyConfig);
+            }
+
             clientDelegator = new CxClientDelegator(config, log);
             clientDelegator.getSastClient().login();
 
@@ -154,6 +163,54 @@ class TestConnectionController extends BaseController {
             result = ex.getMessage();
             return false;
         }
+    }
+
+    private String getVariable(String var) {
+        String value = StringUtils.isNotEmpty(System.getenv(var)) ? System.getenv(var) : System.getProperty(var);
+        return StringUtils.isNotEmpty(value) ? value.trim() : null;
+    }
+
+    private ProxyConfig genProxyConfig() {
+        final String HTTP_HOST = getVariable("http.proxyHost");
+        final String HTTP_PORT = getVariable("http.proxyPort");
+        final String HTTP_USERNAME = getVariable("http.proxyUser");
+        final String HTTP_PASSWORD = getVariable("http.proxyPassword");
+        final String HTTP_NON_HOSTS = getVariable("http.nonProxyHosts");
+
+        final String HTTPS_HOST = getVariable("https.proxyHost");
+        final String HTTPS_PORT = getVariable("https.proxyPort");
+        final String HTTPS_USERNAME = getVariable("https.proxyUser");
+        final String HTTPS_PASSWORD = getVariable("https.proxyPassword");
+        final String HTTPS_NON_HOSTS = getVariable("https.nonProxyHosts");
+
+        ProxyConfig proxyConfig = null;
+        try {
+            if (isNotEmpty(HTTP_HOST) && isNotEmpty(HTTP_PORT)) {
+                proxyConfig = new ProxyConfig();
+                proxyConfig.setUseHttps(false);
+                proxyConfig.setHost(HTTP_HOST);
+                proxyConfig.setPort(Integer.parseInt(HTTP_PORT));
+                proxyConfig.setNoproxyHosts(StringUtils.isEmpty(HTTP_NON_HOSTS) ? "" : HTTP_NON_HOSTS);
+                if (isNotEmpty(HTTP_USERNAME) && isNotEmpty(HTTP_PASSWORD)) {
+                    proxyConfig.setUsername(HTTP_USERNAME);
+                    proxyConfig.setPassword(HTTP_PASSWORD);
+                }
+            } else if (isNotEmpty(HTTPS_HOST) && isNotEmpty(HTTPS_PORT)) {
+                proxyConfig = new ProxyConfig();
+                proxyConfig.setUseHttps(true);
+                proxyConfig.setHost(HTTPS_HOST);
+                proxyConfig.setPort(Integer.parseInt(HTTPS_PORT));
+                proxyConfig.setNoproxyHosts(StringUtils.isEmpty(HTTPS_NON_HOSTS) ? "" : HTTPS_NON_HOSTS);
+                if (isNotEmpty(HTTPS_USERNAME) && isNotEmpty(HTTPS_PASSWORD)) {
+                    proxyConfig.setUsername(HTTPS_USERNAME);
+                    proxyConfig.setPassword(HTTPS_PASSWORD);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Fail to set custom proxy", e);
+        }
+
+        return proxyConfig;
     }
 
     private void printProxyParams() {
