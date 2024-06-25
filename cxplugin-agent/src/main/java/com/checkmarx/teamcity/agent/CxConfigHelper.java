@@ -152,11 +152,14 @@ public class CxConfigHelper {
 
 
         String thresholdEnabled = THRESHOLD_ENABLED;
+        String enableCriticalSeverity = GLOBAL_ENABLE_CRITICAL_THRESHOLD;
+        String criticalThreshold = CRITICAL_THRESHOLD;
         String highThreshold = HIGH_THRESHOLD;
         String mediumThreshold = MEDIUM_THRESHOLD;
         String lowThreshold = LOW_THRESHOLD;
 
         String osaThresholdEnabled = OSA_THRESHOLD_ENABLED;
+        String osaCriticalThreshold = OSA_CRITICAL_THRESHOLD;
         String osaHighThreshold = OSA_HIGH_THRESHOLD;
         String osaMediumThreshold = OSA_MEDIUM_THRESHOLD;
         String osaLowThreshold = OSA_LOW_THRESHOLD;
@@ -168,11 +171,14 @@ public class CxConfigHelper {
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
             thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
+            enableCriticalSeverity = GLOBAL_ENABLE_CRITICAL_THRESHOLD;
+            criticalThreshold = GLOBAL_CRITICAL_THRESHOLD;
             highThreshold = GLOBAL_HIGH_THRESHOLD;
             mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
             lowThreshold = GLOBAL_LOW_THRESHOLD;
 
             osaThresholdEnabled = GLOBAL_OSA_THRESHOLD_ENABLED;
+            osaCriticalThreshold = GLOBAL_OSA_CRITICAL_THRESHOLD;
             osaHighThreshold = GLOBAL_OSA_HIGH_THRESHOLD;
             osaMediumThreshold = GLOBAL_OSA_MEDIUM_THRESHOLD;
             osaLowThreshold = GLOBAL_OSA_LOW_THRESHOLD;
@@ -193,6 +199,8 @@ public class CxConfigHelper {
         if (ret.isSastEnabled()) {
             ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
             if (ret.getSastThresholdsEnabled()) {
+            	ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(enableCriticalSeverity)));
+            	ret.setSastCriticalThreshold(convertToIntegerIfNotNull(parameters.get(criticalThreshold), criticalThreshold));
                 ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
                 ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));
                 ret.setSastLowThreshold(convertToIntegerIfNotNull(parameters.get(lowThreshold), lowThreshold));
@@ -202,6 +210,7 @@ public class CxConfigHelper {
         if (ret.isAstScaEnabled() || ret.isOsaEnabled()) {
             ret.setOsaThresholdsEnabled(TRUE.equals(parameters.get(osaThresholdEnabled)));
             if (ret.getOsaThresholdsEnabled()) {
+            	ret.setOsaCriticalThreshold(convertToIntegerIfNotNull(parameters.get(osaCriticalThreshold), osaCriticalThreshold));
                 ret.setOsaHighThreshold(convertToIntegerIfNotNull(parameters.get(osaHighThreshold), osaHighThreshold));
                 ret.setOsaMediumThreshold(convertToIntegerIfNotNull(parameters.get(osaMediumThreshold), osaMediumThreshold));
                 ret.setOsaLowThreshold(convertToIntegerIfNotNull(parameters.get(osaLowThreshold), osaLowThreshold));

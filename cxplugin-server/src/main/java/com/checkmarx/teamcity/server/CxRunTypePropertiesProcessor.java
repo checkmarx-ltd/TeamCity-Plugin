@@ -83,6 +83,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
             if (TRUE.equals(properties.get(CxParam.IS_SYNCHRONOUS))) {
                 if (TRUE.equals(properties.get(CxParam.THRESHOLD_ENABLED))) {
+                	validateNumeric(CxParam.CRITICAL_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.LOW_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
@@ -90,6 +91,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
                 boolean dependencyScanEnabled = "OSA".equals(properties.get(CxParam.DEPENDENCY_SCANNER_TYPE)) || "SCA".equals(properties.get(CxParam.DEPENDENCY_SCANNER_TYPE));
                 if (dependencyScanEnabled && TRUE.equals(properties.get(CxParam.OSA_THRESHOLD_ENABLED))) {
+                	validateNumeric(CxParam.OSA_CRITICAL_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.OSA_HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.OSA_MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.OSA_LOW_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
