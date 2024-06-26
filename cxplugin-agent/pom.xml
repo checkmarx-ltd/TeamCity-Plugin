@@ -30,6 +30,14 @@
         		    <groupId>dom4j</groupId>
          			<artifactId>dom4j</artifactId>
 				</exclusion>
+				<exclusion>
+         			<groupId>io.vertx</groupId>
+            		<artifactId>vertx-core</artifactId>
+				</exclusion>
+				<exclusion>
+            		<groupId>org.apache.commons</groupId>
+		    		<artifactId>commons-compress</artifactId>
+            	</exclusion>
 <!--			<exclusion>-->
 <!--         		<groupId>org.jdom</groupId>-->
 <!--         		<artifactId>jdom</artifactId>-->
@@ -42,12 +50,31 @@
 		         	<groupId>commons-httpclient</groupId>
 		         	<artifactId>commons-httpclient</artifactId>
 				</exclusion>
+				<exclusion>
+   					 <groupId>org.bouncycastle</groupId>
+    				 <artifactId>bcprov-jdk18on</artifactId>
+         		</exclusion>
 			</exclusions>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.13</version>
+        </dependency>
+        <dependency>
+        	<groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>4.5.8</version>
+        </dependency>  
+        <dependency>
+    		<groupId>org.bouncycastle</groupId>
+    		<artifactId>bcprov-jdk18on</artifactId>
+    		<version>1.78.1</version>
+		</dependency>
+    	<dependency>
+            <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+            <version>1.26.2</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.springframework</groupId>-->
