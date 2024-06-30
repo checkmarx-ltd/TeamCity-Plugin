@@ -103,6 +103,7 @@ public class CxAdminPageController extends BaseFormXmlController {
         	}
         	if (globalEnableCriticalSeverity == null) {
         	   Loggers.SERVER.warn("globalEnableCriticalSeverity is null");
+        	   globalEnableCriticalSeverity = OPTION_FALSE;
         	}
         	
         Loggers.SERVER.info("Global is synchronous: " + globalIsSynchronous);

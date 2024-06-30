@@ -1007,7 +1007,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody id="thresholdSection" ${hideThresholdSection}>
-                <tr>
+						<tr style='display:none'>
+							<th><label for="${optionsBean.enableCriticalSeverity}">Enable
+									Critical Severity</label></th>
+							<td><props:textProperty
+									name="${optionsBean.enableCriticalSeverity}" /></td>
+						</tr>
+						<tr>
                     <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>

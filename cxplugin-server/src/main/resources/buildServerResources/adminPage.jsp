@@ -166,6 +166,9 @@
 <c:if test="${cxGlobalThresholdEnabled != 'true'}">
   <c:set var="hideThresholdSection" value="style='display:none'"/>
 </c:if>
+<c:if test="${cxGlobalEnableCriticalSeverity != 'true'}">
+  <c:set var="hideCriticalThreshold" value="style='display:none'"/>
+</c:if>
 <c:if test="${cxGlobalIsExploitablePath != 'true'}">
   <c:set var="hideExpPathSection" value="style='display:none'"/>
 </c:if>
@@ -325,23 +328,23 @@
 							</td>
 						</tr>
 						<tbody id="thresholdSection" ${hideThresholdSection}>
-								<tr>
+								<tr style='display:none'>
 									<th><label for="cxGlobalEnableCriticalSeverity">Enable Critical Severity</label></th>
 									<td><forms:checkbox name="cxGlobalEnableCriticalSeverity"
 											value="${cxGlobalEnableCriticalSeverity}"
 											checked="${cxGlobalEnableCriticalSeverity}" />
 									</td>
 								</tr>
-								<tr>
-							<th>
-								<label for="cxGlobalCriticalThreshold">Critical</label>
-							</th>
-							<td>
-								<forms:textField name="cxGlobalCriticalThreshold" value="${cxGlobalCriticalThreshold}" className="longField"/>
-								<span class="error" id="invalid_cxGlobalCriticalThreshold"/>
-								
-							</td>
-						</tr>
+									<tr id="criticalThresholdSection" ${hideCriticalThreshold}>
+									<th>
+										<label for="cxGlobalCriticalThreshold">Critical</label>
+									</th>
+									<td>
+										<forms:textField name="cxGlobalCriticalThreshold" value="${cxGlobalCriticalThreshold}" className="longField"/>
+										<span class="error" id="invalid_cxGlobalCriticalThreshold"/>
+										
+									</td>
+									</tr>
 						<tr>
 							<th>
 								<label for="cxGlobalHighThreshold">High</label>

@@ -152,7 +152,7 @@ public class CxConfigHelper {
 
 
         String thresholdEnabled = THRESHOLD_ENABLED;
-        String enableCriticalSeverity = GLOBAL_ENABLE_CRITICAL_THRESHOLD;
+        String enableCriticalSeverity = ENABLE_CRITICAL_SEVERITY;
         String criticalThreshold = CRITICAL_THRESHOLD;
         String highThreshold = HIGH_THRESHOLD;
         String mediumThreshold = MEDIUM_THRESHOLD;
@@ -171,7 +171,7 @@ public class CxConfigHelper {
 
         if (TRUE.equals(buildParameters.get(USE_DEFAULT_SCAN_CONTROL))) {
             thresholdEnabled = GLOBAL_THRESHOLD_ENABLED;
-            enableCriticalSeverity = GLOBAL_ENABLE_CRITICAL_THRESHOLD;
+            enableCriticalSeverity = GLOBAL_ENABLE_CRITICAL_SEVERITY;
             criticalThreshold = GLOBAL_CRITICAL_THRESHOLD;
             highThreshold = GLOBAL_HIGH_THRESHOLD;
             mediumThreshold = GLOBAL_MEDIUM_THRESHOLD;
@@ -199,7 +199,7 @@ public class CxConfigHelper {
         if (ret.isSastEnabled()) {
             ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(thresholdEnabled)));
             if (ret.getSastThresholdsEnabled()) {
-            	ret.setSastThresholdsEnabled(TRUE.equals(parameters.get(enableCriticalSeverity)));
+            	ret.setSastEnableCriticalSeverity(TRUE.equals(parameters.get(enableCriticalSeverity)));
             	ret.setSastCriticalThreshold(convertToIntegerIfNotNull(parameters.get(criticalThreshold), criticalThreshold));
                 ret.setSastHighThreshold(convertToIntegerIfNotNull(parameters.get(highThreshold), highThreshold));
                 ret.setSastMediumThreshold(convertToIntegerIfNotNull(parameters.get(mediumThreshold), mediumThreshold));

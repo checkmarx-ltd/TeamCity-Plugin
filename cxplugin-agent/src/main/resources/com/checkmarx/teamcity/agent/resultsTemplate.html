@@ -1564,6 +1564,7 @@
 
     //thresholds
     var thresholdsEnabled = cx.thresholdEnabled;
+    var enableCriticalSeverity = cx.enableCriticalSeverity;
     var criticalThreshold = cx.criticalThreshold;
     var highThreshold = cx.highThreshold;
     var medThreshold = cx.mediumThreshold;
@@ -1591,7 +1592,7 @@
 
     //thresholds
     var osaThresholdsEnabled = cx.osaThresholdEnabled;
-    var osaCriThreshold = cx.osaCriticalThreshold;
+    var osaCriticalThreshold = cx.osaCriticalThreshold;
     var osaHighThreshold = cx.osaHighThreshold;
     var osaMedThreshold = cx.osaMediumThreshold;
     var osaLowThreshold = cx.osaLowThreshold;
@@ -1795,6 +1796,10 @@
                 var isOsaThresholdExceeded = false;
                 var osaThresholdExceededComplianceElement = document.getElementById("osa-threshold-exceeded-compliance");
 
+                if (osaCriticalThreshold != null && osaCriticalCount > osaCriticalThreshold) {
+                    document.getElementById("osa-tooltip-critical").innerHTML = tooltipGenerator(SEVERITY.OSA_CRITICAL);
+                    isOsaThresholdExceeded = true;
+                }
 
                 if (osaHighThreshold != null && osaHighCount > osaHighThreshold) {
                     document.getElementById("osa-tooltip-high").innerHTML = tooltipGenerator(SEVERITY.OSA_HIGH);

@@ -227,6 +227,11 @@ public class CxOptions {
     }
     
     @NotNull
+    public String getEnableCriticalSeverity() {
+        return ENABLE_CRITICAL_SEVERITY;
+    }
+    
+    @NotNull
     public String getCriticalThreshold() {
         return CRITICAL_THRESHOLD;
     }
@@ -322,7 +327,7 @@ public class CxOptions {
     
     @NotNull
     public String getGlobalEnableCriticalSeverity() {
-        return GLOBAL_ENABLE_CRITICAL_THRESHOLD;
+        return GLOBAL_ENABLE_CRITICAL_SEVERITY;
     }
 
     @NotNull

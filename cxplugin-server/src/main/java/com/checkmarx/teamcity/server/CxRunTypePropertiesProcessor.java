@@ -7,6 +7,7 @@ import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.log.Loggers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,11 +18,16 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
+
+import com.checkmarx.teamcity.common.SASTUtils;
+import java.util.Arrays;
+
+
 import static com.checkmarx.teamcity.common.CxConstants.*;
 
 import static com.checkmarx.teamcity.common.CxParam.*;
 import static com.checkmarx.teamcity.common.CxParam.SCA_RESOLVER_ADD_PARAMETERS;
-
 import static com.checkmarx.teamcity.common.CxParam.CUSTOM_FIELDS;
 import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 
@@ -30,6 +36,7 @@ import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
+    	Loggers.SERVER.info("process method start");
         if (CxConstants.TRUE.equals(properties.get(CxParam.OSA_ENABLED))) {
             properties.put(CxParam.DEPENDENCY_SCANNER_TYPE, ScannerType.OSA.getDisplayName());
             properties.put(CxParam.DEPENDENCY_SCAN_ENABLED, CxConstants.TRUE);
@@ -83,6 +90,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
             if (TRUE.equals(properties.get(CxParam.IS_SYNCHRONOUS))) {
                 if (TRUE.equals(properties.get(CxParam.THRESHOLD_ENABLED))) {
+                	validateCriticalSupport(CxParam.ENABLE_CRITICAL_SEVERITY, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                 	validateNumeric(CxParam.CRITICAL_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.HIGH_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
                     validateNumeric(CxParam.MEDIUM_THRESHOLD, properties, THRESHOLD_POSITIVE_INTEGER_MESSAGE, result);
@@ -98,7 +106,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
                 }
             }
         }
-
+        Loggers.SERVER.info("process method end");
         return result;
     }
 
@@ -171,6 +179,16 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
         if (!com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(num) && (!StringUtil.isNumber(num) || (Integer.parseInt(num) < 0))) {
             result.add(new InvalidProperty(parameterName, errorMessage));
         }
+    }
+    
+    private void validateCriticalSupport(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
+    	String enableCriticalSeverity = properties.get(parameterName);
+//    	if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalSupported")) {
+//    	//result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
+//    	}
+//    	else if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalNotSupported")) {
+//    	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
+//    	}
     }
 
     private void validateNumericLargerThanZero(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {

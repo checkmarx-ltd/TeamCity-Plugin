@@ -36,7 +36,7 @@ public abstract class CxParam {
     public static final String OSA_INSTALL_BEFORE_SCAN = "cxOsaInstallBeforeScan";
     public static final String IS_SYNCHRONOUS = "cxIsSynchronous";
     public static final String THRESHOLD_ENABLED = "cxThresholdEnabled";
-    public static final String ENABLE_CRITICAL_THRESHOLD = "cxEnableCriticalThreshold";
+    public static final String ENABLE_CRITICAL_SEVERITY = "cxEnableCriticalSeverity";
     public static final String CRITICAL_THRESHOLD = "cxCriticalThreshold";
     public static final String HIGH_THRESHOLD = "cxHighThreshold";
     public static final String MEDIUM_THRESHOLD = "cxMediumThreshold";
@@ -66,7 +66,6 @@ public abstract class CxParam {
     public static final String GLOBAL_IS_SYNCHRONOUS = "cxGlobalIsSynchronous";
     public static final String GLOBAL_THRESHOLD_ENABLED = "cxGlobalThresholdEnabled";
     public static final String GLOBAL_CRITICAL_THRESHOLD = "cxGlobalCriticalThreshold";
-    public static final String GLOBAL_ENABLE_CRITICAL_THRESHOLD = "cxGlobalEnableCriticalThreshold";
     public static final String GLOBAL_HIGH_THRESHOLD = "cxGlobalHighThreshold";
     public static final String GLOBAL_MEDIUM_THRESHOLD = "cxGlobalMediumThreshold";
     public static final String GLOBAL_LOW_THRESHOLD = "cxGlobalLowThreshold";
@@ -143,7 +142,7 @@ public abstract class CxParam {
     public static final String[] GLOBAL_CONFIGS = {
             GLOBAL_SERVER_URL, GLOBAL_USERNAME, GLOBAL_PASSWORD, GLOBAL_EXCLUDE_FOLDERS, GLOBAL_FILTER_PATTERNS,
             GLOBAL_SCAN_TIMEOUT_IN_MINUTES, GLOBAL_IS_SYNCHRONOUS, GLOBAL_THRESHOLD_ENABLED, GLOBAL_CRITICAL_THRESHOLD,GLOBAL_HIGH_THRESHOLD,
-            GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD,GLOBAL_ENABLE_CRITICAL_THRESHOLD, GLOBAL_OSA_THRESHOLD_ENABLED,GLOBAL_OSA_CRITICAL_THRESHOLD, GLOBAL_OSA_HIGH_THRESHOLD,
+            GLOBAL_MEDIUM_THRESHOLD, GLOBAL_LOW_THRESHOLD,GLOBAL_ENABLE_CRITICAL_SEVERITY, GLOBAL_OSA_THRESHOLD_ENABLED,GLOBAL_OSA_CRITICAL_THRESHOLD, GLOBAL_OSA_HIGH_THRESHOLD,
             GLOBAL_OSA_MEDIUM_THRESHOLD, GLOBAL_OSA_LOW_THRESHOLD,GLOBAL_DEFINE_DEPENDENCY_SCAN_SETTINGS,GLOBAL_DEPENDENCY_SCANNER_TYPE, GLOBAL_PROJECT_POLICY_VIOLATION,GLOBAL_PROJECT_SCA_POLICY_VIOLATION,
             GLOBAL_OSA_ARCHIVE_INCLUDE_PATTERNS,GLOBAL_DEPENDENCY_SCAN_FILTER_PATTERNS, GLOBAL_EXECUTE_DEPENDENCY_MANAGER,
             GLOBAL_SCA_ENABLED, GLOBAL_OSA_ENABLED, GLOBAL_SCA_API_URL, GLOBAL_SCA_ACCESS_CONTROL_URL,
