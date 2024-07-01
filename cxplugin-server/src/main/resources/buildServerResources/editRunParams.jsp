@@ -3,6 +3,7 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
+<%@ page import="com.checkmarx.teamcity.server.CxAdminConfig" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
     <script type="text/javascript">
@@ -317,9 +318,10 @@ validateSCAParameters: function (credentials) {
     </script>
 
 
-
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<jsp:useBean id="adminConfigBean" scope="request" type="com.checkmarx.teamcity.server.CxAdminConfig"/>
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
+
 
 <style>
     #cxPresetId, #cxTeamId {
@@ -346,6 +348,33 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
+
+<% Double version = 9.0;
+String key = optionsBean.getEnableCriticalSeverity();
+System.out.println("key jsp log: " + key);
+String value = adminConfigBean.getConfiguration("cxEnableCriticalSeverity");
+System.out.println("value jsp log: " + value);
+String enabledCriticalSeverity = adminConfigBean.getConfiguration(optionsBean.getEnableCriticalSeverity());
+System.out.println("enabledCriticalSeverity jsp log" + enabledCriticalSeverity);
+
+if (enabledCriticalSeverity != null) {
+	String[] arr = enabledCriticalSeverity.split("_");
+	if (arr.length > 1) {
+		version = Double.parseDouble(arr[1]);
+	}
+}
+System.out.println("version  jsp log" + version);
+%>
+<c:if test="${version < 9.7}">
+    <c:set var="hideCriticalThreshold" value="${optionsBean.noDisplay}"/>
+</c:if>
+<c:if test="${version >= 9.7}">
+    <c:set var="hideCriticalThreshold" value="style='display:block'"/>
+</c:if>
+
+
+
+
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
@@ -1007,13 +1036,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody id="thresholdSection" ${hideThresholdSection}>
-						<tr style='display:none'>
+						<tr>
 							<th><label for="${optionsBean.enableCriticalSeverity}">Enable
 									Critical Severity</label></th>
 							<td><props:textProperty
 									name="${optionsBean.enableCriticalSeverity}" /></td>
 						</tr>
-						<tr>
+						<tr ${hideCriticalThreshold}>
                     <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>

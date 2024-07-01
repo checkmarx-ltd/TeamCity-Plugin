@@ -39,6 +39,7 @@ import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
+    //private static boolean errorShown = false;
     
     List<InvalidProperty> result = new Vector<>();
 
@@ -182,7 +183,8 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
-        String enableCriticalSeverity = properties.get(CxParam.ENABLE_CRITICAL_SEVERITY);
+        //String enableCriticalSeverity = properties.get(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String enableCriticalSeverity = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
         	enableCriticalSeverity = "noChange_9.0";
         }
@@ -263,11 +265,14 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 							Loggers.SERVER.info("version greater or equal to 9.7:" + enableCriticalSeverity);
 							enableCriticalSeverity = "criticalSupported_" + version;
 							criticalThreshold = "";
+							//if (!errorShown) {
 							actionErrors.addError(new InvalidProperty(CxParam.CRITICAL_THRESHOLD, "*****The configured SAST version supports Critical severity. Critical threshold can also be configured."));
 							System.out.println(
 									"SAST version supports Critical severity. Critical threshold can also be configured.");
 							Loggers.SERVER.info(
 									"SAST version supports Critical severity. Critical threshold can also be configured.");
+							//errorShown = true;
+							//}
 							}
 						} else {
 							if(enableCriticalSeverity.startsWith("criticalNotSupported")) {
@@ -276,11 +281,14 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 							Loggers.SERVER.info("version less than 9.7:" + enableCriticalSeverity);
 							enableCriticalSeverity = "criticalNotSupported_" + version;
 							criticalThreshold = "";
+							//if (!errorShown) {
 							actionErrors.addError(new InvalidProperty(CxParam.HIGH_THRESHOLD,"*******The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
 							System.out.println(
 									"SAST version does not support Critical severity. Critical threshold will not be applicable.");
 							Loggers.SERVER.info(
 									"SAST version does not support Critical severity. Critical threshold will not be applicable.");
+							//errorShown = true;
+							//}
 							}
 						}
 					} else {
@@ -288,11 +296,25 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 					}
 				}
 			}
-			//form.setEnableCriticalSeverity(enableCriticalSeverity); // Set updated value in form
-		    //form.setCriticalThreshold(criticalThreshold); // Set updated value in form
 			properties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
 			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
-			basePropertiesBean.setProperties(properties);
+			try {
+				
+			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+			       this.cxAdminConfig.persistConfiguration();
+			   } catch (IOException e) {
+			       e.printStackTrace();
+			       Loggers.SERVER.error("Error persisting configuration: " + e.getMessage());
+			   }
+			//form.setEnableCriticalSeverity(enableCriticalSeverity); // Set updated value in form
+		    //form.setCriticalThreshold(criticalThreshold); // Set updated value in form
+//			this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+//			this.cxAdminConfig.persistConfiguration();
+//			Map<String,String> localProperties = new HashMap<>();
+//			localProperties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
+//			localProperties.put(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+//			PropertiesUtil.storeProperties(localProperties, new File(this.cxAdminConfig.getServerPaths().getConfigDir(), "checkmarx-plugin.properties"), "");
+//			basePropertiesBean.setProperties(properties);
 
         Loggers.SERVER.info("Validate method end");
         
