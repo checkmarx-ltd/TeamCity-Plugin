@@ -1249,9 +1249,8 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
 error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
 	alert(error_cxCriticalThreshold.innerHTML);
-	if (!hasReloadedCritical && error_cxCriticalThreshold.textContent.includes('The configured SAST version supports Critical severity. Critical threshold can also be configured.')) {
-	       hasReloadedCritical = true;
-	       error_cxCriticalThreshold.textContent += ' ';
+	if(error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.'){
+		error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
 	       window.location.reload();
 	   }
 	});
@@ -1259,9 +1258,8 @@ error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
 const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
 error_cxHighThreshold.addEventListener('DOMSubtreeModified', () => {
 	alert(error_cxHighThreshold.innerHTML);
-	if (!hasReloadedHigh && error_cxHighThreshold.textContent.includes('The configured SAST version does not supports Critical severity. Critical threshold can not be configured.')) {
-	       hasReloadedHigh = true;
-	       error_cxHighThreshold.textContent += ' ';
+	if(error_cxHighThreshold.textContent == 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.'){
+		error_cxHighThreshold.textContent = 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.. ';
 	       window.location.reload();
 	   }
 	});
