@@ -183,12 +183,12 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     
     private void validateCriticalSupport(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
     	String enableCriticalSeverity = properties.get(parameterName);
-//    	if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalSupported")) {
-//    	//result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
-//    	}
-//    	else if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalNotSupported")) {
-//    	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
-//    	}
+    	if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalSupported")) {
+    	result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
+    	}
+    	else if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalNotSupported")) {
+    	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
+    	}
     }
 
     private void validateNumericLargerThanZero(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {

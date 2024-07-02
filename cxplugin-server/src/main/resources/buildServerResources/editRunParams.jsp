@@ -3,7 +3,6 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
-<%@ page import="com.checkmarx.teamcity.server.CxAdminConfig" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
     <script type="text/javascript">
@@ -314,12 +313,10 @@ validateSCAParameters: function (credentials) {
 
 };
 
-
     </script>
 
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
-<jsp:useBean id="adminConfigBean" scope="request" type="com.checkmarx.teamcity.server.CxAdminConfig"/>
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
 
 
@@ -349,12 +346,18 @@ ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
 
+
 <% Double version = 9.0;
 String key = optionsBean.getEnableCriticalSeverity();
 System.out.println("key jsp log: " + key);
-String value = adminConfigBean.getConfiguration("cxEnableCriticalSeverity");
-System.out.println("value jsp log: " + value);
-String enabledCriticalSeverity = adminConfigBean.getConfiguration(optionsBean.getEnableCriticalSeverity());
+if(propertiesBean.getProperties()!=null){
+	propertiesBean.getProperties().forEach((mapkey, value) -> System.out.println("From JSP page :"+mapkey + ":" + value));
+}
+else{
+	 System.out.println("propertiesBean.getProperties() is null");
+}
+
+String enabledCriticalSeverity = propertiesBean.getProperties().get(optionsBean.getEnableCriticalSeverity());
 System.out.println("enabledCriticalSeverity jsp log" + enabledCriticalSeverity);
 
 if (enabledCriticalSeverity != null) {
@@ -366,7 +369,7 @@ if (enabledCriticalSeverity != null) {
 System.out.println("version  jsp log" + version);
 %>
 <c:if test="${version < 9.7}">
-    <c:set var="hideCriticalThreshold" value="${optionsBean.noDisplay}"/>
+    <c:set var="hideCriticalThreshold" value="style='display:none'"/>
 </c:if>
 <c:if test="${version >= 9.7}">
     <c:set var="hideCriticalThreshold" value="style='display:block'"/>
@@ -1047,6 +1050,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                     <td>
                         <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
                         <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
+                        
                     </td>
                 </tr>
                 <tr>

@@ -82,6 +82,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         //put all global properties to the config page
         for (String conf : CxParam.GLOBAL_CONFIGS) {
             properties.put(conf, cxAdminConfig.getConfiguration(conf));
+            System.out.println(""+conf+":"+cxAdminConfig.getConfiguration(conf));
         }
 
         model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
@@ -91,6 +92,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         model.put(CxParam.GLOBAL_SERVER_URL, cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL));
         model.put(CxParam.GLOBAL_USERNAME, cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME));
         model.put(CxParam.GLOBAL_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD));
+        
 
         Loggers.SERVER.info("fillModel method end");
     }
@@ -142,6 +144,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
             e.printStackTrace();
         }
         String cxPass = properties.get(CxParam.PASSWORD);
+        System.out.println("cxPass from properties:"+cxPass);
 
         try {
             if(cxPass != null) {
@@ -179,12 +182,15 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-        
+        System.out.println("Before our code change");
         String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
         //String enableCriticalSeverity = properties.get(CxParam.ENABLE_CRITICAL_SEVERITY);
+        System.out.println("this.cxAdminConfig"+this.cxAdminConfig);
+        
         String enableCriticalSeverity = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        System.out.println("EnableCriticalSeverity from Admin config"+enableCriticalSeverity);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
         	enableCriticalSeverity = "noChange_9.0";
         }
@@ -266,7 +272,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 							enableCriticalSeverity = "criticalSupported_" + version;
 							criticalThreshold = "";
 							//if (!errorShown) {
-							actionErrors.addError(new InvalidProperty(CxParam.CRITICAL_THRESHOLD, "*****The configured SAST version supports Critical severity. Critical threshold can also be configured."));
+							//actionErrors.addError(new InvalidProperty(CxParam.CRITICAL_THRESHOLD, "*****The configured SAST version supports Critical severity. Critical threshold can also be configured."));
 							System.out.println(
 									"SAST version supports Critical severity. Critical threshold can also be configured.");
 							Loggers.SERVER.info(
@@ -282,7 +288,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 							enableCriticalSeverity = "criticalNotSupported_" + version;
 							criticalThreshold = "";
 							//if (!errorShown) {
-							actionErrors.addError(new InvalidProperty(CxParam.HIGH_THRESHOLD,"*******The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
+							//actionErrors.addError(new InvalidProperty(CxParam.HIGH_THRESHOLD,"*******The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
 							System.out.println(
 									"SAST version does not support Critical severity. Critical threshold will not be applicable.");
 							Loggers.SERVER.info(
