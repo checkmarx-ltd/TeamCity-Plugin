@@ -312,7 +312,10 @@ validateSCAParameters: function (credentials) {
 
 
 };
-
+    $('.error').bind('DOMSubtreeModified', function(e) {
+    	  console.info("EVENT TRIGGERT " + e.target.id);
+    	  alert("EVENT TRIGGERT " + e.target.id);
+    	});
     </script>
 
 
@@ -1242,3 +1245,22 @@ Example of Project Full Path: CxServer/team1/projectname."/>
     </tbody>
 
 </l:settingsGroup>
+<script type="text/javascript">
+const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
+error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
+	alert(error_cxCriticalThreshold.innerHTML);
+	if(error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.'){
+		error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
+		window.location.reload();	
+	}
+	});
+
+const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
+error_cxHighThreshold.addEventListener('DOMSubtreeModified', () => {
+	alert(error_cxHighThreshold.innerHTML);
+	if(error_cxHighThreshold.textContent == 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.'){
+		error_cxHighThreshold.textContent = 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.. ';
+		window.location.reload();	
+	}
+	});
+</script>
