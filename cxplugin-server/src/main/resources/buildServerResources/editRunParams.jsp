@@ -2,6 +2,7 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
@@ -350,38 +351,17 @@ optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGl
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
 
 
-<% Double version = 9.0;
-String key = optionsBean.getEnableCriticalSeverity();
-System.out.println("key jsp log: " + key);
-if(propertiesBean.getProperties()!=null){
-	propertiesBean.getProperties().forEach((mapkey, value) -> System.out.println("From JSP page :"+mapkey + ":" + value));
-}
-else{
-	 System.out.println("propertiesBean.getProperties() is null");
-}
-
-String enabledCriticalSeverity = propertiesBean.getProperties().get(optionsBean.getEnableCriticalSeverity());
-System.out.println("enabledCriticalSeverity jsp log" + enabledCriticalSeverity);
-
-if (enabledCriticalSeverity != null) {
-	String[] arr = enabledCriticalSeverity.split("_");
-	if (arr.length > 1) {
-		version = Double.parseDouble(arr[1]);
-	}
-}
-System.out.println("version  jsp log" + version);
-%>
-<c:choose>
+<c:set var="enabledCriticalSeverity" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
+<c:set var="versionParts" value="${fn:split(enabledCriticalSeverity, '_')}" />
+<c:set var="version" value="${Double.parseDouble(versionParts[1])}" />
+<c:choose> 
 <c:when test="${version < 9.7}">
-<c:set var="hideCriticalThreshold" value="style='display:none'"/>
+<c:set var="hidelocalCriticalThreshold" value="style='display:none'"/>
 </c:when>
 <c:otherwise>
-<c:set var="hideCriticalThreshold" value=""/>
+<c:set var="hidelocalCriticalThreshold" value=""/>
 </c:otherwise>
 </c:choose>
-
-
-
 
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
@@ -1049,15 +1029,22 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 									Critical Severity</label></th>
 							<td><props:textProperty
 									name="${optionsBean.enableCriticalSeverity}" /></td>
+							<td>								
+		                        <label>${hidelocalCriticalThreshold}</label>
+		                        <label>Please work!!!</label>
+							</td>
 						</tr>
 						<tr>
-						<tbody id="CriticalField" ${hideCriticalThreshold}>
+						<tbody id="CriticalField" ${hidelocalCriticalThreshold}>
 		                    <tr>
 		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
 		                    <td>
 		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
 		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
-		                        
+		                        <input type="text"  value="${hidelocalCriticalThreshold}" />		                        
+		                        Hellow world!!!			                        	
+		                        <label>${hidelocalCriticalThreshold}</label>
+		                        <label>Please work!!!</label>	                        
 		                    </td>
 		                    </tr>
                			 </tbody>
@@ -1251,6 +1238,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
     </tbody>
 
 </l:settingsGroup>
+
 <script type="text/javascript">
 let hasReloaded = localStorage.getItem('hasReloaded');
 const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
