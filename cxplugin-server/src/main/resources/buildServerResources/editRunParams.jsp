@@ -376,7 +376,7 @@ System.out.println("version  jsp log" + version);
 <c:set var="hideCriticalThreshold" value="style='display:none'"/>
 </c:when>
 <c:otherwise>
-<c:set var="hideCriticalThreshold" value="style='display:table-row'"/>
+<c:set var="hideCriticalThreshold" value=""/>
 </c:otherwise>
 </c:choose>
 
@@ -1050,14 +1050,18 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 							<td><props:textProperty
 									name="${optionsBean.enableCriticalSeverity}" /></td>
 						</tr>
-						<tr ${hideCriticalThreshold}>
-                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
-                    <td>
-                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
-                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
-                        
-                    </td>
-                </tr>
+						<tr>
+						<tbody id="CriticalField" ${hideCriticalThreshold}>
+		                    <tr>
+		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
+		                    <td>
+		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
+		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
+		                        
+		                    </td>
+		                    </tr>
+               			 </tbody>
+               			 </tr>
                 <tr>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
                     <td>
