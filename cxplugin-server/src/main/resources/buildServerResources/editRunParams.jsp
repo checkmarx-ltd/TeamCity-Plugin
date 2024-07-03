@@ -371,12 +371,14 @@ if (enabledCriticalSeverity != null) {
 }
 System.out.println("version  jsp log" + version);
 %>
-<c:if test="${version < 9.7}">
-    <c:set var="hideCriticalThreshold" value="style='display:none'"/>
-</c:if>
-<c:if test="${version >= 9.7}">
-    <c:set var="hideCriticalThreshold" value="style='display:block'"/>
-</c:if>
+<c:choose>
+<c:when test="${version < 9.7}">
+<c:set var="hideCriticalThreshold" value="style='display:none'"/>
+</c:when>
+<c:otherwise>
+<c:set var="hideCriticalThreshold" value="style='display:table-row'"/>
+</c:otherwise>
+</c:choose>
 
 
 
@@ -1246,21 +1248,27 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 
 </l:settingsGroup>
 <script type="text/javascript">
+let hasReloaded = localStorage.getItem('hasReloaded');
 const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
 error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
-	alert(error_cxCriticalThreshold.innerHTML);
-	if(error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.'){
-		error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
-	       window.location.reload();
-	   }
-	});
-
+   alert(error_cxCriticalThreshold.innerHTML);
+   if (error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.' && !hasReloaded) {
+       error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
+       localStorage.setItem('hasReloaded', 'true');
+       window.location.reload();
+   }
+});
 const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
 error_cxHighThreshold.addEventListener('DOMSubtreeModified', () => {
-	alert(error_cxHighThreshold.innerHTML);
-	if(error_cxHighThreshold.textContent == 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.'){
-		error_cxHighThreshold.textContent = 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.. ';
-	       window.location.reload();
-	   }
-	});
+   alert(error_cxHighThreshold.innerHTML);
+   if (error_cxHighThreshold.textContent == 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
+       error_cxHighThreshold.textContent = 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.. ';
+       localStorage.setItem('hasReloaded', 'true');
+       window.location.reload();
+   }
+});
+// Clear the reload flag when the page is fully loaded
+window.addEventListener('load', () => {
+   localStorage.removeItem('hasReloaded');
+});
 </script>
