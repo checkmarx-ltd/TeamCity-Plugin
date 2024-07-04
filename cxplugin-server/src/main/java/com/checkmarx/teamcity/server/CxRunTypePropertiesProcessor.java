@@ -7,7 +7,6 @@ import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.util.StringUtil;
-import jetbrains.buildServer.log.Loggers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +35,6 @@ import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
-    	Loggers.SERVER.info("process method start");
         if (CxConstants.TRUE.equals(properties.get(CxParam.OSA_ENABLED))) {
             properties.put(CxParam.DEPENDENCY_SCANNER_TYPE, ScannerType.OSA.getDisplayName());
             properties.put(CxParam.DEPENDENCY_SCAN_ENABLED, CxConstants.TRUE);
@@ -106,7 +104,6 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
                 }
             }
         }
-        Loggers.SERVER.info("process method end");
         return result;
     }
 
@@ -187,7 +184,7 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     	result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
     	}
     	else if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalNotSupported")) {
-    	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
+    	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not support Critical severity. Critical threshold can not be configured."));
     	}
     }
 

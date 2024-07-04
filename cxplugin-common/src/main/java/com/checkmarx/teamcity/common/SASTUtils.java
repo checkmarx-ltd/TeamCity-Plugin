@@ -33,9 +33,6 @@ import java.util.Set;
 
 import static com.checkmarx.teamcity.common.CxConstants.*;
 import static com.checkmarx.teamcity.common.CxParam.*;
-//
-//import com.checkmarx.teamcity.agent.CommonClientFactory;
-//import com.cx.plugin.testConnection.CxRestResource;
 import com.cx.restclient.configuration.CxScanConfig;
 import com.cx.restclient.dto.ProxyConfig;
 import com.cx.restclient.sast.utils.LegacyClient;
@@ -45,58 +42,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SASTUtils {
-	
-//	public SASTUtils(CxScanConfig config, Logger log) throws MalformedURLException {
-//        super(config, log);
-//    }
-	
+
 	public static LegacyClient getInstance(CxScanConfig config, Logger log)
-            throws MalformedURLException, CxClientException {
-        return new LegacyClient(config, log) {
-        };
-    }
-	
-	
+			throws MalformedURLException, CxClientException {
+		return new LegacyClient(config, log) {
+		};
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(SASTUtils.class);
 	private CxClientDelegator clientDelegator;
 
-    //private static LegacyClient commonClient = null;
-    
-
 	public static String loginToServer(URL url, String username, String pssd) {
-		System.out.println(String.format("Attempting to log in to server with URL: %s, Username: %s, Password: %s, Origin: %s", url, username, pssd, CxConstants.ORIGIN_TEAMCITY));
-		   Loggers.SERVER.info("Attempting to log in to server with URL: " + url + ", Username: " + username +", Password: " + pssd + ", Origin: " + CxConstants.ORIGIN_TEAMCITY);
 		String version = null;
 		String result = "";
-		//LegacyClient commonClient = null;
-	        try {
-	            CxScanConfig scanConfig = new CxScanConfig(url.toString().trim(), username, pssd, CxConstants.ORIGIN_TEAMCITY , true);
-	            System.out.println(String.format("Scan configuration created with URL: %s, Username: %s, Password: %s, Origin: %s", url, username, pssd, CxConstants.ORIGIN_TEAMCITY));
-	            Loggers.SERVER.info("Scan configuration created with URL: " + url + ", Username: " + username +", Password: " + pssd + ", Origin: " + CxConstants.ORIGIN_TEAMCITY);
-	            scanConfig.addScannerType(ScannerType.SAST);
-//	            scanConfig.setUsername(username);
-//	            scanConfig.setPassword(pssd);
-//	            scanConfig.setUrl(url.toString().trim());
-//	            scanConfig.setCxOrigin(CxConstants.ORIGIN_TEAMCITY);
-//	            scanConfig.setDisableCertificateValidation(true);
-//	            String isProxyVar = System.getProperty("cx.isproxy");
-//	            scanConfig.setProxy(StringUtils.isNotEmpty(isProxyVar) && isProxyVar.equalsIgnoreCase("true"));
-	            //commonClient = new LegacyClient(scanConfig, log);
-	            //SASTUtils sastUtils = new SASTUtils(scanConfig, log);
-	            LegacyClient clientCommon = getInstance(scanConfig, log);
-	            //Loggers.SERVER.info("client Common: " + clientCommon.toString());
-	            version = clientCommon.login(true);
-	            System.out.println(String.format("Logged in successfully, version: %s", version));
-	            Loggers.SERVER.info("Logged in successfully, version: " + version);
-	            return version;
-	        } catch (Exception ex) {
-	        	Loggers.SERVER.error("Checkmarx login to server: " + ex.getMessage(), ex);
-	            result = ex.getMessage();
-	            return version;
-	        }
-	    }
-	
-	
-	
-       
+		try {
+			CxScanConfig scanConfig = new CxScanConfig(url.toString().trim(), username, pssd,
+					CxConstants.ORIGIN_TEAMCITY, true);
+			scanConfig.addScannerType(ScannerType.SAST);
+			LegacyClient clientCommon = getInstance(scanConfig, log);
+			version = clientCommon.login(true);
+			return version;
+		} catch (Exception ex) {
+			result = ex.getMessage();
+			return version;
+		}
+	}
 }

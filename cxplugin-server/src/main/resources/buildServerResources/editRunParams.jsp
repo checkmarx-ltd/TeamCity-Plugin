@@ -49,8 +49,7 @@
         jQuery('#periodicScanSection')[periodindFullScanAfter ? 'show' : 'hide']();
 
     }
-
-    console.log('updatePeriodicScanSectionVisibility');
+    
     jQuery(updatePeriodicScanSectionVisibility);
 
     window.Checkmarx = {
@@ -313,10 +312,6 @@ validateSCAParameters: function (credentials) {
 
 
 };
-    $('.error').bind('DOMSubtreeModified', function(e) {
-    	  console.info("EVENT TRIGGERT " + e.target.id);
-    	  alert("EVENT TRIGGERT " + e.target.id);
-    	});
     </script>
 
 
@@ -352,8 +347,15 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 
 
 <c:set var="enabledCriticalSeverity" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
-<c:set var="versionParts" value="${fn:split(enabledCriticalSeverity, '_')}" />
-<c:set var="version" value="${Double.parseDouble(versionParts[1])}" />
+<c:if test="${enabledCriticalSeverity != null}">
+	<c:set var="versionParts" value="${fn:split(enabledCriticalSeverity, '_')}" />
+	<c:set var="version" value="9.0" />
+	<c:if test="${versionParts != null}">
+	<c:if test="${not empty versionParts[1]}">
+		<c:set var="version" value="${Double.parseDouble(versionParts[1])}" />
+	</c:if>
+	</c:if>
+</c:if>
 <c:choose> 
 <c:when test="${version < 9.7}">
 <c:set var="hidelocalCriticalThreshold" value="style='display:none'"/>
@@ -1024,15 +1026,11 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody id="thresholdSection" ${hideThresholdSection}>
-						<tr>
+						<tr style='display:none'>
 							<th><label for="${optionsBean.enableCriticalSeverity}">Enable
 									Critical Severity</label></th>
 							<td><props:textProperty
 									name="${optionsBean.enableCriticalSeverity}" /></td>
-							<td>								
-		                        <label>${hidelocalCriticalThreshold}</label>
-		                        <label>Please work!!!</label>
-							</td>
 						</tr>
 						<tr>
 						<tbody id="CriticalField" ${hidelocalCriticalThreshold}>
@@ -1040,11 +1038,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
 		                    <td>
 		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
-		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
-		                        <input type="text"  value="${hidelocalCriticalThreshold}" />		                        
-		                        Hellow world!!!			                        	
-		                        <label>${hidelocalCriticalThreshold}</label>
-		                        <label>Please work!!!</label>	                        
+		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>	               
 		                    </td>
 		                    </tr>
                			 </tbody>
@@ -1162,7 +1156,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody  ${globalThresholdEnabled ? '' : optionsBean.noDisplay}>
-                <tr>
+                <tr ${hidelocalCriticalThreshold}>
                     <th>Critical</th>
                     <td>
                         <input type="text" class="longField" disabled
@@ -1243,7 +1237,6 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 let hasReloaded = localStorage.getItem('hasReloaded');
 const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
 error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
-   alert(error_cxCriticalThreshold.innerHTML);
    if (error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.' && !hasReloaded) {
        error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
        localStorage.setItem('hasReloaded', 'true');
@@ -1252,9 +1245,8 @@ error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
 });
 const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
 error_cxHighThreshold.addEventListener('DOMSubtreeModified', () => {
-   alert(error_cxHighThreshold.innerHTML);
-   if (error_cxHighThreshold.textContent == 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
-       error_cxHighThreshold.textContent = 'The configured SAST version does not supports Critical severity. Critical threshold can not be configured.. ';
+   if (error_cxHighThreshold.textContent == 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
+       error_cxHighThreshold.textContent = 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.. ';
        localStorage.setItem('hasReloaded', 'true');
        window.location.reload();
    }

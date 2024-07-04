@@ -14,7 +14,6 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import static com.checkmarx.teamcity.common.CxUtility.encrypt;
 import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import com.checkmarx.teamcity.common.SASTUtils;
-import jetbrains.buildServer.log.Loggers;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import jetbrains.buildServer.serverSide.InvalidProperty;
@@ -45,7 +44,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
     public CxEditRunTypeControllerExtension(@NotNull final SBuildServer server,
                                             @NotNull final CxAdminConfig cxAdminConfig) {
-    	Loggers.SERVER.info("CxEditRunTypeControllerExtension method start");
 
         server.registerExtension(EditRunTypeControllerExtension.class, CxConstants.RUNNER_TYPE, this);
 
@@ -55,8 +53,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public void fillModel(@NotNull final HttpServletRequest request,
                           @NotNull final BuildTypeForm form,
                           @NotNull final Map model) {
-    	
-    	Loggers.SERVER.info("fillModel method start");
 
         Map<String, String> properties = null;
         final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
@@ -82,7 +78,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         //put all global properties to the config page
         for (String conf : CxParam.GLOBAL_CONFIGS) {
             properties.put(conf, cxAdminConfig.getConfiguration(conf));
-            System.out.println(""+conf+":"+cxAdminConfig.getConfiguration(conf));
         }
 
         model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
@@ -92,21 +87,14 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         model.put(CxParam.GLOBAL_SERVER_URL, cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL));
         model.put(CxParam.GLOBAL_USERNAME, cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME));
         model.put(CxParam.GLOBAL_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD));
-        
-
-        Loggers.SERVER.info("fillModel method end");
     }
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
-    	Loggers.SERVER.info("updateState method start");
         //Empty implementation - currently not in use .
-    	Loggers.SERVER.info("updateState method end");
     }
 
     @Nullable
     public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
-    	Loggers.SERVER.info("getState method start");
-    	Loggers.SERVER.info("getState method end");
         return null;
         
     }
@@ -115,15 +103,11 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
                                 @NotNull final BuildTypeForm form,
                                 @NotNull final BuildTypeSettings buildTypeSettings,
                                 @NotNull final ActionErrors errors) {
-    	Loggers.SERVER.info("updateBuildType method start");
         //Empty implementation - currently not in use .
-    	Loggers.SERVER.info("updateBuildType method start");
     }
 
     @NotNull
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
-    	
-    	Loggers.SERVER.info("Validate method start");
         Map<String, String> properties = null;
         final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
         BasePropertiesBean basePropertiesBean = null;
@@ -131,20 +115,10 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
             Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
             basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
             properties = basePropertiesBean.getProperties();
-            
-            Map<String, String> optionValues = form.getOptionValues();
-            Loggers.SERVER.info("Actual option values: " + optionValues);
-            
-//            String[] fieldNames = form.getFieldNames();
-//            for(String fieldName : fieldNames) {
-//            	String fieldValue = form.getFieldValues(fieldName);
-//            	Loggers.SERVER.info("Field Name: " + fieldName + ", Field values:" +fieldValue);
-//            }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         String cxPass = properties.get(CxParam.PASSWORD);
-        System.out.println("cxPass from properties:"+cxPass);
 
         try {
             if(cxPass != null) {
@@ -182,52 +156,31 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-        System.out.println("Before our code change");
         String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
-        //String enableCriticalSeverity = properties.get(CxParam.ENABLE_CRITICAL_SEVERITY);
-        System.out.println("this.cxAdminConfig"+this.cxAdminConfig);
         
         String enableCriticalSeverity = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
-        System.out.println("EnableCriticalSeverity from Admin config"+enableCriticalSeverity);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
         	enableCriticalSeverity = "noChange_9.0";
         }
-        String criticalThreshold = properties.get(CxParam.CRITICAL_THRESHOLD);
-//        
-        Loggers.SERVER.info("is synchronous: " + isSynchronous);
-        Loggers.SERVER.info("thresholds enabled: " + thresholdsEnabled);
-        Loggers.SERVER.info("Use default server: " + useDefaultServer);
-        Loggers.SERVER.info("Enable critical severity: " + enableCriticalSeverity);
-        Loggers.SERVER.info("Critical threshold: " + criticalThreshold);
-        
-        Loggers.SERVER.info("Enable Critical Severity: " + enableCriticalSeverity +"******");
-//        if (criticalThreshold == null) {
-//        	   Loggers.SERVER.warn("criticalThreshold is null");
-//        	}
+        String criticalThreshold = properties.get(CxParam.CRITICAL_THRESHOLD);        
         	if (enableCriticalSeverity == null) {
-        	   Loggers.SERVER.warn("enableCriticalSeverity is null");
-//        	   enableCriticalSeverity = CxParam.OPTION_FALSE;
         	}
         	ActionErrors actionErrors = new ActionErrors();
 			if ("true".equals(isSynchronous)) {
-				Loggers.SERVER.info("synchronous is true");
 				if ("true".equals(thresholdsEnabled)) {
-					Loggers.SERVER.info("thresholds enabled is true");
 					Double version = 9.0;
 	                String cxServerUrl = "";
 	                String cxUser = "";
 	                String cxPassword = "";
 	                String proxyEnable = "";
 					if("true".equals(useDefaultServer)) {//For global configuration case  
-	                	Loggers.SERVER.info("Using default server configuration");
 	                	cxServerUrl = cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL);
 	                    cxUser = cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME);
 	                    cxPassword = cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD);       			
 	        		}
 	        		else { // For use specific case
-	        			Loggers.SERVER.info("Using specific server configuration");
 	        			cxServerUrl = properties.get(CxParam.SERVER_URL);
 	        	        cxUser = properties.get(CxParam.USERNAME);
 	        	        cxPassword = properties.get(CxParam.PASSWORD);      			
@@ -235,66 +188,34 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 					String sastVersion;
 					try {
 						sastVersion = SASTUtils.loginToServer(new URL(cxServerUrl), cxUser, decrypt(cxPassword));
-						Loggers.SERVER.info("Fetched SAST version: " + sastVersion);
-						System.out.println("Fetched SAST version: " + sastVersion);
 						String[] sastVersionSplit = sastVersion.split("\\.");
-						Loggers.SERVER.info("SAST version split: " + Arrays.toString(sastVersionSplit));
 						if (sastVersionSplit.length > 1) {
-							Loggers.SERVER.info("SAST version split[0]: " + sastVersionSplit[0]);
-							Loggers.SERVER.info("SAST version split[1]: " + sastVersionSplit[1]);
 							version = Double.parseDouble(sastVersionSplit[0] + "." + sastVersionSplit[1]);
-							Loggers.SERVER.info("Parsed SAST version: " + version);
-						} else {
-							Loggers.SERVER.error("Unexpected SAST version format: " + sastVersion);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
-						System.out.println("Error fetching SAST version: " + e.getMessage());
-						Loggers.SERVER.error("Error fetching SAST version: " + e.getMessage());
 					}
 					Double previousVersion = 9.0;
-					Loggers.SERVER.info("enable Critical Severity *******: " + enableCriticalSeverity);
 					if (enableCriticalSeverity != null) {
 						String[] arr = enableCriticalSeverity.split("_");
 						if (arr.length > 1) {
 							previousVersion = Double.parseDouble(arr[1]);
 						}
 					}
-					
-					Loggers.SERVER.info("previous Version *******: " + previousVersion);
 					if (!((previousVersion >= 9.7 && version >= 9.7) || (previousVersion < 9.7 && version < 9.7))) {
 						if (version >= 9.7) {
 							if(enableCriticalSeverity.startsWith("criticalSupported")) {
 								enableCriticalSeverity = "noChange_" + version;
 							}else {
-								
-							Loggers.SERVER.info("version greater or equal to 9.7:" + enableCriticalSeverity);
 							enableCriticalSeverity = "criticalSupported_" + version;
 							criticalThreshold = "";
-							//if (!errorShown) {
-							//actionErrors.addError(new InvalidProperty(CxParam.CRITICAL_THRESHOLD, "*****The configured SAST version supports Critical severity. Critical threshold can also be configured."));
-							System.out.println(
-									"SAST version supports Critical severity. Critical threshold can also be configured.");
-							Loggers.SERVER.info(
-									"SAST version supports Critical severity. Critical threshold can also be configured.");
-							//errorShown = true;
-							//}
 							}
 						} else {
 							if(enableCriticalSeverity.startsWith("criticalNotSupported")) {
 								enableCriticalSeverity = "noChange_" + version;
 							}else {
-							Loggers.SERVER.info("version less than 9.7:" + enableCriticalSeverity);
 							enableCriticalSeverity = "criticalNotSupported_" + version;
 							criticalThreshold = "";
-							//if (!errorShown) {
-							//actionErrors.addError(new InvalidProperty(CxParam.HIGH_THRESHOLD,"*******The configured SAST version does not supports Critical severity. Critical threshold can not be configured."));
-							System.out.println(
-									"SAST version does not support Critical severity. Critical threshold will not be applicable.");
-							Loggers.SERVER.info(
-									"SAST version does not support Critical severity. Critical threshold will not be applicable.");
-							//errorShown = true;
-							//}
 							}
 						}
 					} else {
@@ -310,19 +231,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 			       this.cxAdminConfig.persistConfiguration();
 			   } catch (IOException e) {
 			       e.printStackTrace();
-			       Loggers.SERVER.error("Error persisting configuration: " + e.getMessage());
 			   }
-			//form.setEnableCriticalSeverity(enableCriticalSeverity); // Set updated value in form
-		    //form.setCriticalThreshold(criticalThreshold); // Set updated value in form
-//			this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
-//			this.cxAdminConfig.persistConfiguration();
-//			Map<String,String> localProperties = new HashMap<>();
-//			localProperties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
-//			localProperties.put(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
-//			PropertiesUtil.storeProperties(localProperties, new File(this.cxAdminConfig.getServerPaths().getConfigDir(), "checkmarx-plugin.properties"), "");
-//			basePropertiesBean.setProperties(properties);
-
-        Loggers.SERVER.info("Validate method end");
         
         
         return actionErrors;
