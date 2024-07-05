@@ -2,6 +2,7 @@ package com.checkmarx.teamcity.server;
 
 import com.checkmarx.teamcity.common.CxConstants;
 import com.checkmarx.teamcity.common.CxParam;
+import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.controllers.StatefulObject;
@@ -11,6 +12,15 @@ import jetbrains.buildServer.controllers.admin.projects.EditRunTypeControllerExt
 import jetbrains.buildServer.serverSide.BuildTypeSettings;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import static com.checkmarx.teamcity.common.CxUtility.encrypt;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
+import com.checkmarx.teamcity.common.SASTUtils;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import jetbrains.buildServer.serverSide.InvalidProperty;
+import java.util.Vector;
+
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,15 +29,22 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.net.URL;
+import java.util.Arrays;
+
 
 import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
+    //private static boolean errorShown = false;
+    
+    List<InvalidProperty> result = new Vector<>();
 
     public CxEditRunTypeControllerExtension(@NotNull final SBuildServer server,
                                             @NotNull final CxAdminConfig cxAdminConfig) {
+
         server.registerExtension(EditRunTypeControllerExtension.class, CxConstants.RUNNER_TYPE, this);
 
         this.cxAdminConfig = cxAdminConfig;
@@ -70,7 +87,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         model.put(CxParam.GLOBAL_SERVER_URL, cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL));
         model.put(CxParam.GLOBAL_USERNAME, cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME));
         model.put(CxParam.GLOBAL_PASSWORD, cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD));
-
     }
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
@@ -80,6 +96,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     @Nullable
     public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         return null;
+        
     }
 
     public void updateBuildType(@NotNull final HttpServletRequest request,
@@ -93,9 +110,10 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         Map<String, String> properties = null;
         final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
+        BasePropertiesBean basePropertiesBean = null;
         try {
             Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
-            BasePropertiesBean basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
+            basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
             properties = basePropertiesBean.getProperties();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -138,6 +156,85 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
-        return new ActionErrors();
+        String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
+        String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
+        String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
+        
+        String enableCriticalSeverity = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
+        	enableCriticalSeverity = "noChange_9.0";
+        }
+        String criticalThreshold = properties.get(CxParam.CRITICAL_THRESHOLD);        
+        	if (enableCriticalSeverity == null) {
+        	}
+        	ActionErrors actionErrors = new ActionErrors();
+			if ("true".equals(isSynchronous)) {
+				if ("true".equals(thresholdsEnabled)) {
+					Double version = 9.0;
+	                String cxServerUrl = "";
+	                String cxUser = "";
+	                String cxPassword = "";
+	                String proxyEnable = "";
+					if("true".equals(useDefaultServer)) {//For global configuration case  
+	                	cxServerUrl = cxAdminConfig.getConfiguration(CxParam.GLOBAL_SERVER_URL);
+	                    cxUser = cxAdminConfig.getConfiguration(CxParam.GLOBAL_USERNAME);
+	                    cxPassword = cxAdminConfig.getConfiguration(CxParam.GLOBAL_PASSWORD);       			
+	        		}
+	        		else { // For use specific case
+	        			cxServerUrl = properties.get(CxParam.SERVER_URL);
+	        	        cxUser = properties.get(CxParam.USERNAME);
+	        	        cxPassword = properties.get(CxParam.PASSWORD);      			
+	        		}
+					String sastVersion;
+					try {
+						sastVersion = SASTUtils.loginToServer(new URL(cxServerUrl), cxUser, decrypt(cxPassword));
+						String[] sastVersionSplit = sastVersion.split("\\.");
+						if (sastVersionSplit.length > 1) {
+							version = Double.parseDouble(sastVersionSplit[0] + "." + sastVersionSplit[1]);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					Double previousVersion = 9.0;
+					if (enableCriticalSeverity != null) {
+						String[] arr = enableCriticalSeverity.split("_");
+						if (arr.length > 1) {
+							previousVersion = Double.parseDouble(arr[1]);
+						}
+					}
+					if (!((previousVersion >= 9.7 && version >= 9.7) || (previousVersion < 9.7 && version < 9.7))) {
+						if (version >= 9.7) {
+							if(enableCriticalSeverity.startsWith("criticalSupported")) {
+								enableCriticalSeverity = "noChange_" + version;
+							}else {
+							enableCriticalSeverity = "criticalSupported_" + version;
+							criticalThreshold = "";
+							}
+						} else {
+							if(enableCriticalSeverity.startsWith("criticalNotSupported")) {
+								enableCriticalSeverity = "noChange_" + version;
+							}else {
+							enableCriticalSeverity = "criticalNotSupported_" + version;
+							criticalThreshold = "";
+							}
+						}
+					} else {
+						enableCriticalSeverity = "noChange_" + version;
+					}
+				}
+			}
+			properties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
+			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+			try {
+				
+			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+			       this.cxAdminConfig.persistConfiguration();
+			   } catch (IOException e) {
+			       e.printStackTrace();
+			   }
+        
+        
+        return actionErrors;
+        
     }
 }

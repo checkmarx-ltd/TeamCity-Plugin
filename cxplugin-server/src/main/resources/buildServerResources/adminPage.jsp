@@ -60,6 +60,16 @@
           $("invalid_cxGlobalScanTimeoutInMinutes").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalScanTimeoutInMinutes"));
         },
+        
+        onInvalid_cxGlobalCriticalThresholdError: function (elem) {
+            $("invalid_cxGlobalCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.criticallightErrorField($("cxGlobalCriticalThreshold"));
+          },
+          
+          onInvalid_cxGlobalEnableCriticalSeverityError: function (elem) {
+              $("invalid_cxGlobalEnableCriticalSeverity").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+              SettingsForm.criticallightErrorField($("cxGlobalEnableCriticalSeverity"));
+            },
 
         onInvalid_cxGlobalHighThresholdError: function (elem) {
           $("invalid_cxGlobalHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
@@ -75,6 +85,11 @@
           $("invalid_cxGlobalLowThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalLowThreshold"));
         },
+        
+        onInvalid_cxGlobalOsaCriticalThresholdError: function (elem) {
+            $("invalid_cxGlobalOsaCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalOsaCriticalThreshold"));
+          },
 
         onInvalid_cxGlobalOsaHighThresholdError: function (elem) {
           $("invalid_cxGlobalOsaHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
@@ -151,6 +166,9 @@
 <c:if test="${cxGlobalThresholdEnabled != 'true'}">
   <c:set var="hideThresholdSection" value="style='display:none'"/>
 </c:if>
+<c:if test="${cxGlobalEnableCriticalSeverity != 'true'}">
+  <c:set var="hideCriticalThreshold" value="style='display:none'"/>
+</c:if>
 <c:if test="${cxGlobalIsExploitablePath != 'true'}">
   <c:set var="hideExpPathSection" value="style='display:none'"/>
 </c:if>
@@ -181,6 +199,8 @@
 <div>
 	<bs:refreshable containerId="generalSettings" pageUrl="${pageUrl}">
 		<bs:messages key="settingsSaved"/>
+		<bs:messages key="criticalSeverityMessage"/>
+		<bs:messages key="criticalSeverityErrorMessage"/>
 		<form id="globalSettingsForm" action="<c:url value='/admin/checkmarxSettings.html'/>" method="post" onsubmit="{return SettingsForm.save()}">
 			<table class="runnerFormTable">
 				<tr class="groupingTitle">
@@ -308,6 +328,23 @@
 							</td>
 						</tr>
 						<tbody id="thresholdSection" ${hideThresholdSection}>
+								<tr style='display:none'>
+									<th><label for="cxGlobalEnableCriticalSeverity">Enable Critical Severity</label></th>
+									<td><forms:checkbox name="cxGlobalEnableCriticalSeverity"
+											value="${cxGlobalEnableCriticalSeverity}"
+											checked="${cxGlobalEnableCriticalSeverity}" />
+									</td>
+								</tr>
+									<tr id="criticalThresholdSection" ${hideCriticalThreshold}>
+									<th>
+										<label for="cxGlobalCriticalThreshold">Critical</label>
+									</th>
+									<td>
+										<forms:textField name="cxGlobalCriticalThreshold" value="${cxGlobalCriticalThreshold}" className="longField"/>
+										<span class="error" id="invalid_cxGlobalCriticalThreshold"/>
+										
+									</td>
+									</tr>
 						<tr>
 							<th>
 								<label for="cxGlobalHighThreshold">High</label>
@@ -348,6 +385,15 @@
 		</td>
 	</tr>
 	<tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
+	<tr>
+		<th>
+			<label for="cxGlobalOsaCriticalThreshold">Critical</label>
+		</th>
+		<td>
+			<forms:textField name="cxGlobalOsaCriticalThreshold" value="${cxGlobalOsaCriticalThreshold}" className="longField"/>
+			<span class="error" id="invalid_cxGlobalOsaCriticalThreshold"/>
+		</td>
+	</tr>
 	<tr>
 		<th>
 			<label for="cxGlobalOsaHighThreshold">High</label>

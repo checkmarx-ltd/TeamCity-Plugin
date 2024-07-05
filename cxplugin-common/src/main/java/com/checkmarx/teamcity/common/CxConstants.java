@@ -34,6 +34,8 @@ public abstract class CxConstants {
 
     public static final String CONNECTION_SUCCESSFUL_MESSAGE = "Connection successful";
     public static final String SUCCESSFUL_SAVE_MESSAGE = "Settings Saved Successfully";
+    public static final String CRITICAL_SEVERITY_MESSAGE = "The configured SAST version supports Critical severity. Critical threshold can also be configured.";
+    public static final String CRITICAL_SEVERITY_ERROR_MESSAGE= "The configured SAST version does not support Critical severity. Critical threshold will not be applicable.";
     public final static String NO_PRESET_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see presets list";
     public final static String NO_TEAM_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see teams list";
     public final static String NO_ENGINE_CONFIG_MESSAGE = "Unable to connect to server. Make sure URL and credentials are valid to see engine configuration list";

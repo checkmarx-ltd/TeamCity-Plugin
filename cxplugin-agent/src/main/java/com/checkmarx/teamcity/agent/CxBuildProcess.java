@@ -1,6 +1,7 @@
 package com.checkmarx.teamcity.agent;
 
 import com.checkmarx.teamcity.common.CxConstants;
+import static com.checkmarx.teamcity.common.CxUtility.decrypt;
 import com.cx.restclient.CxClientDelegator;
 import com.cx.restclient.common.CxPARAM;
 import com.cx.restclient.configuration.CxScanConfig;
@@ -9,6 +10,8 @@ import com.cx.restclient.dto.ScannerType;
 import com.cx.restclient.dto.scansummary.ScanSummary;
 import com.cx.restclient.exception.CxClientException;
 import com.cx.restclient.sast.dto.SASTResults;
+import java.net.URL;
+import com.checkmarx.teamcity.common.SASTUtils;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
@@ -237,6 +240,24 @@ public class CxBuildProcess extends CallableBuildProcess {
             logger.info("Generate PDF report: " + config.getGeneratePDFReport());
             logger.info("CxSAST thresholds enabled: " + config.getSastThresholdsEnabled());
             if (config.getSastThresholdsEnabled()) {
+                String cxServerUrl = config.getUrl();
+                String cxUser = config.getUsername();
+                String cxPass = config.getPassword();
+                Double version = 9.0;
+                String sastVersion;
+                // Fetch SAST version using API call
+                try {
+                    sastVersion = SASTUtils.loginToServer(new URL(cxServerUrl), cxUser, decrypt(cxPass));
+                    String[] sastVersionSplit = sastVersion.split("\\.");
+                    version = Double.parseDouble(sastVersionSplit[0] + "." + sastVersionSplit[1]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // Check if SAST version supports critical threshold
+                if (version >= 9.7) {
+                    logger.info("CxSAST critical threshold: " + (config.getSastCriticalThreshold() == null ? NO_THRESHOLD : config.getSastCriticalThreshold()));
+                }
+            	logger.info("CxSAST critical threshold: " + (config.getSastCriticalThreshold() == null ? NO_THRESHOLD : config.getSastCriticalThreshold()));
                 logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? NO_THRESHOLD : config.getSastHighThreshold()));
                 logger.info("CxSAST medium threshold: " + (config.getSastMediumThreshold() == null ? NO_THRESHOLD : config.getSastMediumThreshold()));
                 logger.info("CxSAST low threshold: " + (config.getSastLowThreshold() == null ? NO_THRESHOLD : config.getSastLowThreshold()));
@@ -252,6 +273,7 @@ public class CxBuildProcess extends CallableBuildProcess {
         	logger.info(" Include/Exclude Filter patterns: " + config.getOsaFilterPattern());	        
         	logger.info(" Dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
 	        if (config.getOsaThresholdsEnabled()) {
+	        	logger.info(" Dependency Scan critical threshold: " + (config.getOsaCriticalThreshold() == null ? "[No Threshold]" : config.getOsaCriticalThreshold()));
 	        	logger.info(" Dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
 	        	logger.info(" Dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
 	        	logger.info(" Dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
