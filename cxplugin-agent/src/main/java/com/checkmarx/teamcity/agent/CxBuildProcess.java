@@ -257,7 +257,6 @@ public class CxBuildProcess extends CallableBuildProcess {
                 if (version >= 9.7) {
                     logger.info("CxSAST critical threshold: " + (config.getSastCriticalThreshold() == null ? NO_THRESHOLD : config.getSastCriticalThreshold()));
                 }
-            	logger.info("CxSAST critical threshold: " + (config.getSastCriticalThreshold() == null ? NO_THRESHOLD : config.getSastCriticalThreshold()));
                 logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? NO_THRESHOLD : config.getSastHighThreshold()));
                 logger.info("CxSAST medium threshold: " + (config.getSastMediumThreshold() == null ? NO_THRESHOLD : config.getSastMediumThreshold()));
                 logger.info("CxSAST low threshold: " + (config.getSastLowThreshold() == null ? NO_THRESHOLD : config.getSastLowThreshold()));

@@ -1033,15 +1033,14 @@ Example of Project Full Path: CxServer/team1/projectname."/>
 									name="${optionsBean.enableCriticalSeverity}" /></td>
 						</tr>
 						<tr>
-						<tbody id="CriticalField" ${hidelocalCriticalThreshold}>
-		                    <tr>
+					
+		                    <tr id="CriticalField" ${hidelocalCriticalThreshold}>
 		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
 		                    <td>
 		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
 		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>	               
 		                    </td>
 		                    </tr>
-               			 </tbody>
                			 </tr>
                 <tr>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
