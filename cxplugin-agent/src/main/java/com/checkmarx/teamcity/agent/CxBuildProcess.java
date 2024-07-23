@@ -272,7 +272,9 @@ public class CxBuildProcess extends CallableBuildProcess {
         	logger.info(" Include/Exclude Filter patterns: " + config.getOsaFilterPattern());	        
         	logger.info(" Dependency Scan thresholds enabled: " + config.getOsaThresholdsEnabled());
 	        if (config.getOsaThresholdsEnabled()) {
+	        	if (config.isAstScaEnabled()) {
 	        	logger.info(" Dependency Scan critical threshold: " + (config.getOsaCriticalThreshold() == null ? "[No Threshold]" : config.getOsaCriticalThreshold()));
+	        	}
 	        	logger.info(" Dependency Scan high threshold: " + (config.getOsaHighThreshold() == null ? "[No Threshold]" : config.getOsaHighThreshold()));
 	        	logger.info(" Dependency Scan medium threshold: " + (config.getOsaMediumThreshold() == null ? "[No Threshold]" : config.getOsaMediumThreshold()));
 	        	logger.info(" Dependency Scan low threshold: " + (config.getOsaLowThreshold() == null ? "[No Threshold]" : config.getOsaLowThreshold()));
