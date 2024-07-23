@@ -1069,7 +1069,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 <tbody id="osaThresholdSection">
                 <tr>
                     <th><label for="${optionsBean.osaThresholdEnabled}">Enable Dependency Scan Vulnerability Thresholds
-                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/></label>
                     </th>
                     <td>
@@ -1188,7 +1188,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 <tbody id="globalOsaThresholdSection">
                 <tr>
                     <th>Enable Dependency Scan Vulnerability Thresholds
-                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalOsaThresholdEnabled ? 'checked' : ''}/>

@@ -376,7 +376,7 @@
 					<tr>
 		<th>
 			<label for="cxGlobalOsaThresholdEnabled">Enable Dependency Scan Vulnerability Thresholds
-						<bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+						<bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/>
 			</label>
 		</th>
