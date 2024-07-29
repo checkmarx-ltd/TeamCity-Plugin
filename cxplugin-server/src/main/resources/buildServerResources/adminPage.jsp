@@ -32,6 +32,7 @@
 
         jQuery('#osaInput')[cxGlobalOsaEnabled ? 'show' : 'hide']();
         jQuery('#scaInput')[cxGlobalScaEnabled ? 'show' : 'hide']();
+        jQuery('#scaCriticalThresholdSection')[cxGlobalScaEnabled ? 'show' : 'hide']();
     }
     
     jQuery(handleRadioButtonClick);
@@ -385,7 +386,7 @@
 		</td>
 	</tr>
 	<tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
-	<tr>
+	<tr id="scaCriticalThresholdSection" ${hideScaInput}>
 		<th>
 			<label for="cxGlobalOsaCriticalThreshold">Critical</label>
 		</th>

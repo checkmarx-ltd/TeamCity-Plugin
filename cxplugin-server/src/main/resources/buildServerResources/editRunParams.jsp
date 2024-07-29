@@ -1080,7 +1080,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                         <props:checkboxProperty name="${optionsBean.osaThresholdEnabled}" onclick="${onclick}"/>
                     </td>
                 </tr>
-                <tr class="osaThresholdRow" ${hideOsaThresholdSection}>
+                <tr id="osaCriticalThresholdRow" class="osaThresholdRow scaInput" ${hideOsaThresholdSection}>
                     <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.osaCriticalThreshold}" className="longField"/>
