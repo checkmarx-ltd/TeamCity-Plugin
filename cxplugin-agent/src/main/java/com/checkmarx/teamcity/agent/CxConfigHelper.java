@@ -261,22 +261,6 @@ public class CxConfigHelper {
 				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
 				scaConfig.setConfigFilePaths(trimmedConfigPaths);
 			}
-			
-			//set the exp path params
-
-			String isExpPath = globalParameters.get(GLOBAL_IS_EXPLOITABLE_PATH);
-			if (TRUE.equals(isExpPath)) {
-				String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
-				String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
-				String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
-
-				scaConfig.setSastServerUrl(scaSASTServerUrl);
-				scaConfig.setSastUsername(scaSASTServerUserName);
-				scaConfig.setSastPassword(scaSASTServerPassword);
-				scaConfig.setSastProjectName(validateNotEmpty(buildParameters.get(PROJECT_NAME), PROJECT_NAME));
-
-			}
-
 		}else {
 			scaConfig.setAccessControlUrl(buildParameters.get(SCA_ACCESS_CONTROL_URL));
             scaConfig.setWebAppUrl(buildParameters.get(SCA_WEB_APP_URL));
@@ -296,7 +280,6 @@ public class CxConfigHelper {
             //add SCA Resolver code here
             if (buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE) != null
                     && "SCAResolver".equalsIgnoreCase(buildParameters.get(DEPENDENCY_SCA_SCAN_TYPE))) {
-//                scaResolverPathExist(buildParameters.get(SCA_RESOLVER_PATH));
                 validateScaResolverParams(buildParameters.get(SCA_RESOLVER_ADD_PARAMETERS));
                 scaConfig.setEnableScaResolver(true);
             }
@@ -315,35 +298,6 @@ public class CxConfigHelper {
 				String[] strArrayFile = configFilePaths.split(",");
 				List<String> trimmedConfigPaths = getTrimmedConfigPaths(strArrayFile);
 				scaConfig.setConfigFilePaths(trimmedConfigPaths);
-			}
-			
-			//set the exp path params
-
-			String isExpPath = buildParameters.get(IS_EXPLOITABLE_PATH);
-			if (TRUE.equals(isExpPath)) {
-				String sastProjectName = buildParameters.get(SCA_SAST_PROJECT_FULLPATH);
-				String sastProjectId = buildParameters.get(SCA_SAST_PROJECT_ID);
-				scaConfig.setSastProjectName(sastProjectName);
-				scaConfig.setSastProjectId(sastProjectId);
-				if (!TRUE.equals(buildParameters.get(USE_SAST_DEFAULT_SERVER))) {
-					String scaSASTServerUrl = buildParameters.get(SCA_SAST_SERVER_URL);
-					String scaSASTServerUserName = buildParameters.get(SCA_SAST_SERVER_USERNAME);
-					String scaSASTServerPassword = decrypt(buildParameters.get(SCA_SAST_SERVER_PASSWORD));
-
-					scaConfig.setSastServerUrl(scaSASTServerUrl);
-					scaConfig.setSastUsername(scaSASTServerUserName);
-					scaConfig.setSastPassword(scaSASTServerPassword);
-				} else {
-					String scaSASTServerUrl = globalParameters.get(GLOBAL_SAST_SERVER_URL);
-					String scaSASTServerUserName = globalParameters.get(GLOBAL_SAST_SERVER_USERNAME);
-					String scaSASTServerPassword = decrypt(globalParameters.get(GLOBAL_SAST_SERVER_PASSWORD));
-
-					scaConfig.setSastServerUrl(scaSASTServerUrl);
-					scaConfig.setSastUsername(scaSASTServerUserName);
-					scaConfig.setSastPassword(scaSASTServerPassword);
-				}
-				
-
 			}
 		}
 		return scaConfig;

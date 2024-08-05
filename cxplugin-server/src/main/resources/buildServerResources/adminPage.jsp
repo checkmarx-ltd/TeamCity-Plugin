@@ -130,20 +130,7 @@
          onInvalid_cxGlobalSCATenantError: function (elem) {
                   $("invalid_cxGlobalSCATenant").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
                   SettingsForm.highlightErrorField($("cxGlobalSCATenant"));
-        },
-        
-        onInvalid_cxGlobalSastServerUrlError: function (elem) {
-            $("invalid_cxGlobalSastServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastServerUrl"));
-          },
-          onInvalid_cxGlobalSastUsernameError: function (elem) {
-            $("invalid_cxGlobalSastUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastUsername"));
-          },
-          onInvalid_cxGlobalSastPasswordError: function (elem) {
-            $("invalid_cxGlobalSastPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastPassword"));
-          },  
+        }, 
         onSuccessfulSave: function () {        
           SettingsForm.enable();
         },
@@ -169,9 +156,6 @@
 </c:if>
 <c:if test="${cxGlobalEnableCriticalSeverity != 'true'}">
   <c:set var="hideCriticalThreshold" value="style='display:none'"/>
-</c:if>
-<c:if test="${cxGlobalIsExploitablePath != 'true'}">
-  <c:set var="hideExpPathSection" value="style='display:none'"/>
 </c:if>
 <c:if test="${globalDependencyScanEnabled != 'true'}">
 	<c:set var="hideGlobalDependencyScanRow" value="style='display:none'"/>
@@ -602,56 +586,7 @@
 				<textarea rows="5" cols="50" name="cxGlobalScaEnvVariable" wrap="off">${cxGlobalScaEnvVariable}</textarea>
 			</td>
 		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalIsExploitablePath">Enable Exploitable Path
-							<bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. In this section, provide details like CxSAST server url, credentials. At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST.
-Example of Project Full Path: CxServer/team1/projectname"/>
-				</label>
-			</th>
-			<td>
-				<forms:checkbox name="cxGlobalIsExploitablePath" value="${cxGlobalIsExploitablePath}" checked="${cxGlobalIsExploitablePath}" onclick="$('expPathSection').toggle()"/>
-			</td>
-		</tr>
-		<tbody id="expPathSection" ${hideExpPathSection}>
-		<tr>
-			<th>
-				<label for="cxGlobalSastServerUrl">Server URL<l:star/>
-				</label>
-			</th>
-			<td>
-				<forms:textField name="cxGlobalSastServerUrl" value="${cxGlobalSastServerUrl}" className="longField"/>
-				<span class="error" id="invalid_cxGlobalSastServerUrl"/>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalSastUsername">Username<l:star/>
-				</label>
-			</th>
-			<td>
-				<forms:textField name="cxGlobalSastUsername" value="${cxGlobalSastUsername}" className="longField"/>
-				<span class="error" id="invalid_cxGlobalSastUsername"/>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalSastPassword">Password<l:star/>
-				</label>
-			</th>
-			<td>
-				<input type="password" id="cxGlobalSastPassword" name="cxGlobalSastPassword" value="${cxGlobalSastPassword}" class="longField"/>
-				<span class="error" id="invalid_cxGlobalSastPassword"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<form>
-					<input id="testScaSastConnection" type="button" name="TestScaSastConnection" value="Connect to Server" onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractGlobalSASTCredentials())"/>
-					<span id="testScaSASTConnectionMsg"/>
-				</form>
-			</td>
-		</tr>
+		
 	</tbody>
 	
 </tbody>

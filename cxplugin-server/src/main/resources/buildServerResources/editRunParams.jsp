@@ -360,13 +360,21 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 	<c:if test="${not empty versionParts[2]}">
 		<c:set var="previousVersion" value="${Double.parseDouble(versionParts[2])}" />
 	</c:if>
+	<c:if test="${not empty versionParts[3]}">
+		<c:set var="updatedUrl" value="${versionParts[3]}" />
 	</c:if>
-</c:if>
-<p>error_cxCriticalThreshold:<c:out value = "${error_cxCriticalThreshold}"/>:</p>
-<p>error_cxHighThreshold:<c:out value = "${error_cxHighThreshold}"/>:</p>
-
-<c:if test="${criticalSupportFlag != 'noChange' && empty error_cxCriticalThreshold && empty error_cxHighThreshold}">
-	<c:set var="version" value="${previousVersion}" />
+	<c:choose> 
+		<c:when test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
+		<c:set var="urlForCurrentVersion" value="${propertiesBean.properties[optionsBean.globalServerUrl]}" /> 
+		</c:when>
+	<c:otherwise>
+		<c:set var="urlForCurrentVersion" value="${propertiesBean.properties[optionsBean.serverUrl]}" /> 
+	</c:otherwise>
+	</c:choose>
+		<c:if test="${urlForCurrentVersion != updatedUrl}">
+			<c:set var="version" value="${previousVersion}" />
+		</c:if>
+	</c:if>
 </c:if>
 <c:choose> 
 <c:when test="${version < 9.7}">
@@ -894,74 +902,6 @@ Example: param1:value1,param2:value2"/>
         </td>
     </tr>
     
-    <tr class="dependencyScanRow scaInput enableManifestFile">
-        <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
-            <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
-In this section, provide details like CxSAST server url, credentials.
-At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST. 
-<p>
-Example of Project Full Path: CxServer/team1/projectname."/>
-        </label></th>
-        <td> 
-       
-        <props:checkboxProperty name="${optionsBean.isExploitablePath}" onclick="updateDependencyScanSectionVisibility()"/>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath">
-        <th>
-            <label for="${optionsBean.useSASTDefaultServer}">Use Global Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
-            Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
-        </th>
-        <td>
-            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTServerUrl}">Server URL<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTServerUrl}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTServerUrl}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTUserName}">Username<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTUserName}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTUserName}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTPassword}">Password<l:star/></label></th>
-        <td>
-            <props:passwordProperty name="${optionsBean.scaSASTPassword}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTPassword}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-    <td>
-        <form>
-            <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
-                   onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
-            <span id="testScaSASTConnectionMsg"></span>
-        </form>
-    </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath">
-        <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTProjectFullPath}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTProjectFullPath}"></span>
-        </td>
-    </tr>
-    
-    <tr  class="dependencyScanRow scaInput expPath">
-        <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTProjectID}"></span>
-        </td>
-    </tr>
    
     <!-- END SCA FEATURES -->
     

@@ -205,21 +205,21 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 					if (!((previousVersion >= 9.7 && version >= 9.7) || (previousVersion < 9.7 && version < 9.7))) {
 						if (version >= 9.7) {
 							if(enableCriticalSeverity.startsWith("criticalSupported")) {
-								enableCriticalSeverity = "noChange_" + version + "_" + previousVersion;
+								enableCriticalSeverity = "noChange_" + version + "_" + previousVersion + "_" + cxServerUrl;
 							}else {
-							enableCriticalSeverity = "criticalSupported_" + version + "_" + previousVersion;
+							enableCriticalSeverity = "criticalSupported_" + version + "_" + previousVersion + "_" + cxServerUrl;
 							criticalThreshold = "";
 							}
 						} else {
 							if(enableCriticalSeverity.startsWith("criticalNotSupported")) {
-								enableCriticalSeverity = "noChange_" + version + "_" + previousVersion;
+								enableCriticalSeverity = "noChange_" + version + "_" + previousVersion + "_" + cxServerUrl;
 							}else {
-							enableCriticalSeverity = "criticalNotSupported_" + version + "_" + previousVersion;
+							enableCriticalSeverity = "criticalNotSupported_" + version + "_" + previousVersion + "_" + cxServerUrl;
 							criticalThreshold = "";
 							}
 						}
 					} else {
-						enableCriticalSeverity = "noChange_" + version + "_" + previousVersion;
+						enableCriticalSeverity = "noChange_" + version + "_" + previousVersion + "_" + cxServerUrl;
 					}
 				}
 			}

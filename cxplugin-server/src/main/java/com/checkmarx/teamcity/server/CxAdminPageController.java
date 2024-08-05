@@ -47,7 +47,6 @@ public class CxAdminPageController extends BaseFormXmlController {
 
     @Override
     protected void doPost(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response, @NotNull final Element xmlResponse) {
-
         ActionErrors actionErrors = validateForm(request);
         if(actionErrors.hasErrors()) {
             actionErrors.serialize(xmlResponse);
@@ -58,14 +57,10 @@ public class CxAdminPageController extends BaseFormXmlController {
             cxAdminConfig.setConfiguration(config, StringUtil.emptyIfNull(request.getParameter(config)));
         }
 
-
         String sastAndOsaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalPassword");
         cxAdminConfig.setConfiguration(GLOBAL_PASSWORD, sastAndOsaPassword);
-
         String scaPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSCAPassword");
         cxAdminConfig.setConfiguration(GLOBAL_SCA_PASSWORD, scaPassword);
-        String sastPassword = ensurePasswordEncryption(request, "encryptedCxGlobalSastPassword");
-        cxAdminConfig.setConfiguration(GLOBAL_SAST_SERVER_PASSWORD, sastPassword);
         getOrCreateMessages(request).addMessage("settingsSaved", SUCCESSFUL_SAVE_MESSAGE);
 
         String globalIsSynchronous = request.getParameter(GLOBAL_IS_SYNCHRONOUS);
@@ -78,7 +73,6 @@ public class CxAdminPageController extends BaseFormXmlController {
         	if (globalEnableCriticalSeverity == null) {
         	   globalEnableCriticalSeverity = OPTION_FALSE;
         	}
-        
         if ("true".equals(globalIsSynchronous)) {
             if ("true".equals(globalThresholdsEnabled)) {
                 Double version = 9.0;
@@ -109,7 +103,6 @@ public class CxAdminPageController extends BaseFormXmlController {
         }
         cxAdminConfig.setConfiguration(GLOBAL_CRITICAL_THRESHOLD, globalCriticalThreshold);
         cxAdminConfig.setConfiguration(GLOBAL_ENABLE_CRITICAL_SEVERITY, globalEnableCriticalSeverity);
-        
         try {
             cxAdminConfig.persistConfiguration();
         } catch (IOException e) {
@@ -123,7 +116,6 @@ public class CxAdminPageController extends BaseFormXmlController {
     }
 
     private ActionErrors validateForm(final HttpServletRequest request) {
-
         ActionErrors ret = new ActionErrors();
 
         String cxGlobalServerUrl = request.getParameter(GLOBAL_SERVER_URL);
@@ -140,34 +132,12 @@ public class CxAdminPageController extends BaseFormXmlController {
         if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter(GLOBAL_USERNAME))) {
             ret.addError(INVALID + GLOBAL_USERNAME, USERNAME_NOT_EMPTY_MESSAGE);
         }
-
+        
         if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter("encryptedCxGlobalPassword"))) {
             ret.addError(INVALID + GLOBAL_PASSWORD, PASSWORD_NOT_EMPTY_MESSAGE);
         }
 
         validateNumericLargerThanZero(GLOBAL_SCAN_TIMEOUT_IN_MINUTES, SCAN_TIMEOUT_POSITIVE_INTEGER_MESSAGE, request, ret);
-
-        if(TRUE.equals(request.getParameter(GLOBAL_IS_EXPLOITABLE_PATH))){
-        	
-        	String cxGlobalSastServerUrl = request.getParameter(GLOBAL_SAST_SERVER_URL);
-            if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(cxGlobalSastServerUrl)) {
-                ret.addError(INVALID + GLOBAL_SAST_SERVER_URL, SAST_URL_NOT_EMPTY_MESSAGE);
-            } else {
-                try {
-                    new URL(cxGlobalSastServerUrl);
-                } catch (MalformedURLException e) {
-                    ret.addError(INVALID + GLOBAL_SAST_SERVER_URL, SAST_URL_NOT_VALID_MESSAGE);
-                }
-            }
-
-            if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter(GLOBAL_SAST_SERVER_USERNAME))) {
-                ret.addError(INVALID + GLOBAL_SAST_SERVER_USERNAME, SAST_USERNAME_NOT_EMPTY_MESSAGE);
-            }
-        	
-        	if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(request.getParameter("encryptedCxGlobalSastPassword"))) {
-                ret.addError(INVALID + GLOBAL_SAST_SERVER_PASSWORD, SAST_PASSWORD_NOT_EMPTY_MESSAGE);
-            }
-        }
 
         if(TRUE.equals(request.getParameter(GLOBAL_IS_SYNCHRONOUS))) {
 
@@ -177,7 +147,7 @@ public class CxAdminPageController extends BaseFormXmlController {
                 validateNumeric(GLOBAL_MEDIUM_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_LOW_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
             }
-
+            
             if(TRUE.equals(request.getParameter(GLOBAL_OSA_THRESHOLD_ENABLED))) {
             	validateNumeric(GLOBAL_OSA_CRITICAL_THRESHOLD,THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
                 validateNumeric(GLOBAL_OSA_HIGH_THRESHOLD, THRESHOLD_POSITIVE_INTEGER_MESSAGE, request, ret);
