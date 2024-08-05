@@ -285,16 +285,7 @@ public class CxOptions {
     public String getGlobalUsername() {
         return GLOBAL_USERNAME;
     }
-
-    @NotNull
-    public String getGlobalSastServerUrl() {
-        return GLOBAL_SAST_SERVER_URL;
-    }
-
-    @NotNull
-    public String getGlobalSastUsername() {
-        return GLOBAL_SAST_SERVER_USERNAME;
-    }
+    
     @NotNull
     public String getGlobalExcludeFolders() {
         return GLOBAL_EXCLUDE_FOLDERS;
