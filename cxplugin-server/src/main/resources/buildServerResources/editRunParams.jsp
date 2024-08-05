@@ -1032,13 +1032,15 @@ Example: param1:value1,param2:value2"/>
                         <props:checkboxProperty name="${optionsBean.osaThresholdEnabled}" onclick="${onclick}"/>
                     </td>
                 </tr>
-                <tr id="osaCriticalThresholdRow" class="osaThresholdRow scaInput" ${hideOsaThresholdSection}>
-                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
-                    <td>
-                        <props:textProperty name="${optionsBean.osaCriticalThreshold}" className="longField"/>
-                        <span class="error" id="error_${optionsBean.osaCriticalThreshold}"></span>
-                    </td>
-                </tr>
+                <tbody class="scaInput">
+                	<tr class="osaThresholdRow" ${hideOsaThresholdSection}>
+	                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
+	                    <td>
+	                        <props:textProperty name="${optionsBean.osaCriticalThreshold}" className="longField"/>
+	                        <span class="error" id="error_${optionsBean.osaCriticalThreshold}"></span>
+	                    </td>
+                    </tr>
+                </tbody>
                 <tr class="osaThresholdRow" ${hideOsaThresholdSection}>
                     <th><label for="${optionsBean.osaHighThreshold}">High</label></th>
                     <td>
