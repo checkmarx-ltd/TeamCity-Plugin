@@ -26,7 +26,7 @@
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        jQuery('.scaInputCritical')[(isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled == 'SCA') ? 'show' : 'hide']();
+        jQuery('.scaInputCritical')[(isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled) ? 'show' : 'hide']();
         alert("cx Global Sca Enabled" + isGlobalScaEnabled);
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
@@ -421,11 +421,11 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 <c:if test="${propertiesBean.properties[optionsBean.globalProjectPolicyViolation] != 'true'}">
     <c:set var="globalProjectPolicydEnabled" value="false"/>
 </c:if>
-
-<c:if test="${propertiesBean.properties[optionsBean.globalScaEnabled] == 'SCA'}">
+<c:set var="scanType" value="cxGlobalDependencyScanType"/>
+<c:if test="${propertiesBean.properties[scanType] == 'SCA'}">
     <c:set var="globalScaScanEnabled" value="true"/>
 </c:if>
-<c:if test="${propertiesBean.properties[optionsBean.globalScaEnabled] != 'SCA'}">
+<c:if test="${propertiesBean.properties[scanType] != 'SCA'}">
     <c:set var="globalScaScanEnabled" value="false"/>
 </c:if>
 
