@@ -17,16 +17,17 @@
             isEnableExpPath = jQuery('#isExploitablePath').prop('checked'),
             isEnableSCAResolver = jQuery('#ScaResolverEnabled').prop('checked'),
             isManifestFileEnabled = jQuery('#ManifestFileEnabled').prop('checked'),
-             isOverriding = depScanEnabled && overrideChecked;
-            
-        	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
+            isOverriding = depScanEnabled && overrideChecked,
+             //isGlobalScaEnabled = $('cxGlobalScaEnabled').value;
+            isGlobalScaEnabled = jQuery('#cxAdminScaEnabled').val(),
+            isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
-
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        
+        jQuery('.scaInputCritical')[(isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled == 'SCA') ? 'show' : 'hide']();
+        alert("cx Global Sca Enabled" + isGlobalScaEnabled);
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
         
@@ -419,6 +420,13 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 </c:if>
 <c:if test="${propertiesBean.properties[optionsBean.globalProjectPolicyViolation] != 'true'}">
     <c:set var="globalProjectPolicydEnabled" value="false"/>
+</c:if>
+
+<c:if test="${propertiesBean.properties[optionsBean.globalScaEnabled] == 'SCA'}">
+    <c:set var="globalScaScanEnabled" value="true"/>
+</c:if>
+<c:if test="${propertiesBean.properties[optionsBean.globalScaEnabled] != 'SCA'}">
+    <c:set var="globalScaScanEnabled" value="false"/>
 </c:if>
 
 <c:if test="${propertiesBean.properties[optionsBean.globalProjectSCAPolicyViolation] == 'true'}">
@@ -1032,7 +1040,10 @@ Example: param1:value1,param2:value2"/>
                         <props:checkboxProperty name="${optionsBean.osaThresholdEnabled}" onclick="${onclick}"/>
                     </td>
                 </tr>
-                <tbody class="scaInput">
+                <tbody>
+                <input type="text" id="cxAdminScaEnabled" name="cxAdminScaEnabled" value="${globalScaScanEnabled}">
+                </tbody>
+                <tbody class="scaInputCritical">
                 	<tr class="osaThresholdRow" ${hideOsaThresholdSection}>
 	                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
 	                    <td>

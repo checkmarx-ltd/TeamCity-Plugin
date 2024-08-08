@@ -511,7 +511,7 @@ public class CxOptions {
     }
 
     @NotNull
-    public static String getGlobaldependencyScannerType() {
+    public static String getGlobalDependencyScanType() {
         return GLOBAL_DEPENDENCY_SCANNER_TYPE;
     }
 
