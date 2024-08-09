@@ -110,11 +110,23 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         Map<String, String> properties = null;
         final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
+        System.out.println("form.getExternalId()" + form.getExternalId());
+        System.out.println("form.getName()" + form.getName());
+        System.out.println("form.getPublicKey()" + form.getPublicKey());
         BasePropertiesBean basePropertiesBean = null;
         try {
             Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
             basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
             properties = basePropertiesBean.getProperties();
+            
+//            if (properties != null) {
+//                System.out.println("Properties:");
+//                for (Map.Entry<String, String> entry : properties.entrySet()) {
+//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
+//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
+//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
+//                }
+//            }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -159,10 +171,24 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
-        
-        String enableCriticalSeverity = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String projectName = properties.get(CxParam.PROJECT_NAME);
+        System.out.println("project Name useDefaultServer projectName2" + projectName);
+        String something = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String[] keys = something.split("\\|");
+        String enableCriticalSeverity = null;
+        String someKey = null;
+
+        for (String key : keys) {
+            if (key.startsWith(projectName)) {
+                someKey = key;
+                enableCriticalSeverity = key.replace(projectName + "_", "");
+                break;
+            }
+        }
+        System.out.println("enable Critical Severity below for loop : " + enableCriticalSeverity);
+        System.out.println("some Key below for loop : " + someKey);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
-        	enableCriticalSeverity = "noChange_9.0";
+        	enableCriticalSeverity = "noChange_9.0_9.0_http://localhost";
         }
         String criticalThreshold = properties.get(CxParam.CRITICAL_THRESHOLD);        
         	if (enableCriticalSeverity == null) {
@@ -223,11 +249,18 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 					}
 				}
 			}
+			if (someKey != null) {
+				System.out.println("something before something : " + something);
+	            something = something.replace(someKey + "|", "");
+	            System.out.println("something after something : " + something);
+	        }
+	        something = something + "|" + projectName + "_" + enableCriticalSeverity;
+	        System.out.println("something after something below if condidtion : " + something);
 			properties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
-			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, something);
 			try {
 				
-			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, enableCriticalSeverity);
+			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, something);
 			       this.cxAdminConfig.persistConfiguration();
 			   } catch (IOException e) {
 			       e.printStackTrace();
