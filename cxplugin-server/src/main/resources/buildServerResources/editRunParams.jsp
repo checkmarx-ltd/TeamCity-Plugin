@@ -26,8 +26,8 @@
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        jQuery('.scaInputCritical')[(isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled) ? 'show' : 'hide']();
-        alert("cx Global Sca Enabled" + isGlobalScaEnabled);
+        isScaInputCriticalVisible=((isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled));
+    	jQuery('#scaInputCritical')[((''+isScaInputCriticalVisible) =='true') ? 'show' : 'hide']();
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
         
@@ -758,7 +758,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
+        	<props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
         </td>
     </tr>
     <tr class="dependencyScanRow osaInput">
@@ -784,8 +784,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         <th><label for="enableSca">Use CxSCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
-
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
+		<td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
                                        onclick="updateDependencyScanSectionVisibility()"/></td>
 
     </tr>
@@ -1043,7 +1042,7 @@ Example: param1:value1,param2:value2"/>
                 <tbody>
                 <input type="text" id="cxAdminScaEnabled" name="cxAdminScaEnabled" value="${globalScaScanEnabled}">
                 </tbody>
-                <tbody class="scaInputCritical">
+                <tbody id="scaInputCritical">
                 	<tr class="osaThresholdRow" ${hideOsaThresholdSection}>
 	                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
 	                    <td>
