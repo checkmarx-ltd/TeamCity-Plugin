@@ -346,11 +346,19 @@ ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
 
-<c:set var="projectNamePartsDelimiter" value="___" />
+<c:set var="enableCriticalSeverityFromFile" value=""/>
+<c:set var="buildConfigurationId" value="${buildConfigurationId}" />
+<c:set var="allBuildConfigurations" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
+<c:set var="buildConfigurationArray" value="${fn:split(allBuildConfigurations, '|')}" />
+<c:forEach var="key" items="${buildConfigurationArray}">    
+ <c:if test="${fn:startsWith(key, buildConfigurationId)}">      
+   <c:set var="enableCriticalSeverityFromFile" value="${key}" />
+</c:if> 
+</c:forEach>
+<c:set var="projectNamePartsDelimiter" value="," />
 <c:set var="enabledCriticalSeverity" value="" />
-<c:set var="enableCriticalSeverityFromFile" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
 <c:if test="${enableCriticalSeverityFromFile != null}">
-	<c:set var="projectNameParts" value="${fn:split(enableCriticalSeverityFromFile, '___')}" />
+	<c:set var="projectNameParts" value="${fn:split(enableCriticalSeverityFromFile, projectNamePartsDelimiter)}" />
 	<c:set var="projectNameFromFile" value="" />
 	<c:if test="${projectNameParts != null}">
 		<c:if test="${not empty projectNameParts[0]}">
@@ -1010,12 +1018,7 @@ Example: param1:value1,param2:value2"/>
 		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
 		                    <td>
 		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
-		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
-		                        <p>hidelocalCriticalThreshold :${hidelocalCriticalThreshold}</p>
-		                        <p>enableCriticalSeverityFromFile :${enableCriticalSeverityFromFile}</p>
-		                        <p>enableCriticalSeverity :${enableCriticalSeverity}</p>
-		                        <p>projectNameFromFile :${projectNameFromFile}</p>
-		                        <p>version :${version}</p>	               
+		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>            
 		                    </td>
 		                    </tr>
                			 </tr>
@@ -1023,7 +1026,7 @@ Example: param1:value1,param2:value2"/>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.highThreshold}" className="longField"/>
-                        <span class="error" id="error_${optionsBean.highThreshold}"></span>
+                        <span class="error" id="error_${optionsBean.highThreshold}"></span>	               
                     </td>
                 </tr>
                 <tr>

@@ -38,7 +38,7 @@ import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
-    private final String projectNameDelimiter = "___";
+    private final String projectNameDelimiter = ",";
     //private static boolean errorShown = false;
     
     List<InvalidProperty> result = new Vector<>();
@@ -85,7 +85,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         System.out.println("form.getExternalId()" + form.getExternalId());
         String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
         System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
-//        model.put("enableCriticalSeverityFromFile",enableCriticalSeverityFromFile);
+        model.put("buildConfigurationId",form.getExternalId());
         model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
         model.put(CxParam.SERVER_URL, properties.get(CxParam.SERVER_URL));
         model.put(CxParam.USERNAME, properties.get(CxParam.USERNAME));
@@ -291,7 +291,11 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 				if(someKey.equalsIgnoreCase(something)) {
 					something="";
 				}else {
-	            something = something.replace("|"+someKey, "");
+					if(something.startsWith(someKey)) {
+						something = something.replace(someKey + "|" , "");
+					}else {
+						 something = something.replace("|"+someKey, "");
+					}
 				}
 	            System.out.println("something after something : " + something);
 	        }

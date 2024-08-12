@@ -33,7 +33,7 @@ import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
-	private final String projectNameDelimiter = "___";
+	private final String projectNameDelimiter = ",";
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
         if (CxConstants.TRUE.equals(properties.get(CxParam.OSA_ENABLED))) {
