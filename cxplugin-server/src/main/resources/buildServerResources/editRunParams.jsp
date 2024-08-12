@@ -346,8 +346,21 @@ ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
 
-
-<c:set var="enabledCriticalSeverity" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
+<c:set var="projectNamePartsDelimiter" value="___" />
+<c:set var="enabledCriticalSeverity" value="" />
+<c:set var="enableCriticalSeverityFromFile" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
+<c:if test="${enableCriticalSeverityFromFile != null}">
+	<c:set var="projectNameParts" value="${fn:split(enableCriticalSeverityFromFile, '___')}" />
+	<c:set var="projectNameFromFile" value="" />
+	<c:if test="${projectNameParts != null}">
+		<c:if test="${not empty projectNameParts[0]}">
+			<c:set var="projectNameFromFile" value="${projectNameParts[0]}" />
+		</c:if>
+		<c:if test="${not empty projectNameParts[1]}">
+			<c:set var="enabledCriticalSeverity" value="${projectNameParts[1]}" />
+		</c:if>
+	</c:if>
+</c:if>
 <c:if test="${enabledCriticalSeverity != null}">
 	<c:set var="versionParts" value="${fn:split(enabledCriticalSeverity, '_')}" />
 	<c:set var="version" value="9.0" />
@@ -997,7 +1010,12 @@ Example: param1:value1,param2:value2"/>
 		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
 		                    <td>
 		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
-		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>	               
+		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>
+		                        <p>hidelocalCriticalThreshold :${hidelocalCriticalThreshold}</p>
+		                        <p>enableCriticalSeverityFromFile :${enableCriticalSeverityFromFile}</p>
+		                        <p>enableCriticalSeverity :${enableCriticalSeverity}</p>
+		                        <p>projectNameFromFile :${projectNameFromFile}</p>
+		                        <p>version :${version}</p>	               
 		                    </td>
 		                    </tr>
                			 </tr>
@@ -1040,7 +1058,7 @@ Example: param1:value1,param2:value2"/>
                     </td>
                 </tr>
                 <tbody>
-                <input type="text" id="cxAdminScaEnabled" name="cxAdminScaEnabled" value="${globalScaScanEnabled}">
+                <input type="text" id="cxAdminScaEnabled" name="cxAdminScaEnabled" value="${globalScaScanEnabled}" style='display:none'>
                 </tbody>
                 <tbody id="scaInputCritical">
                 	<tr class="osaThresholdRow" ${hideOsaThresholdSection}>

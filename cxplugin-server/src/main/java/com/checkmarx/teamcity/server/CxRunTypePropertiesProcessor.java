@@ -33,6 +33,7 @@ import static com.checkmarx.teamcity.common.CxParam.DEPENDENCY_SCANNER_TYPE;
 
 
 public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
+	private final String projectNameDelimiter = "___";
 
     public Collection<InvalidProperty> process(Map<String, String> properties) {
         if (CxConstants.TRUE.equals(properties.get(CxParam.OSA_ENABLED))) {
@@ -180,11 +181,13 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     
     private void validateCriticalSupport(String parameterName,  Map<String, String> properties, String errorMessage, List<InvalidProperty> result) {
     	String enableCriticalSeverity = properties.get(parameterName);
-    	if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalSupported")) {
+    	if(enableCriticalSeverity != null && enableCriticalSeverity.contains(projectNameDelimiter+"criticalSupported")) {
     	result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
+    	System.out.println("_criticalSupported_");
     	}
-    	else if(enableCriticalSeverity != null && enableCriticalSeverity.startsWith("criticalNotSupported")) {
+    	else if(enableCriticalSeverity != null && enableCriticalSeverity.contains(projectNameDelimiter+"criticalNotSupported")) {
     	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not support Critical severity. Critical threshold can not be configured."));
+    	System.out.println("_criticalNotSupported_");
     	}
     }
 

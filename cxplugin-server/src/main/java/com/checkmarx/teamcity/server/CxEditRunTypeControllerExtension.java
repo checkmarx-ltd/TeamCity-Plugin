@@ -38,6 +38,7 @@ import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
+    private final String projectNameDelimiter = "___";
     //private static boolean errorShown = false;
     
     List<InvalidProperty> result = new Vector<>();
@@ -77,9 +78,14 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
         //put all global properties to the config page
         for (String conf : CxParam.GLOBAL_CONFIGS) {
+        	System.out.println("FillModel method:"+conf+":"+cxAdminConfig.getConfiguration(conf));
             properties.put(conf, cxAdminConfig.getConfiguration(conf));
         }
-
+        
+        System.out.println("form.getExternalId()" + form.getExternalId());
+        String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
+        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
+//        model.put("enableCriticalSeverityFromFile",enableCriticalSeverityFromFile);
         model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
         model.put(CxParam.SERVER_URL, properties.get(CxParam.SERVER_URL));
         model.put(CxParam.USERNAME, properties.get(CxParam.USERNAME));
@@ -91,10 +97,18 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         //Empty implementation - currently not in use .
+    	System.out.println("######################### In updateState");
+    	System.out.println("form.getExternalId()" + form.getExternalId());
+        String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
+        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
     }
 
     @Nullable
     public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
+    	System.out.println("######################### In getState");
+    	System.out.println("form.getExternalId()" + form.getExternalId());
+        String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
+        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
         return null;
         
     }
@@ -104,6 +118,28 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
                                 @NotNull final BuildTypeSettings buildTypeSettings,
                                 @NotNull final ActionErrors errors) {
         //Empty implementation - currently not in use .
+    }
+    
+    private String fetchEnableCriticalSeverity(String projectName) {
+    	System.out.println("project Name useDefaultServer projectName2" + projectName);
+        String something = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String[] keys = something.split("\\|");
+        String enableCriticalSeverity = null;
+        String someKey = null;
+
+        for (String key : keys) {
+            if (key.startsWith(projectName)) {
+                someKey = key;
+                enableCriticalSeverity = key.replace(projectName + projectNameDelimiter, "");
+                break;
+            }
+        }
+        System.out.println("enable Critical Severity below for loop : " + enableCriticalSeverity);
+        System.out.println("some Key below for loop : " + someKey);
+        if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
+        	enableCriticalSeverity = "noChange_9.0_9.0_http://localhost";
+        }
+        return enableCriticalSeverity;
     }
 
     @NotNull
@@ -171,7 +207,7 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String isSynchronous = properties.get(CxParam.IS_SYNCHRONOUS);
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
-        String projectName = properties.get(CxParam.PROJECT_NAME);
+        String projectName = form.getExternalId();
         System.out.println("project Name useDefaultServer projectName2" + projectName);
         String something = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
         String[] keys = something.split("\\|");
@@ -181,7 +217,8 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         for (String key : keys) {
             if (key.startsWith(projectName)) {
                 someKey = key;
-                enableCriticalSeverity = key.replace(projectName + "_", "");
+                //Removing project name and three underscores 
+                enableCriticalSeverity = key.replace(projectName + projectNameDelimiter, "");
                 break;
             }
         }
@@ -251,10 +288,19 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 			}
 			if (someKey != null) {
 				System.out.println("something before something : " + something);
-	            something = something.replace(someKey + "|", "");
+				if(someKey.equalsIgnoreCase(something)) {
+					something="";
+				}else {
+	            something = something.replace("|"+someKey, "");
+				}
 	            System.out.println("something after something : " + something);
 	        }
-	        something = something + "|" + projectName + "_" + enableCriticalSeverity;
+			//The string in file will be appended with project name and three underscores
+			if(something==null || something.isEmpty() || "|".equalsIgnoreCase(something.trim())) {
+				something = projectName + projectNameDelimiter + enableCriticalSeverity;
+			}else {
+				something = something + "|" + projectName + projectNameDelimiter + enableCriticalSeverity;
+			}
 	        System.out.println("something after something below if condidtion : " + something);
 			properties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
 			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, something);
