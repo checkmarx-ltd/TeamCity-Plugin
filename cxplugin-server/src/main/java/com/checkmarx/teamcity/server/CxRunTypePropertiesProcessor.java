@@ -183,11 +183,9 @@ public class CxRunTypePropertiesProcessor implements PropertiesProcessor {
     	String enableCriticalSeverity = properties.get(parameterName);
     	if(enableCriticalSeverity != null && enableCriticalSeverity.contains(projectNameDelimiter+"criticalSupported")) {
     	result.add(new InvalidProperty(CRITICAL_THRESHOLD,"The configured SAST version supports Critical severity. Critical threshold can also be configured."));
-    	System.out.println("_criticalSupported_");
     	}
     	else if(enableCriticalSeverity != null && enableCriticalSeverity.contains(projectNameDelimiter+"criticalNotSupported")) {
     	result.add(new InvalidProperty(HIGH_THRESHOLD,"The configured SAST version does not support Critical severity. Critical threshold can not be configured."));
-    	System.out.println("_criticalNotSupported_");
     	}
     }
 

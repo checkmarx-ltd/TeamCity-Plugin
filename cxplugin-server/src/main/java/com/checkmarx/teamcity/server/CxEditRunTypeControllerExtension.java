@@ -39,7 +39,6 @@ import static com.checkmarx.teamcity.common.CxConstants.TRUE;
 public class CxEditRunTypeControllerExtension implements EditRunTypeControllerExtension {
     private final CxAdminConfig cxAdminConfig;
     private final String projectNameDelimiter = ",";
-    //private static boolean errorShown = false;
     
     List<InvalidProperty> result = new Vector<>();
 
@@ -67,24 +66,18 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         PluginDataMigration migration = new PluginDataMigration();
         migration.migrate(properties);
 
-        //put default project name as the build name
         if(StringUtils.isEmpty(properties.get(CxParam.PROJECT_NAME))) {
             properties.put(CxParam.PROJECT_NAME, form.getName());
         }
-        //Default to true in case its an old job configuration.
         if(properties.get(CxParam.SAST_ENABLED) == null){
             properties.put(CxParam.SAST_ENABLED,CxConstants.TRUE);
         }
 
-        //put all global properties to the config page
         for (String conf : CxParam.GLOBAL_CONFIGS) {
-        	System.out.println("FillModel method:"+conf+":"+cxAdminConfig.getConfiguration(conf));
             properties.put(conf, cxAdminConfig.getConfiguration(conf));
         }
         
-        System.out.println("form.getExternalId()" + form.getExternalId());
         String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
-        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
         model.put("buildConfigurationId",form.getExternalId());
         model.put(CxParam.USE_DEFAULT_SERVER, properties.get(CxParam.USE_DEFAULT_SERVER));
         model.put(CxParam.SERVER_URL, properties.get(CxParam.SERVER_URL));
@@ -97,18 +90,10 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 
     public void updateState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         //Empty implementation - currently not in use .
-    	System.out.println("######################### In updateState");
-    	System.out.println("form.getExternalId()" + form.getExternalId());
-        String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
-        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
     }
 
     @Nullable
     public StatefulObject getState(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
-    	System.out.println("######################### In getState");
-    	System.out.println("form.getExternalId()" + form.getExternalId());
-        String enableCriticalSeverityFromFile = fetchEnableCriticalSeverity(form.getExternalId());
-        System.out.println("enableCriticalSeverityFromFile: " + enableCriticalSeverityFromFile);
         return null;
         
     }
@@ -121,21 +106,18 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     }
     
     private String fetchEnableCriticalSeverity(String projectName) {
-    	System.out.println("project Name useDefaultServer projectName2" + projectName);
-        String something = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
-        String[] keys = something.split("\\|");
+        String criticalSeverityConfig = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String[] keys = criticalSeverityConfig.split("\\|");
         String enableCriticalSeverity = null;
-        String someKey = null;
+        String currentKey = null;
 
         for (String key : keys) {
             if (key.startsWith(projectName)) {
-                someKey = key;
+            	currentKey = key;
                 enableCriticalSeverity = key.replace(projectName + projectNameDelimiter, "");
                 break;
             }
         }
-        System.out.println("enable Critical Severity below for loop : " + enableCriticalSeverity);
-        System.out.println("some Key below for loop : " + someKey);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
         	enableCriticalSeverity = "noChange_9.0_9.0_http://localhost";
         }
@@ -146,23 +128,11 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
     public ActionErrors validate(@NotNull final HttpServletRequest request, @NotNull final BuildTypeForm form) {
         Map<String, String> properties = null;
         final BuildRunnerBean buildRunnerBean = form.getBuildRunnerBean();
-        System.out.println("form.getExternalId()" + form.getExternalId());
-        System.out.println("form.getName()" + form.getName());
-        System.out.println("form.getPublicKey()" + form.getPublicKey());
         BasePropertiesBean basePropertiesBean = null;
         try {
             Method propertiesBeanMethod = BuildRunnerBean.class.getDeclaredMethod("getPropertiesBean");
             basePropertiesBean = (BasePropertiesBean) propertiesBeanMethod.invoke(buildRunnerBean);
             properties = basePropertiesBean.getProperties();
-            
-//            if (properties != null) {
-//                System.out.println("Properties:");
-//                for (Map.Entry<String, String> entry : properties.entrySet()) {
-//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
-//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
-//                    System.out.println(entry.getKey() + " = " + entry.getExternalId());
-//                }
-//            }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -199,8 +169,6 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         }
         properties.put(CxParam.SCA_SAST_SERVER_PASSWORD, scaSastPass);
         
-        //the jsp page dosent pass false value, so we need to check if it isnt true, null in this case, set it as false
-        //this way we can distinguish in the build process between an old job (sast enabled == null) and a job where user specified not to run sast (sast_enabled == false)
         if(!TRUE.equals(properties.get(CxParam.SAST_ENABLED))) {
             properties.put(CxParam.SAST_ENABLED, CxConstants.FALSE);
         }
@@ -208,22 +176,18 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
         String thresholdsEnabled = properties.get(CxParam.THRESHOLD_ENABLED);
         String useDefaultServer = properties.get(CxParam.USE_DEFAULT_SERVER);
         String projectName = form.getExternalId();
-        System.out.println("project Name useDefaultServer projectName2" + projectName);
-        String something = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
-        String[] keys = something.split("\\|");
+        String criticalSeverityConfig = this.cxAdminConfig.getConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY);
+        String[] keys = criticalSeverityConfig.split("\\|");
         String enableCriticalSeverity = null;
-        String someKey = null;
+        String currentKey = null;
 
         for (String key : keys) {
             if (key.startsWith(projectName)) {
-                someKey = key;
-                //Removing project name and three underscores 
+            	currentKey = key;
                 enableCriticalSeverity = key.replace(projectName + projectNameDelimiter, "");
                 break;
             }
         }
-        System.out.println("enable Critical Severity below for loop : " + enableCriticalSeverity);
-        System.out.println("some Key below for loop : " + someKey);
         if((enableCriticalSeverity == null || enableCriticalSeverity.isEmpty())) {
         	enableCriticalSeverity = "noChange_9.0_9.0_http://localhost";
         }
@@ -286,31 +250,27 @@ public class CxEditRunTypeControllerExtension implements EditRunTypeControllerEx
 					}
 				}
 			}
-			if (someKey != null) {
-				System.out.println("something before something : " + something);
-				if(someKey.equalsIgnoreCase(something)) {
-					something="";
+			if (currentKey != null) {
+				if(currentKey.equalsIgnoreCase(criticalSeverityConfig)) {
+					criticalSeverityConfig = "";
 				}else {
-					if(something.startsWith(someKey)) {
-						something = something.replace(someKey + "|" , "");
+					if(criticalSeverityConfig.startsWith(currentKey)) {
+						criticalSeverityConfig = criticalSeverityConfig.replace(currentKey + "|" , "");
 					}else {
-						 something = something.replace("|"+someKey, "");
+						criticalSeverityConfig = criticalSeverityConfig.replace("|"+currentKey, "");
 					}
 				}
-	            System.out.println("something after something : " + something);
 	        }
-			//The string in file will be appended with project name and three underscores
-			if(something==null || something.isEmpty() || "|".equalsIgnoreCase(something.trim())) {
-				something = projectName + projectNameDelimiter + enableCriticalSeverity;
+			if(criticalSeverityConfig == null || criticalSeverityConfig.isEmpty() || "|".equalsIgnoreCase(criticalSeverityConfig.trim())) {
+				criticalSeverityConfig = projectName + projectNameDelimiter + enableCriticalSeverity;
 			}else {
-				something = something + "|" + projectName + projectNameDelimiter + enableCriticalSeverity;
+				criticalSeverityConfig = criticalSeverityConfig + "|" + projectName + projectNameDelimiter + enableCriticalSeverity;
 			}
-	        System.out.println("something after something below if condidtion : " + something);
 			properties.put(CxParam.CRITICAL_THRESHOLD, criticalThreshold);
-			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, something);
+			properties.put(CxParam.ENABLE_CRITICAL_SEVERITY, criticalSeverityConfig);
 			try {
 				
-			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, something);
+			       this.cxAdminConfig.setConfiguration(CxParam.ENABLE_CRITICAL_SEVERITY, criticalSeverityConfig);
 			       this.cxAdminConfig.persistConfiguration();
 			   } catch (IOException e) {
 			       e.printStackTrace();

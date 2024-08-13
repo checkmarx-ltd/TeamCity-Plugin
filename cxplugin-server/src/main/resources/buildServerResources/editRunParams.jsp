@@ -211,11 +211,6 @@
                         messageElm.css('color','red');
                     }
 
-//                    if(!credentials.global) {
-//                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
-//                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
-//                    }
-
                 },
                 error: function (data) {
                 }
