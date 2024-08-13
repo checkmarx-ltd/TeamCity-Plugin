@@ -394,11 +394,11 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 	</c:if>
 </c:if>
 <c:choose> 
-<c:when test="${version < 9.7}">
-<c:set var="hidelocalCriticalThreshold" value="style='display:none'"/>
+<c:when test="${version >= 9.7}">
+<c:set var="hidelocalCriticalThreshold" value=""/>
 </c:when>
 <c:otherwise>
-<c:set var="hidelocalCriticalThreshold" value=""/>
+<c:set var="hidelocalCriticalThreshold" value="style='display:none'"/>
 </c:otherwise>
 </c:choose>
 
