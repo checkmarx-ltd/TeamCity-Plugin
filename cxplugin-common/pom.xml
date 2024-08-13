@@ -79,7 +79,7 @@
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>2024.3.25</version>
+      <version>2024.3.26</version>
       <exclusions>
 <!--        <exclusion>-->
 <!--          <groupId>stax</groupId>-->
