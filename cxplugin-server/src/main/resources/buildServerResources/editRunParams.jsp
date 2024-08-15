@@ -1214,24 +1214,39 @@ Example: param1:value1,param2:value2"/>
 
 <script type="text/javascript">
 let hasReloaded = localStorage.getItem('hasReloaded');
+const config = { childList: true, attributes: true, subtree: true};
 const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
-error_cxCriticalThreshold.addEventListener('DOMSubtreeModified', () => {
-   if (error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.' && !hasReloaded) {
-       error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
-       localStorage.setItem('hasReloaded', 'true');
-       window.location.reload();
-   }
-});
+const criticalThresholdErrorObserver = new MutationObserver(criticalThresholdErrorCallback);
+function criticalThresholdErrorCallback(mutationsList, criticalThresholdErrorObserver) {
+	for (let mutation of mutationsList) {
+	    if (mutation.type === "childList") {
+	      if (error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.' && !hasReloaded) {
+	          error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
+	          localStorage.setItem('hasReloaded', 'true');
+	          window.location.reload();
+	      }
+	    }
+	}
+}
+criticalThresholdErrorObserver.observe(error_cxCriticalThreshold, config);
+
 const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
-error_cxHighThreshold.addEventListener('DOMSubtreeModified', () => {
-   if (error_cxHighThreshold.textContent == 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
-       error_cxHighThreshold.textContent = 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.. ';
-       localStorage.setItem('hasReloaded', 'true');
-       window.location.reload();
-   }
-});
+const highThresholdErrorObserver = new MutationObserver(highThresholdErrorCallback);
+function highThresholdErrorCallback(mutationsList, highThresholdErrorObserver) {
+	for (let mutation of mutationsList) {
+	    if (mutation.type === "childList") {
+	      if (error_cxHighThreshold.textContent == 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
+	          error_cxHighThreshold.textContent = 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.. ';
+	          localStorage.setItem('hasReloaded', 'true');
+	          window.location.reload();
+	      }
+	    }
+	}
+}
+highThresholdErrorObserver.observe(error_cxHighThreshold, config);
+
 // Clear the reload flag when the page is fully loaded
 window.addEventListener('load', () => {
-   localStorage.removeItem('hasReloaded');
+	localStorage.removeItem('hasReloaded');
 });
 </script>
