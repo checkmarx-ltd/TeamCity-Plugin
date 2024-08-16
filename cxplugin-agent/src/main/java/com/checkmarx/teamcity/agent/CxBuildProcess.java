@@ -256,6 +256,9 @@ public class CxBuildProcess extends CallableBuildProcess {
                 // Check if SAST version supports critical threshold
                 if (version >= 9.7) {
                     logger.info("CxSAST critical threshold: " + (config.getSastCriticalThreshold() == null ? NO_THRESHOLD : config.getSastCriticalThreshold()));
+                }else {
+                	// Removing value of SAST Critical Threshold for SAST version prior to 9.6
+                	config.setSastCriticalThreshold(null);
                 }
                 logger.info("CxSAST high threshold: " + (config.getSastHighThreshold() == null ? NO_THRESHOLD : config.getSastHighThreshold()));
                 logger.info("CxSAST medium threshold: " + (config.getSastMediumThreshold() == null ? NO_THRESHOLD : config.getSastMediumThreshold()));
