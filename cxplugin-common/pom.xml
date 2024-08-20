@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>2024.3.8</version>
+    <version>2024.3.9</version>
   </parent>
   <artifactId>cxplugin-common</artifactId>
   <packaging>jar</packaging>
@@ -44,6 +44,10 @@
 			<artifactId>snappy</artifactId>
 		</exclusion>
 		<exclusion>
+			<groupId>io.netty</groupId>
+		    <artifactId>netty-handler-proxy</artifactId>
+		</exclusion>
+		<exclusion>
          	<groupId>commons-httpclient</groupId>
          	<artifactId>commons-httpclient</artifactId>
 		</exclusion>  
@@ -74,6 +78,11 @@
 		<groupId>org.iq80.snappy</groupId>
 		<artifactId>snappy</artifactId>
 		<version>0.5</version>
+	</dependency>
+	<dependency>
+		<groupId>io.netty</groupId>
+		<artifactId>netty-handler-proxy</artifactId>
+		<version>4.1.112.Final</version>
 	</dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -146,6 +155,10 @@
     		<groupId>org.bouncycastle</groupId>
     		<artifactId>bcprov-jdk18on</artifactId>
 		</exclusion>
+		<exclusion>
+			<groupId>org.mozilla</groupId>
+			<artifactId>rhino</artifactId>
+		</exclusion>
         <exclusion>
           <artifactId>vertx-core</artifactId>
           <groupId>io.vertx</groupId>
@@ -198,6 +211,11 @@
 	    <groupId>org.bouncycastle</groupId>
 	    <artifactId>bcprov-jdk18on</artifactId>
 	    <version>1.78.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.mozilla</groupId>
+		<artifactId>rhino</artifactId>
+		<version>1.7.15</version>
 	</dependency>
 	<dependency>
         <groupId>io.vertx</groupId>
