@@ -51,6 +51,14 @@
 		         	<artifactId>commons-httpclient</artifactId>
 				</exclusion>
 				<exclusion>
+					<groupId>io.netty</groupId>
+				    <artifactId>netty-codec-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.iq80.snappy</groupId>
+			    	<artifactId>snappy</artifactId>
+				</exclusion>
+				<exclusion>
    					 <groupId>org.bouncycastle</groupId>
     				 <artifactId>bcprov-jdk18on</artifactId>
          		</exclusion>
@@ -64,7 +72,7 @@
         <dependency>
         	<groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>4.5.8</version>
+            <version>4.5.9</version>
         </dependency>  
         <dependency>
     		<groupId>org.bouncycastle</groupId>
@@ -74,8 +82,18 @@
     	<dependency>
             <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-compress</artifactId>
-            <version>1.26.2</version>
+            <version>1.27.0</version>
         </dependency>
+        <dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+		    <version>4.1.112.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.iq80.snappy</groupId>
+		    <artifactId>snappy</artifactId>
+		    <version>0.5</version>
+		</dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.springframework</groupId>-->
 <!--            <artifactId>spring-core</artifactId>-->
