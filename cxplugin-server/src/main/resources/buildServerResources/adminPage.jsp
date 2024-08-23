@@ -313,6 +313,11 @@
 							</td>
 						</tr>
 						<tbody id="thresholdSection" ${hideThresholdSection}>
+						<tr style='display:none'>
+									<th><label for="cxEnableCriticalSeverity">Enable Local Critical Severity</label></th>
+									<td><forms:textField name="cxEnableCriticalSeverity" value="${cxEnableCriticalSeverity}" className="longField"/>
+									</td>
+								</tr>
 								<tr style='display:none'>
 									<th><label for="cxGlobalEnableCriticalSeverity">Enable Critical Severity</label></th>
 									<td><forms:checkbox name="cxGlobalEnableCriticalSeverity"
