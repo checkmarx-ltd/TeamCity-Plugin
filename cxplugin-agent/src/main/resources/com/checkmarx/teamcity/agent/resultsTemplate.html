@@ -596,6 +596,7 @@
         padding: 11px;
     }
 
+	table.cve-table td.sast-cve-table-critical,
     table.cve-table td.sast-cve-table-high,
     table.cve-table td.sast-cve-table-med,
     table.cve-table td.sast-cve-table-low {
@@ -680,6 +681,47 @@
                     <div class="threshold-exceeded-compliance" id="threshold-exceeded-compliance"></div>
                     <ul class="chart">
 
+						<!--critical-->
+                        <li>
+                                <span class="bar-3" id="bar-critical">
+                                    <div id="tooltip-critical"></div>
+                                </span>
+                            <div class="bar-title-container">
+                                <div class="bar-title-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                         width="16" height="19" viewBox="0 0 16 19"><title>Low</title>
+                                        <defs>
+                                            <path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z"
+                                                  id="a"/>
+                                            <path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z"
+                                                  id="c"/>
+                                        </defs>
+                                        <g fill="none" fill-rule="evenodd">
+                                            <path d="M7.96 17.32L8 .015l-6.5 1s-.96 4.5-.96 8.75c1.272 4.602 5.968 9.25 5.968 9.25h.163l1.29-1.695z"
+                                                  fill="#EDEFF5"/>
+                                            <mask id="b" fill="#fff">
+                                                <use xlink:href="#a"/>
+                                            </mask>
+                                            <use fill="#FFEB3B" xlink:href="#a"/>
+                                            <path stroke="#E4D200"
+                                                  d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/>
+                                            <path fill="#DDCE00" mask="url(#b)" d="M8-8h10v32H8z"/>
+                                            <mask id="d" fill="#fff">
+                                                <use xlink:href="#c"/>
+                                            </mask>
+                                            <path stroke="#E4D200"
+                                                  d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.342.48 2.682.488 3.924V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38C.634 5.6.786 4.51.992 3.4c.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/>
+                                            <path fill="#605900" mask="url(#d)" d="M5.54 12h5.33v-1.7H7.48V5H5.54"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div class="bar-title">Critical -</div>
+                                <div class="bar-count" id="bar-count-critical"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
                         <!--high-->
                         <li>
                                 <span class="bar-1" id="bar-high">
@@ -927,6 +969,45 @@
                     <div class="osa-chart">
                         <div class="threshold-exceeded-compliance" id="osa-threshold-exceeded-compliance"></div>
                         <ul class="osa-chart chart">
+                        <!--osa medium-->
+                            <li>
+                                    <span class="bar-2" id="osa-bar-cri">
+                                        <div id="osa-tooltip-cri"></div>
+                                    </span>
+                                <div class="bar-title-container">
+                                    <div class="bar-title-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="20"
+                                             viewBox="0 0 16 20"><title>
+                                            Critical</title>
+                                            <defs>
+                                                <path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z"
+                                                      id="a"/>
+                                                <path d="M1 1.053L8 0l7 1.053s1 3.173 1 6.315c0 6.332-5.346 11.89-5.346 11.89-.36.41-1.097.742-1.663.742H7.01c-.558 0-1.3-.34-1.652-.77 0 0-5.358-6.056-5.358-10.81 0-3.338 1-7.367 1-7.367z"
+                                                      id="c"/>
+                                            </defs>
+                                            <g fill="none" fill-rule="evenodd">
+                                                <mask id="b" fill="#fff">
+                                                    <use xlink:href="#a"/>
+                                                </mask>
+                                                <use fill="#FFAC00" xlink:href="#a"/>
+                                                <path stroke="#E49B16"
+                                                      d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/>
+                                                <path fill="#D79201" mask="url(#b)" d="M8 0h8v20H8z"/>
+                                                <mask id="d" fill="#fff">
+                                                    <use xlink:href="#c"/>
+                                                </mask>
+                                                <path stroke="#D49100"
+                                                      d="M1.41 1.497L8 .507l6.61.993c.02.067.04.144.064.228.114.425.23.898.337 1.407.3 1.418.48 2.83.49 4.143v.09c0 2.665-.972 5.404-2.6 8.06-.57.934-1.185 1.79-1.8 2.55-.213.264-.412.498-.59.698-.105.118-.18.198-.216.237-.282.32-.882.587-1.302.587H7.01c-.414 0-1.01-.277-1.266-.587-.05-.06-.126-.146-.233-.274-.18-.216-.38-.464-.594-.74-.62-.79-1.237-1.654-1.814-2.56-.982-1.55-1.74-3.06-2.18-4.463C.645 9.994.5 9.17.5 8.42c0-.457.02-.944.057-1.457.077-1.072.23-2.22.435-3.392.11-.614.224-1.197.34-1.73L1.41 1.5z"/>
+                                                <path fill="#472F00" mask="url(#d)"
+                                                      d="M4.28 12.632h1.9v-4.21l1.78 2.862H8L9.79 8.4v4.232h1.93v-7.37H9.67L8 8.117 6.33 5.263H4.28"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class="bar-title">Critical -</div>
+                                    <div class="bar-count" id="osa-bar-count-cri"></div>
+                                </div>
+                            </li>
                             <li>
                                     <span class="bar-1" id="osa-bar-high">
                                         <div id="osa-tooltip-high"></div>
@@ -1274,6 +1355,8 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
+                    <div id="sast-cve-table-critical-container">
                     </div>
                     <div id="sast-cve-table-high-container">
 
@@ -1466,12 +1549,14 @@
 <script type="text/javascript">
     //---------------------------------------------------------- vars ---------------------------------------------------------------
     var SEVERITY = {
+    	CRITICAL: {value: 0, name: "critical"},
         HIGH: {value: 0, name: "high"},
         MED: {value: 1, name: "medium"},
         LOW: {value: 2, name: "low"},
-        OSA_HIGH: {value: 3, name: "high"},
-        OSA_MED: {value: 4, name: "medium"},
-        OSA_LOW: {value: 5, name: "low"}
+        OSA_CRITICAL: {value: 4, name: "critical"},
+        OSA_HIGH: {value: 5, name: "high"},
+        OSA_MED: {value: 6, name: "medium"},
+        OSA_LOW: {value: 7, name: "low"}
     };
 
     //-------------------------- sast vars --------------------------------------
@@ -1479,6 +1564,8 @@
 
     //thresholds
     var thresholdsEnabled = cx.thresholdEnabled;
+    var enableCriticalSeverity = cx.enableCriticalSeverity;
+    var criticalThreshold = cx.criticalThreshold;
     var highThreshold = cx.highThreshold;
     var medThreshold = cx.mediumThreshold;
     var lowThreshold = cx.lowThreshold;
@@ -1490,6 +1577,7 @@
 
 
     //counts
+    var criticalCount = cx.criticalResults;
     var highCount = cx.highResults;
     var medCount = cx.mediumResults;
     var lowCount = cx.lowResults;
@@ -1504,6 +1592,7 @@
 
     //thresholds
     var osaThresholdsEnabled = cx.osaThresholdEnabled;
+    var osaCriticalThreshold = cx.osaCriticalThreshold;
     var osaHighThreshold = cx.osaHighThreshold;
     var osaMedThreshold = cx.osaMediumThreshold;
     var osaLowThreshold = cx.osaLowThreshold;
@@ -1513,6 +1602,7 @@
 
 
     //counts
+    var osaCriCount = cx.osaCriResults;
     var osaHighCount = cx.osaHighResults;
     var osaMedCount = cx.osaMediumResults;
     var osaLowCount = cx.osaLowResults;
@@ -1541,6 +1631,7 @@
             queryList != null;
 
 
+    var criticalCveList;
     var highCveList;
     var medCveList;
     var lowCveList;
@@ -1614,12 +1705,14 @@
             document.getElementById("scanErrorMessage").setAttribute("style", "display:none");
 
             //set bars height and count
+            document.getElementById("bar-count-critical").innerHTML = criticalCount;
             document.getElementById("bar-count-high").innerHTML = highCount;
             document.getElementById("bar-count-med").innerHTML = medCount;
             document.getElementById("bar-count-low").innerHTML = lowCount;
 
-            var maxCount = Math.max(highCount, medCount, lowCount);
+            var maxCount = Math.max(criticalCount, highCount, medCount, lowCount);
             var maxHeight = maxCount * 100 / 90;
+            document.getElementById("bar-critical").setAttribute("style", "height:" + lowCount * 100 / maxHeight + "%");
             document.getElementById("bar-high").setAttribute("style", "height:" + highCount * 100 / maxHeight + "%");
             document.getElementById("bar-med").setAttribute("style", "height:" + medCount * 100 / maxHeight + "%");
             document.getElementById("bar-low").setAttribute("style", "height:" + lowCount * 100 / maxHeight + "%");
@@ -1633,6 +1726,11 @@
                 var isThresholdExceeded = false;
                 var thresholdExceededComplianceElement = document.getElementById("threshold-exceeded-compliance");
 
+                if (criticalThreshold != null && criticalCount > criticalThreshold) {
+                    document.getElementById("tooltip-high").innerHTML = tooltipGenerator(SEVERITY.CRITICAL);
+                    isThresholdExceeded = true;
+                }
+                
                 if (highThreshold != null && highCount > highThreshold) {
                     document.getElementById("tooltip-high").innerHTML = tooltipGenerator(SEVERITY.HIGH);
                     isThresholdExceeded = true;
@@ -1698,6 +1796,10 @@
                 var isOsaThresholdExceeded = false;
                 var osaThresholdExceededComplianceElement = document.getElementById("osa-threshold-exceeded-compliance");
 
+                if (osaCriticalThreshold != null && osaCriticalCount > osaCriticalThreshold) {
+                    document.getElementById("osa-tooltip-critical").innerHTML = tooltipGenerator(SEVERITY.OSA_CRITICAL);
+                    isOsaThresholdExceeded = true;
+                }
 
                 if (osaHighThreshold != null && osaHighCount > osaHighThreshold) {
                     document.getElementById("osa-tooltip-high").innerHTML = tooltipGenerator(SEVERITY.OSA_HIGH);
@@ -1739,6 +1841,7 @@
     if (isSastFullReady) {
 
         //queries lists
+        criticalCveList = generateQueryList(SEVERITY.CRITICAL);
         highCveList = generateQueryList(SEVERITY.HIGH);
         medCveList = generateQueryList(SEVERITY.MED);
         lowCveList = generateQueryList(SEVERITY.LOW);
@@ -1772,9 +1875,12 @@
 
         try {
             //generate full reports
-            if (highCount == 0 && medCount == 0 && lowCount == 0) {
+            if (critical == 0 && highCount == 0 && medCount == 0 && lowCount == 0) {
                 document.getElementById("sast-full").setAttribute("style", "display: none");
             } else {
+            	if (criticalCount > 0) {
+                    generateCveTable(SEVERITY.CRITICAL);
+                }
                 if (highCount > 0) {
                     generateCveTable(SEVERITY.HIGH);
                 }
@@ -1851,6 +1957,10 @@
         //if low - ...
 
         switch (severity) {
+        	case SEVERITY.CRITICAL:
+            	threshold = criticalThreshold;
+            	count = criticalCount;
+            	break;
             case SEVERITY.HIGH:
                 threshold = highThreshold;
                 count = highCount;
@@ -1906,6 +2016,18 @@
         var svgLowIcon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="19" viewBox="0 0 16 19"><title>Low</title><defs><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z" id="a"/><path d="M1 1l7-1 7 1s1 3.015 1 6c0 6.015-6 12-6 12H6S0 12.515 0 8c0-3.172 1-7 1-7z" id="c"/></defs><g fill="none" fill-rule="evenodd"><path d="M7.96 17.32L8 .015l-6.5 1s-.96 4.5-.96 8.75c1.272 4.602 5.968 9.25 5.968 9.25h.163l1.29-1.695z" fill="#EDEFF5"/><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><use fill="#FFEB3B" xlink:href="#a"/><path stroke="#E4D200" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.34.48 2.68.488 3.923V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38.078-1.02.23-2.11.436-3.22.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#DDCE00" mask="url(#b)" d="M8-8h10v32H8z"/><mask id="d" fill="#fff"><use xlink:href="#c"/></mask><path stroke="#E4D200" d="M1.404 1.447L8 .505l6.616.945.06.205c.114.402.23.85.336 1.334.298 1.34.48 2.68.488 3.923V7c0 2.515-1.09 5.243-2.916 7.978-.644.966-1.335 1.863-2.026 2.667-.24.28-.465.53-.665.745-.04.04-.074.077-.105.11H6.222l-.105-.118c-.202-.23-.427-.492-.67-.785-.694-.837-1.388-1.744-2.035-2.687-.89-1.298-1.62-2.56-2.128-3.738C.772 9.982.5 8.912.5 8c0-.433.02-.895.056-1.38.078-1.02.23-2.11.436-3.22.108-.584.223-1.137.34-1.64.026-.118.05-.222.072-.313z"/><path fill="#605900" mask="url(#d)" d="M5.54 12h5.33v-1.7H7.48V5H5.54"/></g></svg>';
 
         switch (severity) {
+        	case SEVERITY.CRITICAL:
+            	svgIcon = svgCriticalIcon;
+            	severityNameTtl = "Critical";
+            	severityCountTtl = criticalCount;
+            	break;
+            	
+        	case SEVERITY.OSA_CRI:
+                svgIcon = svgCriIcon;
+                severityNameTtl = "Critical";
+                severityCountTtl = osaCriCount;
+                break;
+                
             case SEVERITY.HIGH:
                 svgIcon = svgHighIcon;
                 severityNameTtl = "High";
@@ -1959,6 +2081,11 @@
         var tableElementId = "";
 
         switch (severity) {
+        	case SEVERITY.CRITICAL:
+            	severityCount = criticalCount;
+            	severityCveList = criticalCveList;
+            	tableElementId = "sast-cve-table-critical";
+            	break;
             case SEVERITY.HIGH:
                 severityCount = highCount;
                 severityCveList = highCveList;

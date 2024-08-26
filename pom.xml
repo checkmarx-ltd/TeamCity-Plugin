@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.checkmarx.teamcity</groupId>
     <artifactId>cxplugin</artifactId>
-    <version>2024.1.6</version>
+    <version>2024.3.10</version>
     <packaging>pom</packaging>
 
     <properties>
-        <teamcity-version>2023.11</teamcity-version>
+        <teamcity-version>2024.03</teamcity-version>
            <!-- properties for scanning this project with SonarCloud-->
         <sonar.projectKey>checkmarx-ltd_TeamCity-Plugin1</sonar.projectKey>
         <sonar.moduleKey>

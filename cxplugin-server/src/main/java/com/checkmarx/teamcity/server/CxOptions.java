@@ -225,6 +225,16 @@ public class CxOptions {
     public String getThresholdEnabled() {
         return THRESHOLD_ENABLED;
     }
+    
+    @NotNull
+    public String getEnableCriticalSeverity() {
+        return ENABLE_CRITICAL_SEVERITY;
+    }
+    
+    @NotNull
+    public String getCriticalThreshold() {
+        return CRITICAL_THRESHOLD;
+    }
 
     @NotNull
     public String getHighThreshold() {
@@ -244,6 +254,11 @@ public class CxOptions {
     @NotNull
     public String getOsaThresholdEnabled() {
         return OSA_THRESHOLD_ENABLED;
+    }
+    
+    @NotNull
+    public String getOsaCriticalThreshold() {
+        return OSA_CRITICAL_THRESHOLD;
     }
 
     @NotNull
@@ -270,16 +285,7 @@ public class CxOptions {
     public String getGlobalUsername() {
         return GLOBAL_USERNAME;
     }
-
-    @NotNull
-    public String getGlobalSastServerUrl() {
-        return GLOBAL_SAST_SERVER_URL;
-    }
-
-    @NotNull
-    public String getGlobalSastUsername() {
-        return GLOBAL_SAST_SERVER_USERNAME;
-    }
+    
     @NotNull
     public String getGlobalExcludeFolders() {
         return GLOBAL_EXCLUDE_FOLDERS;
@@ -304,6 +310,16 @@ public class CxOptions {
     public String getGlobalThresholdEnabled() {
         return GLOBAL_THRESHOLD_ENABLED;
     }
+    
+    @NotNull
+    public String getGlobalCriticalThreshold() {
+        return GLOBAL_CRITICAL_THRESHOLD;
+    }
+    
+    @NotNull
+    public String getGlobalEnableCriticalSeverity() {
+        return GLOBAL_ENABLE_CRITICAL_SEVERITY;
+    }
 
     @NotNull
     public String getGlobalHighThreshold() {
@@ -323,6 +339,11 @@ public class CxOptions {
     @NotNull
     public String getGlobalOsaThresholdEnabled() {
         return GLOBAL_OSA_THRESHOLD_ENABLED;
+    }
+    
+    @NotNull
+    public String getGlobalOsaCriticalThreshold() {
+        return GLOBAL_OSA_CRITICAL_THRESHOLD;
     }
 
     @NotNull
@@ -418,6 +439,11 @@ public class CxOptions {
     public String getOverrideGlobalConfigurations() {
         return OVERRIDE_GLOBAL_CONFIGURATIONS;
     }
+    
+    @NotNull
+    public String getScaCritical() {
+        return SCA_CRITICAL;
+    }
 
     @NotNull
     public String getScaHigh() {
@@ -485,7 +511,7 @@ public class CxOptions {
     }
 
     @NotNull
-    public static String getGlobaldependencyScannerType() {
+    public static String getGlobalDependencyScanType() {
         return GLOBAL_DEPENDENCY_SCANNER_TYPE;
     }
 

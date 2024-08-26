@@ -32,6 +32,7 @@
 
         jQuery('#osaInput')[cxGlobalOsaEnabled ? 'show' : 'hide']();
         jQuery('#scaInput')[cxGlobalScaEnabled ? 'show' : 'hide']();
+        jQuery('#scaCriticalThresholdSection')[cxGlobalScaEnabled ? 'show' : 'hide']();
     }
     
     jQuery(handleRadioButtonClick);
@@ -60,6 +61,16 @@
           $("invalid_cxGlobalScanTimeoutInMinutes").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalScanTimeoutInMinutes"));
         },
+        
+        onInvalid_cxGlobalCriticalThresholdError: function (elem) {
+            $("invalid_cxGlobalCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.criticallightErrorField($("cxGlobalCriticalThreshold"));
+          },
+          
+          onInvalid_cxGlobalEnableCriticalSeverityError: function (elem) {
+              $("invalid_cxGlobalEnableCriticalSeverity").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+              SettingsForm.criticallightErrorField($("cxGlobalEnableCriticalSeverity"));
+            },
 
         onInvalid_cxGlobalHighThresholdError: function (elem) {
           $("invalid_cxGlobalHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
@@ -75,6 +86,11 @@
           $("invalid_cxGlobalLowThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
           SettingsForm.highlightErrorField($("cxGlobalLowThreshold"));
         },
+        
+        onInvalid_cxGlobalOsaCriticalThresholdError: function (elem) {
+            $("invalid_cxGlobalOsaCriticalThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
+            SettingsForm.highlightErrorField($("cxGlobalOsaCriticalThreshold"));
+          },
 
         onInvalid_cxGlobalOsaHighThresholdError: function (elem) {
           $("invalid_cxGlobalOsaHighThreshold").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
@@ -114,20 +130,7 @@
          onInvalid_cxGlobalSCATenantError: function (elem) {
                   $("invalid_cxGlobalSCATenant").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
                   SettingsForm.highlightErrorField($("cxGlobalSCATenant"));
-        },
-        
-        onInvalid_cxGlobalSastServerUrlError: function (elem) {
-            $("invalid_cxGlobalSastServerUrl").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastServerUrl"));
-          },
-          onInvalid_cxGlobalSastUsernameError: function (elem) {
-            $("invalid_cxGlobalSastUsername").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastUsername"));
-          },
-          onInvalid_cxGlobalSastPasswordError: function (elem) {
-            $("invalid_cxGlobalSastPassword").innerHTML = sanitizeJS(elem.firstChild.nodeValue);
-            SettingsForm.highlightErrorField($("cxGlobalSastPassword"));
-          },  
+        }, 
         onSuccessfulSave: function () {        
           SettingsForm.enable();
         },
@@ -151,8 +154,8 @@
 <c:if test="${cxGlobalThresholdEnabled != 'true'}">
   <c:set var="hideThresholdSection" value="style='display:none'"/>
 </c:if>
-<c:if test="${cxGlobalIsExploitablePath != 'true'}">
-  <c:set var="hideExpPathSection" value="style='display:none'"/>
+<c:if test="${cxGlobalEnableCriticalSeverity != 'true'}">
+  <c:set var="hideCriticalThreshold" value="style='display:none'"/>
 </c:if>
 <c:if test="${globalDependencyScanEnabled != 'true'}">
 	<c:set var="hideGlobalDependencyScanRow" value="style='display:none'"/>
@@ -181,6 +184,8 @@
 <div>
 	<bs:refreshable containerId="generalSettings" pageUrl="${pageUrl}">
 		<bs:messages key="settingsSaved"/>
+		<bs:messages key="criticalSeverityMessage"/>
+		<bs:messages key="criticalSeverityErrorMessage"/>
 		<form id="globalSettingsForm" action="<c:url value='/admin/checkmarxSettings.html'/>" method="post" onsubmit="{return SettingsForm.save()}">
 			<table class="runnerFormTable">
 				<tr class="groupingTitle">
@@ -308,6 +313,28 @@
 							</td>
 						</tr>
 						<tbody id="thresholdSection" ${hideThresholdSection}>
+						<tr style='display:none'>
+									<th><label for="cxEnableCriticalSeverity">Enable Local Critical Severity</label></th>
+									<td><forms:textField name="cxEnableCriticalSeverity" value="${cxEnableCriticalSeverity}" className="longField"/>
+									</td>
+								</tr>
+								<tr style='display:none'>
+									<th><label for="cxGlobalEnableCriticalSeverity">Enable Critical Severity</label></th>
+									<td><forms:checkbox name="cxGlobalEnableCriticalSeverity"
+											value="${cxGlobalEnableCriticalSeverity}"
+											checked="${cxGlobalEnableCriticalSeverity}" />
+									</td>
+								</tr>
+									<tr id="criticalThresholdSection" ${hideCriticalThreshold}>
+									<th>
+										<label for="cxGlobalCriticalThreshold">Critical</label>
+									</th>
+									<td>
+										<forms:textField name="cxGlobalCriticalThreshold" value="${cxGlobalCriticalThreshold}" className="longField"/>
+										<span class="error" id="invalid_cxGlobalCriticalThreshold"/>
+										
+									</td>
+									</tr>
 						<tr>
 							<th>
 								<label for="cxGlobalHighThreshold">High</label>
@@ -339,7 +366,7 @@
 					<tr>
 		<th>
 			<label for="cxGlobalOsaThresholdEnabled">Enable Dependency Scan Vulnerability Thresholds
-						<bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+						<bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/>
 			</label>
 		</th>
@@ -348,6 +375,15 @@
 		</td>
 	</tr>
 	<tbody id="osaThresholdSection" ${hideOsaThresholdSection}>
+	<tr id="scaCriticalThresholdSection" ${hideScaInput}>
+		<th>
+			<label for="cxGlobalOsaCriticalThreshold">Critical</label>
+		</th>
+		<td>
+			<forms:textField name="cxGlobalOsaCriticalThreshold" value="${cxGlobalOsaCriticalThreshold}" className="longField"/>
+			<span class="error" id="invalid_cxGlobalOsaCriticalThreshold"/>
+		</td>
+	</tr>
 	<tr>
 		<th>
 			<label for="cxGlobalOsaHighThreshold">High</label>
@@ -555,56 +591,7 @@
 				<textarea rows="5" cols="50" name="cxGlobalScaEnvVariable" wrap="off">${cxGlobalScaEnvVariable}</textarea>
 			</td>
 		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalIsExploitablePath">Enable Exploitable Path
-							<bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. In this section, provide details like CxSAST server url, credentials. At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST.
-Example of Project Full Path: CxServer/team1/projectname"/>
-				</label>
-			</th>
-			<td>
-				<forms:checkbox name="cxGlobalIsExploitablePath" value="${cxGlobalIsExploitablePath}" checked="${cxGlobalIsExploitablePath}" onclick="$('expPathSection').toggle()"/>
-			</td>
-		</tr>
-		<tbody id="expPathSection" ${hideExpPathSection}>
-		<tr>
-			<th>
-				<label for="cxGlobalSastServerUrl">Server URL<l:star/>
-				</label>
-			</th>
-			<td>
-				<forms:textField name="cxGlobalSastServerUrl" value="${cxGlobalSastServerUrl}" className="longField"/>
-				<span class="error" id="invalid_cxGlobalSastServerUrl"/>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalSastUsername">Username<l:star/>
-				</label>
-			</th>
-			<td>
-				<forms:textField name="cxGlobalSastUsername" value="${cxGlobalSastUsername}" className="longField"/>
-				<span class="error" id="invalid_cxGlobalSastUsername"/>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<label for="cxGlobalSastPassword">Password<l:star/>
-				</label>
-			</th>
-			<td>
-				<input type="password" id="cxGlobalSastPassword" name="cxGlobalSastPassword" value="${cxGlobalSastPassword}" class="longField"/>
-				<span class="error" id="invalid_cxGlobalSastPassword"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<form>
-					<input id="testScaSastConnection" type="button" name="TestScaSastConnection" value="Connect to Server" onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractGlobalSASTCredentials())"/>
-					<span id="testScaSASTConnectionMsg"/>
-				</form>
-			</td>
-		</tr>
+		
 	</tbody>
 	
 </tbody>

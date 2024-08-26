@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cxplugin</artifactId>
     <groupId>com.checkmarx.teamcity</groupId>
-    <version>2024.1.6</version>
+    <version>2024.3.10</version>
   </parent>
   <artifactId>cxplugin-common</artifactId>
   <packaging>jar</packaging>
@@ -27,6 +27,10 @@
          	<groupId>dom4j</groupId>
          	<artifactId>dom4j</artifactId>
 		</exclusion>
+		<exclusion>
+         	<groupId>org.apache.commons</groupId>
+         	<artifactId>commons-compress</artifactId>
+		</exclusion>
 <!--		<exclusion>-->
 <!--         	<groupId>org.jdom</groupId>-->
 <!--         	<artifactId>jdom</artifactId>-->
@@ -34,6 +38,14 @@
 		<exclusion>
          	<groupId>jdom</groupId>
          	<artifactId>jdom</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.iq80.snappy</groupId>
+			<artifactId>snappy</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>io.netty</groupId>
+		    <artifactId>netty-handler-proxy</artifactId>
 		</exclusion>
 		<exclusion>
          	<groupId>commons-httpclient</groupId>
@@ -46,6 +58,12 @@
       <artifactId>xalan</artifactId>
       <version>2.7.3</version>
     </dependency>
+    
+    <dependency>
+            <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+            <version>1.27.0</version>
+        </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -55,7 +73,17 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.9.0</version>
-    </dependency>
+    </dependency> 
+    <dependency>
+		<groupId>org.iq80.snappy</groupId>
+		<artifactId>snappy</artifactId>
+		<version>0.5</version>
+	</dependency>
+	<dependency>
+		<groupId>io.netty</groupId>
+		<artifactId>netty-handler-proxy</artifactId>
+		<version>4.1.112.Final</version>
+	</dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
@@ -69,7 +97,7 @@
     <dependency>
       <groupId>com.checkmarx</groupId>
       <artifactId>cx-client-common</artifactId>
-      <version>2024.1.1</version>
+      <version>2024.3.26</version>
       <exclusions>
 <!--        <exclusion>-->
 <!--          <groupId>stax</groupId>-->
@@ -119,10 +147,26 @@
          <artifactId>commons-collections</artifactId>
          <groupId>commons-collections</groupId>
         </exclusion>
-<!--        <exclusion>-->
-<!--          <artifactId>vertx-core</artifactId>-->
-<!--          <groupId>io.vertx</groupId>-->
-<!--        </exclusion>-->
+        <exclusion>
+           <groupId>io.vertx</groupId>
+           <artifactId>vertx-web</artifactId>
+        </exclusion>
+        <exclusion>
+    		<groupId>org.bouncycastle</groupId>
+    		<artifactId>bcprov-jdk18on</artifactId>
+		</exclusion>
+		<exclusion>
+			<groupId>org.mozilla</groupId>
+			<artifactId>rhino</artifactId>
+		</exclusion>
+        <exclusion>
+          <artifactId>vertx-core</artifactId>
+          <groupId>io.vertx</groupId>
+        </exclusion>
+        <exclusion>
+			<groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+		</exclusion>
 <!--        <exclusion>-->
 <!--           <groupId>io.vertx</groupId>-->
 <!--           <artifactId>vertx-web</artifactId>-->
@@ -158,11 +202,31 @@
     	<artifactId>guava</artifactId>
     	<version>32.0.1-jre</version>
 	</dependency>
-    <dependency>
-       <artifactId>spring-web</artifactId>
-       <groupId>org.springframework</groupId>
-       <version>5.3.31</version>
+	<dependency>
+          <groupId>io.vertx</groupId>
+          <artifactId>vertx-web</artifactId>
+          <version>4.5.8</version>
+     </dependency>
+     <dependency>
+	    <groupId>org.bouncycastle</groupId>
+	    <artifactId>bcprov-jdk18on</artifactId>
+	    <version>1.78.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.mozilla</groupId>
+		<artifactId>rhino</artifactId>
+		<version>1.7.15</version>
+	</dependency>
+	<dependency>
+        <groupId>io.vertx</groupId>
+		<artifactId>vertx-core</artifactId>
+        <version>4.5.9</version>
     </dependency>
+    <dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+		    <version>4.1.112.Final</version>
+		</dependency>
 <!--    <dependency>-->
 <!--          <groupId>io.vertx</groupId>-->
 <!--          <artifactId>vertx-web</artifactId>-->

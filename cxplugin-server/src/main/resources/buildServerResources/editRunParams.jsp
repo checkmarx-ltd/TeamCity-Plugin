@@ -2,6 +2,7 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <script type="text/javascript" src="<c:url value='${teamcityPluginResourcesPath}testConnection.js'/>"></script>
 
@@ -16,16 +17,17 @@
             isEnableExpPath = jQuery('#isExploitablePath').prop('checked'),
             isEnableSCAResolver = jQuery('#ScaResolverEnabled').prop('checked'),
             isManifestFileEnabled = jQuery('#ManifestFileEnabled').prop('checked'),
-             isOverriding = depScanEnabled && overrideChecked;
-            
-        	isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
+            isOverriding = depScanEnabled && overrideChecked,
+             //isGlobalScaEnabled = $('cxGlobalScaEnabled').value;
+            isGlobalScaEnabled = jQuery('#cxAdminScaEnabled').val(),
+            isSASTOverridingForSCA = isOverriding && isEnableExpPath && (!overrideSASTChecked);
         jQuery('#overrideGlobalDSSettings')[depScanEnabled ? 'show' : 'hide']();
         jQuery('#overrideGlobalSASTSettings')[isEnableExpPath ? 'show' : 'hide']();
         jQuery('.dependencyScanRow')[isOverriding ? 'show' : 'hide']();
-
         jQuery('.osaInput')[isOverriding && osaEnabled ? 'show' : 'hide']();
         jQuery('.scaInput')[isOverriding && scaEnabled ? 'show' : 'hide']();
-        
+        isScaInputCriticalVisible=((isOverriding && scaEnabled) || (!isOverriding && isGlobalScaEnabled));
+    	jQuery('#scaInputCritical')[((''+isScaInputCriticalVisible) =='true') ? 'show' : 'hide']();
         jQuery('.expPath')[isOverriding && scaEnabled && isEnableExpPath && isManifestFileEnabled ? 'show' : 'hide']();
         jQuery('.sastDetailsRow')[isSASTOverridingForSCA && isManifestFileEnabled? 'show' : 'hide']();
         
@@ -48,8 +50,7 @@
         jQuery('#periodicScanSection')[periodindFullScanAfter ? 'show' : 'hide']();
 
     }
-
-    console.log('updatePeriodicScanSectionVisibility');
+    
     jQuery(updatePeriodicScanSectionVisibility);
 
     window.Checkmarx = {
@@ -210,11 +211,6 @@
                         messageElm.css('color','red');
                     }
 
-//                    if(!credentials.global) {
-//                        Checkmarx.populateDropdownList(data.presetList, '#cxPresetId', 'id', 'name');
-//                        Checkmarx.populateDropdownList(data.teamPathList, '#cxTeamId', 'id', 'fullName');
-//                    }
-
                 },
                 error: function (data) {
                 }
@@ -312,14 +308,12 @@ validateSCAParameters: function (credentials) {
 
 
 };
-
-
     </script>
-
 
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="optionsBean" class="com.checkmarx.teamcity.server.CxOptions"/>
+
 
 <style>
     #cxPresetId, #cxTeamId {
@@ -346,6 +340,68 @@ optionsBean.testConnection(cxServerUrl, cxUsername, cxPassword)}
 ${'true'.equals(useSASTDefaultServer) ?
 optionsBean.testSASTConnection(cxGlobalSastServerUrl, cxGlobalSastUsername, cxGlobalSastPassword) :
 optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPassword)}
+
+<c:set var="enableCriticalSeverityFromFile" value=""/>
+<c:set var="buildConfigurationId" value="${buildConfigurationId}" />
+<c:set var="allBuildConfigurations" value="${propertiesBean.properties[optionsBean.enableCriticalSeverity]}"/>
+<c:set var="buildConfigurationArray" value="${fn:split(allBuildConfigurations, '|')}" />
+<c:forEach var="key" items="${buildConfigurationArray}">    
+ <c:if test="${fn:startsWith(key, buildConfigurationId)}">      
+   <c:set var="enableCriticalSeverityFromFile" value="${key}" />
+</c:if> 
+</c:forEach>
+<c:set var="projectNamePartsDelimiter" value="," />
+<c:set var="enabledCriticalSeverity" value="" />
+<c:if test="${enableCriticalSeverityFromFile != null}">
+	<c:set var="projectNameParts" value="${fn:split(enableCriticalSeverityFromFile, projectNamePartsDelimiter)}" />
+	<c:set var="projectNameFromFile" value="" />
+	<c:if test="${projectNameParts != null}">
+		<c:if test="${not empty projectNameParts[0]}">
+			<c:set var="projectNameFromFile" value="${projectNameParts[0]}" />
+		</c:if>
+		<c:if test="${not empty projectNameParts[1]}">
+			<c:set var="enabledCriticalSeverity" value="${projectNameParts[1]}" />
+		</c:if>
+	</c:if>
+</c:if>
+<c:if test="${enabledCriticalSeverity != null}">
+	<c:set var="versionParts" value="${fn:split(enabledCriticalSeverity, '_')}" />
+	<c:set var="version" value="9.0" />
+	<c:if test="${versionParts != null}">
+	<c:if test="${not empty versionParts[0]}">
+		<c:set var="criticalSupportFlag" value="${versionParts[0]}" />
+	</c:if>
+	<c:if test="${not empty versionParts[1]}">
+		<c:set var="version" value="${Double.parseDouble(versionParts[1])}" />
+	</c:if>
+	<c:if test="${not empty versionParts[2]}">
+		<c:set var="previousVersion" value="${Double.parseDouble(versionParts[2])}" />
+	</c:if>
+	<c:if test="${not empty versionParts[3]}">
+		<c:set var="updatedUrl" value="${versionParts[3]}" />
+	</c:if>
+	<c:choose> 
+		<c:when test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
+		<c:set var="urlForCurrentVersion" value="${propertiesBean.properties[optionsBean.globalServerUrl]}" /> 
+		</c:when>
+	<c:otherwise>
+		<c:set var="urlForCurrentVersion" value="${propertiesBean.properties[optionsBean.serverUrl]}" /> 
+	</c:otherwise>
+	</c:choose>
+		<c:if test="${urlForCurrentVersion != updatedUrl}">
+			<c:set var="version" value="${previousVersion}" />
+		</c:if>
+	</c:if>
+</c:if>
+<c:choose> 
+<c:when test="${version >= 9.7}">
+<c:set var="hidelocalCriticalThreshold" value=""/>
+</c:when>
+<c:otherwise>
+<c:set var="hidelocalCriticalThreshold" value="style='display:none'"/>
+</c:otherwise>
+</c:choose>
+
 
 <c:if test="${propertiesBean.properties[optionsBean.useDefaultServer] == 'true'}">
     <c:set var="hideServerOverrideSection" value="${optionsBean.noDisplay}"/>
@@ -380,6 +436,13 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
 </c:if>
 <c:if test="${propertiesBean.properties[optionsBean.globalProjectPolicyViolation] != 'true'}">
     <c:set var="globalProjectPolicydEnabled" value="false"/>
+</c:if>
+<c:set var="scanType" value="cxGlobalDependencyScanType"/>
+<c:if test="${propertiesBean.properties[scanType] == 'SCA'}">
+    <c:set var="globalScaScanEnabled" value="true"/>
+</c:if>
+<c:if test="${propertiesBean.properties[scanType] != 'SCA'}">
+    <c:set var="globalScaScanEnabled" value="false"/>
 </c:if>
 
 <c:if test="${propertiesBean.properties[optionsBean.globalProjectSCAPolicyViolation] == 'true'}">
@@ -711,7 +774,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
             <bs:helpIcon iconTitle="Select CxOSA to perform dependency scan using CxOSA"/>
         </label></th>
         <td>
-            <props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
+        	<props:radioButtonProperty name="${optionsBean.dependencyScannerType}" onclick="updateDependencyScanSectionVisibility()" value="OSA" id="OsaEnabled"/>
         </td>
     </tr>
     <tr class="dependencyScanRow osaInput">
@@ -737,8 +800,7 @@ optionsBean.testSASTConnection(scaSASTServerUrl, scaSASTUserName, scaSASTPasswor
         <th><label for="enableSca">Use CxSCA dependency Scanner
             <bs:helpIcon iconTitle="Select SCA to perform dependency scan using CxSCA"/>
         </label></th>
-
-        <td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
+		<td><props:radioButtonProperty name="${optionsBean.dependencyScannerType}" id="enableSca" value="SCA"
                                        onclick="updateDependencyScanSectionVisibility()"/></td>
 
     </tr>
@@ -863,74 +925,6 @@ Example: param1:value1,param2:value2"/>
         </td>
     </tr>
     
-    <tr class="dependencyScanRow scaInput enableManifestFile">
-        <th><label for="${optionsBean.isExploitablePath}">Enable Exploitable Path
-            <bs:helpIcon iconTitle="Exploitable Path feature will attempt to co-relate CxSCA scan with the available CxSAST scan results. 
-In this section, provide details like CxSAST server url, credentials.
-At the job level, two more parameters need to be configured. These project full path name and/or project id from CxSAST. 
-<p>
-Example of Project Full Path: CxServer/team1/projectname."/>
-        </label></th>
-        <td> 
-       
-        <props:checkboxProperty name="${optionsBean.isExploitablePath}" onclick="updateDependencyScanSectionVisibility()"/>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath">
-        <th>
-            <label for="${optionsBean.useSASTDefaultServer}">Use Global Credentials<br>
-            Server URL: ${propertiesBean.properties[optionsBean.globalSastServerUrl]}, <br>
-            Username: ${propertiesBean.properties[optionsBean.globalSastUsername]}</label>
-        </th>
-        <td>
-            <props:checkboxProperty name="${optionsBean.useSASTDefaultServer}" onclick="updateDependencyScanSectionVisibility()"/>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTServerUrl}">Server URL<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTServerUrl}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTServerUrl}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTUserName}">Username<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTUserName}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTUserName}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-        <th><label for="${optionsBean.scaSASTPassword}">Password<l:star/></label></th>
-        <td>
-            <props:passwordProperty name="${optionsBean.scaSASTPassword}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTPassword}"></span>
-        </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath sastDetailsRow">
-    <td>
-        <form>
-            <input id="testScaSASTConnection" type="button" name="TestSASTConnection" value="Connect to Server"
-                   onclick="Checkmarx.testScaSASTConnection(Checkmarx.extractSASTCredentials())"/>
-            <span id="testScaSASTConnectionMsg"></span>
-        </form>
-    </td>
-    </tr>
-    <tr class="dependencyScanRow scaInput expPath">
-        <th><label for="${optionsBean.scaSASTProjectFullPath}">Project Full Path<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTProjectFullPath}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTProjectFullPath}"></span>
-        </td>
-    </tr>
-    
-    <tr  class="dependencyScanRow scaInput expPath">
-        <th><label for="${optionsBean.scaSASTProjectID}">Project ID<l:star/></label></th>
-        <td>
-            <props:textProperty name="${optionsBean.scaSASTProjectID}" className="longField"/>
-            <span class="error" id="error_${optionsBean.scaSASTProjectID}"></span>
-        </td>
-    </tr>
    
     <!-- END SCA FEATURES -->
     
@@ -1007,11 +1001,27 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody id="thresholdSection" ${hideThresholdSection}>
+						<tr style='display:none'>
+							<th><label for="${optionsBean.enableCriticalSeverity}">Enable
+									Critical Severity</label></th>
+							<td><props:textProperty
+									name="${optionsBean.enableCriticalSeverity}" /></td>
+						</tr>
+						<tr>
+					
+		                    <tr id="CriticalField" ${hidelocalCriticalThreshold}>
+		                    <th><label for="${optionsBean.criticalThreshold}">Critical</label></th>
+		                    <td>
+		                        <props:textProperty name="${optionsBean.criticalThreshold}" className="longField"/>
+		                        <span class="error" id="error_${optionsBean.criticalThreshold}"></span>            
+		                    </td>
+		                    </tr>
+               			 </tr>
                 <tr>
                     <th><label for="${optionsBean.highThreshold}">High</label></th>
                     <td>
                         <props:textProperty name="${optionsBean.highThreshold}" className="longField"/>
-                        <span class="error" id="error_${optionsBean.highThreshold}"></span>
+                        <span class="error" id="error_${optionsBean.highThreshold}"></span>	               
                     </td>
                 </tr>
                 <tr>
@@ -1034,7 +1044,7 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 <tbody id="osaThresholdSection">
                 <tr>
                     <th><label for="${optionsBean.osaThresholdEnabled}">Enable Dependency Scan Vulnerability Thresholds
-                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/></label>
                     </th>
                     <td>
@@ -1045,6 +1055,18 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                         <props:checkboxProperty name="${optionsBean.osaThresholdEnabled}" onclick="${onclick}"/>
                     </td>
                 </tr>
+                <tbody>
+                <input type="text" id="cxAdminScaEnabled" name="cxAdminScaEnabled" value="${globalScaScanEnabled}" style='display:none'>
+                </tbody>
+                <tbody id="scaInputCritical">
+                	<tr class="osaThresholdRow" ${hideOsaThresholdSection}>
+	                    <th><label for="${optionsBean.osaCriticalThreshold}">Critical</label></th>
+	                    <td>
+	                        <props:textProperty name="${optionsBean.osaCriticalThreshold}" className="longField"/>
+	                        <span class="error" id="error_${optionsBean.osaCriticalThreshold}"></span>
+	                    </td>
+                    </tr>
+                </tbody>
                 <tr class="osaThresholdRow" ${hideOsaThresholdSection}>
                     <th><label for="${optionsBean.osaHighThreshold}">High</label></th>
                     <td>
@@ -1113,6 +1135,13 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 </tr>
 
                 <tbody  ${globalThresholdEnabled ? '' : optionsBean.noDisplay}>
+                <tr ${hidelocalCriticalThreshold}>
+                    <th>Critical</th>
+                    <td>
+                        <input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalCriticalThreshold]}">
+                    </td>
+                </tr>
                 <tr>
                     <th>High</th>
                     <td>
@@ -1139,10 +1168,17 @@ Example of Project Full Path: CxServer/team1/projectname."/>
                 <tbody id="globalOsaThresholdSection">
                 <tr>
                     <th>Enable Dependency Scan Vulnerability Thresholds
-                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break.</br>
+                        <bs:helpIcon iconTitle="Severity vulnerability threshold. If the number of vulnerabilities exceeds the threshold, build will break. Critical severity thresholds are supported for SCA Scan. Not supported for OSA dependency scans.</br>
                         Leave blank for no thresholds."/></th>
                     <td>
                         <input type="checkbox" disabled ${globalOsaThresholdEnabled ? 'checked' : ''}/>
+                    </td>
+                </tr>
+                <tr ${globalOsaThresholdEnabled ? '' : optionsBean.noDisplay}>
+                    <th>Critical</th>
+                    <td>
+                        <input type="text" class="longField" disabled
+                               value="${propertiesBean.properties[optionsBean.globalOsaCriticalThreshold]}">
                     </td>
                 </tr>
                 <tr ${globalOsaThresholdEnabled ? '' : optionsBean.noDisplay}>
@@ -1175,3 +1211,42 @@ Example of Project Full Path: CxServer/team1/projectname."/>
     </tbody>
 
 </l:settingsGroup>
+
+<script type="text/javascript">
+let hasReloaded = localStorage.getItem('hasReloaded');
+const config = { childList: true, attributes: true, subtree: true};
+const error_cxCriticalThreshold = document.getElementById('error_cxCriticalThreshold');
+const criticalThresholdErrorObserver = new MutationObserver(criticalThresholdErrorCallback);
+function criticalThresholdErrorCallback(mutationsList, criticalThresholdErrorObserver) {
+	for (let mutation of mutationsList) {
+	    if (mutation.type === "childList") {
+	      if (error_cxCriticalThreshold.textContent == 'The configured SAST version supports Critical severity. Critical threshold can also be configured.' && !hasReloaded) {
+	          error_cxCriticalThreshold.textContent = 'The configured SAST version supports Critical severity. Critical threshold can also be configured.. ';
+	          localStorage.setItem('hasReloaded', 'true');
+	          window.location.reload();
+	      }
+	    }
+	}
+}
+criticalThresholdErrorObserver.observe(error_cxCriticalThreshold, config);
+
+const error_cxHighThreshold = document.getElementById('error_cxHighThreshold');
+const highThresholdErrorObserver = new MutationObserver(highThresholdErrorCallback);
+function highThresholdErrorCallback(mutationsList, highThresholdErrorObserver) {
+	for (let mutation of mutationsList) {
+	    if (mutation.type === "childList") {
+	      if (error_cxHighThreshold.textContent == 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.' && !hasReloaded) {
+	          error_cxHighThreshold.textContent = 'The configured SAST version does not support Critical severity. Critical threshold can not be configured.. ';
+	          localStorage.setItem('hasReloaded', 'true');
+	          window.location.reload();
+	      }
+	    }
+	}
+}
+highThresholdErrorObserver.observe(error_cxHighThreshold, config);
+
+// Clear the reload flag when the page is fully loaded
+window.addEventListener('load', () => {
+	localStorage.removeItem('hasReloaded');
+});
+</script>
